@@ -7,6 +7,7 @@ scalaVersion  := "2.10.3"
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 resolvers ++= Seq(
+  "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases",
   "spray repo" at "http://repo.spray.io/",
   "Guardian GitHub Releases" at "http://guardian.github.io/maven/repo-releases"
 )
@@ -21,10 +22,11 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
     "com.typesafe.akka"   %%  "akka-testkit"  % akkaV,
     "org.specs2"          %%  "specs2"        % "2.2.3" % "test",
+    "org.scalacheck"      %%  "scalacheck"    % "1.10.0" % "test",
     "com.gu"              %%  "management-internal" % "5.32",
     "com.gu"              %%  "configuration" % "3.10",
     "com.gu"              %%  "mobile-notifications-client" % "0.1",
-    "com.gu"              %%  "pa-client" % "4.0" 
+    "com.gu"              %%  "pa-client"     % "4.0" 
   )
 }
 

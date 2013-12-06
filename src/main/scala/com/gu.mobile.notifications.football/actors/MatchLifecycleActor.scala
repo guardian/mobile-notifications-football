@@ -54,7 +54,7 @@ class MatchLifecycleActor(apiClient: PaClient) extends Actor with ActorLogging {
         log.info(s"Updated match info for ${matchDay.summaryString}")
       }
 
-      // do update, diff
+
     }
   }
 
