@@ -7,7 +7,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.gu.mobile.notifications.football.management.MobileNotificationsManagementServer
-import com.gu.mobile.notifications.football.actors.MatchLifecycleActor
+import com.gu.mobile.notifications.football.actors.MatchDayObserverActor
 import com.gu.mobile.notifications.football.lib.PaFootballClient
 
 object Boot extends App {
@@ -21,7 +21,7 @@ object Boot extends App {
   // start a new HTTP server on port 8080 with our service actor as the handler
   IO(Http) ? Http.Bind(service, interface = "localhost", port = 8080)
 
-  val matchLifecycleActor = system.actorOf(MatchLifecycleActor.props(PaFootballClient))
+  val matchLifecycleActor = system.actorOf(MatchDayObserverActor.props(PaFootballClient))
 
   MobileNotificationsManagementServer.start()
 }
