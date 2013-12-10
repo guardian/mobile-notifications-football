@@ -13,7 +13,9 @@ object MatchDayObserverActor {
 
   case object Refresh extends Message
   case class UpdatedMatchDays(matchDays: List[MatchDay]) extends Message
-  case class GoalEvent(goal: Goal) extends Message
+  case class GoalEvent(goal: Goal, matchDay: MatchDay) extends Message
+  case object GetCurrentLiveMatches extends Message
+  case class CurrentLiveMatches(matchDays: List[MatchDay]) extends Message
 
   val RefreshDelay = 15.seconds
 
@@ -52,18 +54,26 @@ class MatchDayObserverActor(apiClient: PaClient) extends Actor with ActorLogging
     }
 
     case UpdatedMatchDays(newMatchDays) => {
+      val liveMatches = newMatchDays.filter(_.liveMatch)
+      log.info(s"Got ${newMatchDays.length} matches of which ${liveMatches.length} are live")
+      if (liveMatches.nonEmpty) {
+        log.info(s"Currently live: ${liveMatches.map(_.summaryString).mkString(", ")}")
+      }
+
       previousMatchDays foreach { oldMatchDays =>
         /** Calculate delta */
         for ((oldMatchDay, newMatchDay) <- Lists.pairs(oldMatchDays, newMatchDays)(_.id)) {
           delta(oldMatchDay, newMatchDay) foreach { goal =>
-            log.info(s"${goal.scorerName} scored for ${goal.team.name} at ${goal.minute} minute")
-            context.parent ! GoalEvent(goal)
+            log.info(s"${goal.scorerName} scored for ${goal.scoringTeam.name} at ${goal.minute} minute")
+            context.parent ! GoalEvent(goal, newMatchDay)
           }
         }
       }
 
       previousMatchDays = Some(newMatchDays)
     }
+
+    case GetCurrentLiveMatches => sender ! CurrentLiveMatches(previousMatchDays getOrElse Nil)
   }
 
   def scheduleRefresh(delay: FiniteDuration) = context.system.scheduler.scheduleOnce(delay, self, Refresh)

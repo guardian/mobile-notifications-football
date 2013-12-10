@@ -22,7 +22,7 @@ object Pa {
     }
   }
 
-  case class Goal(minute: Int, scorerName: String, team: MatchDayTeam)
+  case class Goal(minute: Int, scorerName: String, scoringTeam: MatchDayTeam)
 
   def delta(matchDay1: MatchDay, matchDay2: MatchDay): Set[Goal] = matchDay2.goals.toSet diff matchDay1.goals.toSet
 }
