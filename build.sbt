@@ -1,4 +1,4 @@
-organization  := "com.gu.mobile.notifications.football"
+organization  := "com.gu.mobile.notifications"
 
 version       := "0.1"
 
