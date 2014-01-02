@@ -8,14 +8,14 @@ import akka.util.Timeout
 import scala.concurrent.duration._
 import com.gu.mobile.notifications.football.management.MobileNotificationsManagementServer
 import com.gu.mobile.notifications.football.actors.{GoalNotificationsManagerActor, GoalNotificationSenderActor, MatchDayObserverActor}
-import com.gu.mobile.notifications.football.lib.{NotificationsClient, PaFootballClient}
+import com.gu.mobile.notifications.football.lib.{PaMatchDayClient, NotificationsClient, PaFootballClient}
 
 object Boot extends App {
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("goal-notifications-system")
 
   val notificationsManager = system.actorOf(
-    GoalNotificationsManagerActor.props(PaFootballClient, NotificationsClient),
+    GoalNotificationsManagerActor.props(PaMatchDayClient(PaFootballClient), NotificationsClient),
     "goal-notifications-manager"
   )
   // create and start our service actor

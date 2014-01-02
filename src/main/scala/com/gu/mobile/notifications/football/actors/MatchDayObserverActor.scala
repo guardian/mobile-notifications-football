@@ -2,11 +2,10 @@ package com.gu.mobile.notifications.football.actors
 
 import akka.actor.{Props, ActorLogging, Actor}
 import com.gu.mobile.notifications.football.lib.Pa._
-import pa.{MatchDay, PaClient}
-import org.joda.time.DateTime
+import pa.MatchDay
 import scala.util.{Failure, Success}
 import scala.concurrent.duration._
-import com.gu.mobile.notifications.football.lib.Lists
+import com.gu.mobile.notifications.football.lib.{MatchDayClient, Lists}
 
 object MatchDayObserverActor {
   sealed trait Message
@@ -19,16 +18,16 @@ object MatchDayObserverActor {
 
   val RefreshDelay = 15.seconds
 
-  def props(paClient: PaClient) = Props(classOf[MatchDayObserverActor], paClient)
+  def props(matchDayClient: MatchDayClient) = Props(classOf[MatchDayObserverActor], matchDayClient)
 }
 
 /** Actor that polls PA's match day endpoint, watching for goals.
   *
   * If the actor sees any goals, it sends an alert to its parent.
   *
-  * @param apiClient PA football client
+  * @param matchDayClient PA football client
   */
-class MatchDayObserverActor(apiClient: PaClient) extends Actor with ActorLogging {
+class MatchDayObserverActor(matchDayClient: MatchDayClient) extends Actor with ActorLogging {
   import MatchDayObserverActor._
   import context.dispatcher
 
@@ -40,7 +39,7 @@ class MatchDayObserverActor(apiClient: PaClient) extends Actor with ActorLogging
     case Refresh => {
       log.info("Refreshing ...")
 
-      apiClient.matchDay(DateTime.now.toDateMidnight) onComplete {
+      matchDayClient.today onComplete {
         case Success(newMatchDays) => {
           self ! UpdatedMatchDays(newMatchDays)
           scheduleRefresh(RefreshDelay)

@@ -1,12 +1,12 @@
 package com.gu.mobile.notifications.football.actors
 
 import akka.actor.{Props, OneForOneStrategy, Actor}
-import pa.PaClient
 import akka.actor.SupervisorStrategy.Restart
 import com.gu.mobile.notifications.client.ApiClient
 import akka.util.Timeout
 import akka.pattern.{ask, pipe}
 import scala.concurrent.duration._
+import com.gu.mobile.notifications.football.lib.MatchDayClient
 
 object GoalNotificationsManagerActor {
   sealed trait Message
@@ -14,8 +14,8 @@ object GoalNotificationsManagerActor {
   case object GetHistory extends Message
   case object GetLiveMatches extends Message
 
-  def props(paClient: PaClient, notificationsApi: ApiClient) =
-    Props(classOf[GoalNotificationsManagerActor], paClient, notificationsApi)
+  def props(matchDayClient: MatchDayClient, notificationsApi: ApiClient) =
+    Props(classOf[GoalNotificationsManagerActor], matchDayClient, notificationsApi)
 }
 
 /** What a mouthful! It's like being in Java-land!
@@ -23,7 +23,7 @@ object GoalNotificationsManagerActor {
   * This class just basically manages death watch on the other classes and allows the HTTP API to query the internal
   * state of the system
   */
-class GoalNotificationsManagerActor(paClient: PaClient, notificationsApi: ApiClient) extends Actor {
+class GoalNotificationsManagerActor(matchDayClient: MatchDayClient, notificationsApi: ApiClient) extends Actor {
   import GoalNotificationsManagerActor._
   import GoalNotificationSenderActor._
   import MatchDayObserverActor._
@@ -31,7 +31,7 @@ class GoalNotificationsManagerActor(paClient: PaClient, notificationsApi: ApiCli
 
   import context.dispatcher
 
-  val matchDayObserver = context.system.actorOf(MatchDayObserverActor.props(paClient))
+  val matchDayObserver = context.system.actorOf(MatchDayObserverActor.props(matchDayClient))
   val goalNotificationSender = context.system.actorOf(GoalNotificationSenderActor.props(notificationsApi))
   val notificationsHistory = context.system.actorOf(GoalNotificationHistoryActor.props())
 

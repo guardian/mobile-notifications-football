@@ -1,14 +1,22 @@
 package com.gu.mobile.notifications.football.lib
 
-import org.specs2.{ScalaCheck, Specification}
 import org.scalacheck.Gen
+import org.scalacheck.Prop.forAll
+import org.scalatest.WordSpec
 
-class IntegerStringSpec extends Specification with ScalaCheck {
+class IntegerStringSpec extends WordSpec {
   implicit val arbitraryNonDigitString = Gen.alphaStr
 
-  def is = "convert integer strings into integers" ! prop { n: Int =>
-    IntegerString.unapply(n.toString) mustEqual Some(n)
-  } ^ "return None for non-integer strings" ! prop { s: String =>
-    IntegerString.unapply(s) mustEqual None
+  "IntegerString" when {
+    "given an integer as a string" should {
+      "return it as an integer" in {
+        forAll { n: Int => IntegerString.unapply(n.toString) == Some(n) }
+      }
+    }
+    "given some other string" should {
+      "return None" in {
+        forAll { s: String => IntegerString.unapply(s) == None  }
+      }
+    }
   }
 }

@@ -1,15 +1,13 @@
 package com.gu.mobile.notifications.football.actors
 
 import akka.testkit.TestActorRef
-import org.specs2.Specification
 import com.gu.mobile.notifications.football.actors.GoalNotificationSenderActor.SentNotification
 import org.joda.time.DateTime
 import com.gu.mobile.notifications.client.models.{MessagePayloads, Target, Notification}
-import akka.actor.ActorSystem
+import TestActorSystem._
+import org.scalatest.WordSpec
 
-class GoalNotificationHistoryActorSpec extends Specification {
-  implicit val testActorSystem = ActorSystem("test")
-
+class GoalNotificationHistoryActorSpec extends WordSpec {
   val fixture1 = SentNotification(
     new DateTime(),
     Notification(
@@ -34,23 +32,31 @@ class GoalNotificationHistoryActorSpec extends Specification {
     )
   )
 
-  def is = "record history" ! {
-    val actorRef = TestActorRef[GoalNotificationHistoryActor]
+  "GoalNotificationHistoryActor" when {
+    "empty and sent a new notification" should {
+      "prepend it to its history" in {
+        val actorRef = TestActorRef[GoalNotificationHistoryActor]
 
-    actorRef ! fixture1
+        actorRef ! fixture1
 
-    actorRef.underlyingActor.history mustEqual List(fixture1)
-  } ^ "limit the size of the history" ! {
-    val actorRef = TestActorRef[GoalNotificationHistoryActor]
-
-    (1 to (GoalNotificationHistoryActor.MaxSize * 3)) foreach { _ =>
-      actorRef ! fixture1
+        actorRef.underlyingActor.history == List(fixture1)
+      }
     }
 
-    actorRef ! fixture2
+    "full and sent a new notification" should {
+      val actorRef = TestActorRef[GoalNotificationHistoryActor]
+      (1 to (GoalNotificationHistoryActor.MaxSize * 3)) foreach { _ =>
+        actorRef ! fixture1
+      }
+      actorRef ! fixture2
 
-    val expectedHistory = fixture2 :: List.fill(GoalNotificationHistoryActor.MaxSize - 1)(fixture1)
+      "prepend it to its history" in {
+        actorRef.underlyingActor.history.headOption == Some(fixture2)
+      }
 
-    actorRef.underlyingActor.history mustEqual expectedHistory
+      "limit the size of its history to MaxSize" in {
+        actorRef.underlyingActor.history.size == GoalNotificationHistoryActor.MaxSize
+      }
+    }
   }
 }

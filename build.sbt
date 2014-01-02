@@ -24,7 +24,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
     "com.typesafe.akka"   %%  "akka-testkit"  % akkaV,
     "com.typesafe.akka"   %%  "akka-slf4j"    % akkaV,
-    "org.specs2"          %%  "specs2"        % "2.2.3" % "test",
+    "org.scalatest"       %   "scalatest_2.10" % "2.0" % "test",
     "org.scalacheck"      %%  "scalacheck"    % "1.10.0" % "test",
     "com.gu"              %%  "management-internal" % guardianManagementVersion,
     "com.gu"              %%  "management-logback" % guardianManagementVersion,

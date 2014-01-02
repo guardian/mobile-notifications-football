@@ -1,15 +1,25 @@
 package com.gu.mobile.notifications.football.lib
 
-import org.specs2._
 import ArbitraryScorerString._
+import org.scalatest.WordSpec
+import org.scalacheck.Prop.forAll
 
-class ScorerMatcherSpec extends Specification with ScalaCheck {
-  def is =
-    "match string" ! prop { (scorer: ScorerString) => Pa.ScorerMatcher.findFirstMatchIn(scorer.toString).isDefined } ^
-    "extract name" ! prop { (scorer: ScorerString) =>
-      Pa.ScorerMatcher.findFirstMatchIn(scorer.toString).get.group(1) mustEqual scorer.fullName
-    } ^
-    "extract minute" ! prop { (scorer: ScorerString) =>
-      Pa.ScorerMatcher.findFirstMatchIn(scorer.toString).get.group(2).toInt mustEqual scorer.minute
+class ScorerMatcherSpec extends WordSpec {
+  "ScorerMatcher" when {
+    "applied to a scorer string" should {
+      "match it" in {
+        forAll { (scorer: ScorerString) => Pa.ScorerMatcher.findFirstMatchIn(scorer.toString).isDefined }
+      }
+      "extract the Scorer's name" in {
+        forAll { (scorer: ScorerString) =>
+          Pa.ScorerMatcher.findFirstMatchIn(scorer.toString).get.group(1) == scorer.fullName
+        }
+      }
+      "extract the minute of the goal" in {
+        forAll { (scorer: ScorerString) =>
+          Pa.ScorerMatcher.findFirstMatchIn(scorer.toString).get.group(2).toInt == scorer.minute
+        }
+      }
     }
+  }
 }

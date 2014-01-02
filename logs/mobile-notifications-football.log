@@ -369,3 +369,4 @@ rvm_version=1.23.8 (stable)
 2014-01-02 16:27:57,663 [test-akka.actor.default-dispatcher-3] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
 2014-01-02 16:36:50,545 [test-akka.actor.default-dispatcher-3] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
 2014-01-02 16:39:05,335 [test-akka.actor.default-dispatcher-2] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+2014-01-02 17:59:34,590 [test-akka.actor.default-dispatcher-4] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
