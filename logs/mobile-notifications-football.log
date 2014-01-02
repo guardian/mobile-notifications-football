@@ -1,0 +1,371 @@
+2014-01-02 14:57:04,584 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+2014-01-02 14:57:04,671 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:57:05,336 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  com.gu.conf.impl.SetupConfiguration - Loading setup properties from file:///etc/gu/install_vars
+2014-01-02 14:57:05,577 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - INT_SERVICE_DOMAIN: gudev.gnl
+2014-01-02 14:57:05,577 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - Configuring application mobile-notifications-football using classpath configuration directory conf/mobile-notifications-football
+2014-01-02 14:57:05,579 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - Loading developer account override properties from file:///home/robert/.gu/mobile-notifications-football.properties
+2014-01-02 14:57:05,595 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - Loading operations properties from file:///etc/gu/mobile-notifications-football.properties
+2014-01-02 14:57:05,595 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  com.gu.conf.impl.PropertiesLoader - Ignoring missing configuration file:///etc/gu/mobile-notifications-football.properties
+2014-01-02 14:57:05,603 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - Loading developer stage based properties from classpath:conf/mobile-notifications-football/DEV.properties
+2014-01-02 14:57:05,614 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  com.gu.conf.impl.PropertiesLoader - Ignoring missing configuration classpath:conf/mobile-notifications-football/DEV.properties
+2014-01-02 14:57:05,615 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - Loading developer service domain based properties from classpath:conf/mobile-notifications-football/gudev.gnl.properties
+2014-01-02 14:57:05,615 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  com.gu.conf.impl.PropertiesLoader - Ignoring missing configuration classpath:conf/mobile-notifications-football/gudev.gnl.properties
+2014-01-02 14:57:05,615 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - Loading developer common properties from classpath:conf/mobile-notifications-football/global.properties
+2014-01-02 14:57:05,616 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  com.gu.conf.impl.PropertiesLoader - Ignoring missing configuration classpath:conf/mobile-notifications-football/global.properties
+2014-01-02 14:57:05,616 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - Loading system environment variables
+2014-01-02 14:57:05,644 [run-main] WARN  c.g.m.internal.ManagementServer$ - Could not create management port file at /var/run/ports/mobile-notifications-football.port
+java.io.IOException: No such file or directory
+	at java.io.UnixFileSystem.createFileExclusively(Native Method) ~[na:1.7.0_45]
+	at java.io.File.createNewFile(File.java:1006) ~[na:1.7.0_45]
+	at scalax.io.support.FileUtils$$anonfun$scalax$io$support$FileUtils$$preOpen$1.apply(FileUtils.scala:66) ~[scala-io-core_2.10-0.4.1.jar:0.4.1]
+	at scalax.io.support.FileUtils$$anonfun$scalax$io$support$FileUtils$$preOpen$1.apply(FileUtils.scala:58) ~[scala-io-core_2.10-0.4.1.jar:0.4.1]
+2014-01-02 14:57:05,649 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.c.GuardianConfigurationStrategy - Configured webapp mobile-notifications-football with properties:
+
+# Properties from file:///home/robert/.gu/mobile-notifications-football.properties
+pa.api_key=dxj451p9
+
+# Properties from file:///etc/gu/mobile-notifications-football.properties
+
+# Properties from classpath:conf/mobile-notifications-football/DEV.properties
+
+# Properties from classpath:conf/mobile-notifications-football/gudev.gnl.properties
+
+# Properties from classpath:conf/mobile-notifications-football/global.properties
+
+# Properties from Environment
+COLORTERM=gnome-terminal
+COMPIZ_CONFIG_PROFILE=ubuntu
+CONTENT_API_TARGET_URI=http://prod-mq-elb.content.guardianapis.com/api
+CONTENT_API_USER_TIER=internal
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-2lTI9qgu0x,guid=f2dfe7727cc5b956deda361900000027
+DEFAULTS_PATH=/usr/share/gconf/ubuntu.default.path
+DESKTOP_SESSION=ubuntu
+DISPLAY=:0
+GDMSESSION=ubuntu
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+GNOME_KEYRING_CONTROL=/tmp/keyring-GZHheY
+GNOME_KEYRING_PID=1699
+GPG_AGENT_INFO=/tmp/keyring-GZHheY/gpg:0:1
+HOME=/home/robert
+LANG=en_GB.UTF-8
+LANGUAGE=en_GB:en
+LESSCLOSE=/usr/bin/lesspipe %s %s
+LESSOPEN=| /usr/bin/lesspipe %s
+LIBGL_DRIVERS_PATH=/usr/lib/fglrx/dri:/usr/lib32/fglrx/dri
+LOGNAME=robert
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:
+MANDATORY_PATH=/usr/share/gconf/ubuntu.mandatory.path
+NLSPATH=/usr/dt/lib/nls/msg/%L/%N.cat
+NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
+PATH=/home/robert/Android/sdk/platform-tools:/home/robert/Android/sdk/tools/:/home/robert/bin/idea/bin:/home/robert/bin:/home/robert/bin/idea/bin:/home/robert/bin:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/robert/.rvm/bin
+PWD=/home/robert/Git/mobile-notifications-football
+SESSION_MANAGER=local/gnm41076:@/tmp/.ICE-unix/1710,unix/gnm41076:/tmp/.ICE-unix/1710
+SHELL=/bin/bash
+SHLVL=2
+SSH_AGENT_PID=1747
+SSH_AUTH_SOCK=/tmp/keyring-GZHheY/ssh
+TERM=xterm
+UBUNTU_MENUPROXY=libappmenu.so
+USER=robert
+WINDOWID=54541859
+XAUTHORITY=/home/robert/.Xauthority
+XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/etc/xdg
+XDG_CURRENT_DESKTOP=Unity
+XDG_DATA_DIRS=/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+XDG_SESSION_COOKIE=364f59b1b4cb5121adc715c80000000a-1388655719.722314-1255015826
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+XFILESEARCHPATH=/usr/dt/app-defaults/%L/Dt
+_=/usr/bin/java
+_system_arch=x86_64
+_system_name=Ubuntu
+_system_type=Linux
+_system_version=12.04
+rvm_bin_path=/home/robert/.rvm/bin
+rvm_path=/home/robert/.rvm
+rvm_prefix=/home/robert
+rvm_version=1.23.8 (stable)
+
+
+2014-01-02 14:57:06,175 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  spray.can.server.HttpListener - Bound to localhost/127.0.0.1:8080
+2014-01-02 14:57:06,223 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:57:21,240 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:57:21,287 [goal-notifications-system-akka.actor.default-dispatcher-4] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:57:36,300 [goal-notifications-system-akka.actor.default-dispatcher-4] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:57:36,356 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:57:51,370 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:57:51,416 [goal-notifications-system-akka.actor.default-dispatcher-4] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:58:06,430 [goal-notifications-system-akka.actor.default-dispatcher-4] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:58:06,486 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:58:21,499 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:58:21,553 [goal-notifications-system-akka.actor.default-dispatcher-4] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:58:36,570 [goal-notifications-system-akka.actor.default-dispatcher-4] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:58:36,628 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:58:51,640 [goal-notifications-system-akka.actor.default-dispatcher-8] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:58:51,700 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:59:06,720 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:59:06,782 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:59:21,800 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:59:21,852 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:59:36,870 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:59:36,924 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 0 are live
+2014-01-02 14:59:51,940 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 14:59:51,989 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 1 are live
+2014-01-02 14:59:51,989 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:00:06,999 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:00:07,052 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 1 are live
+2014-01-02 15:00:07,052 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:00:22,069 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:00:22,112 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 1 are live
+2014-01-02 15:00:22,112 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:00:37,129 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:00:37,176 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 1 are live
+2014-01-02 15:00:37,176 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:00:52,190 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:00:52,239 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 1 are live
+2014-01-02 15:00:52,239 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:01:07,249 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:01:07,344 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 1 are live
+2014-01-02 15:01:07,345 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:01:22,360 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:01:22,419 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 2 are live
+2014-01-02 15:01:22,419 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:01:37,429 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:01:37,484 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 2 are live
+2014-01-02 15:01:37,484 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:01:52,500 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:01:52,541 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 2 are live
+2014-01-02 15:01:52,541 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:02:07,559 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:02:07,610 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 3 are live
+2014-01-02 15:02:07,611 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:02:22,630 [goal-notifications-system-akka.actor.default-dispatcher-8] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:02:22,673 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 3 are live
+2014-01-02 15:02:22,673 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0
+2014-01-02 15:02:37,690 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:02:37,748 [goal-notifications-system-akka.actor.default-dispatcher-8] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 5 are live
+2014-01-02 15:02:37,748 [goal-notifications-system-akka.actor.default-dispatcher-8] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:02:52,760 [goal-notifications-system-akka.actor.default-dispatcher-8] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:02:52,803 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 6 are live
+2014-01-02 15:02:52,803 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:03:07,820 [goal-notifications-system-akka.actor.default-dispatcher-8] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:03:07,867 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 6 are live
+2014-01-02 15:03:07,867 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:03:22,879 [goal-notifications-system-akka.actor.default-dispatcher-5] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:03:22,922 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 6 are live
+2014-01-02 15:03:22,923 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Alloa vs Cowdenbeath at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:03:37,940 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:03:38,016 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 7 are live
+2014-01-02 15:03:38,017 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:03:53,030 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:03:53,070 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 7 are live
+2014-01-02 15:03:53,070 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:04:08,080 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:04:08,129 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 7 are live
+2014-01-02 15:04:08,130 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:04:23,150 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:04:23,188 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:04:23,189 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:04:38,199 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:04:38,351 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:04:38,351 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:04:53,370 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:04:53,414 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:04:53,414 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:05:08,430 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:05:08,481 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:05:08,481 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:05:23,500 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:05:23,548 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:05:23,548 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:05:38,560 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:05:38,665 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:05:38,665 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:05:53,679 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:05:53,722 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:05:53,723 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:06:08,740 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:06:08,940 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:06:08,941 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:06:23,959 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:06:24,001 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:06:24,002 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:06:39,019 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:06:39,071 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:06:39,072 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:06:54,089 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:06:54,132 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:06:54,132 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:07:09,150 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:07:09,193 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:07:09,194 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:07:24,209 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:07:24,251 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:07:24,251 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:07:39,270 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:07:39,327 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:07:39,327 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:07:54,340 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:07:54,379 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:07:54,380 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:08:09,390 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:08:09,437 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:08:09,437 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:08:24,450 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:08:24,489 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:08:24,490 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:08:39,510 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:08:39,559 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:08:39,560 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:08:54,570 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:08:54,608 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:08:54,609 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:09:09,620 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:09:09,663 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:09:09,663 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:09:24,679 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:09:24,713 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:09:24,714 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:09:39,730 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:09:39,780 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:09:39,780 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:09:54,799 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:09:54,870 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:09:54,870 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:10:09,890 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:10:09,938 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:10:09,938 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:10:24,949 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:10:25,104 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:10:25,104 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:10:25,108 [goal-notifications-system-akka.actor.default-dispatcher-7] INFO  c.g.m.n.f.a.MatchDayObserverActor - Martyn Fotheringham scored for Forfar at 7 minute
+2014-01-02 15:10:25,112 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  akka.actor.LocalActorRef - Message [com.gu.mobile.notifications.football.actors.MatchDayObserverActor$GoalEvent] from Actor[akka://goal-notifications-system/user/$a#-999105517] to Actor[akka://goal-notifications-system/user] was not delivered. [1] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+2014-01-02 15:10:40,119 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:10:40,273 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:10:40,273 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:10:55,290 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:10:55,327 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:10:55,328 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:11:10,339 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:11:10,384 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:11:10,384 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:11:25,400 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:11:25,468 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:11:25,468 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:11:40,480 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:11:40,525 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:11:40,525 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:11:55,540 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:11:55,576 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:11:55,576 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:12:10,589 [goal-notifications-system-akka.actor.default-dispatcher-4] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:12:13,685 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:12:13,685 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:12:28,699 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:12:28,736 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:12:28,736 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:12:43,750 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:12:43,798 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:12:43,799 [goal-notifications-system-akka.actor.default-dispatcher-3] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:12:58,810 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:12:58,846 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:12:58,847 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:13:13,860 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:13:13,905 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:13:13,905 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:13:28,919 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:13:28,956 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:13:28,956 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:13:43,969 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:13:44,036 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:13:44,036 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:13:59,050 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:13:59,084 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:13:59,085 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:14:14,100 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:14:14,143 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:14:14,143 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:14:29,160 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:14:29,196 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:14:29,196 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:14:44,210 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:14:44,256 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:14:44,256 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:14:59,269 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:14:59,304 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:14:59,304 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:15:14,319 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:15:14,411 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:15:14,411 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:15:29,429 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:15:29,469 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:15:29,470 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:15:44,480 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:15:44,524 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:15:44,524 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:15:59,540 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:15:59,577 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:15:59,577 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:16:14,590 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:16:14,633 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:16:14,633 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:16:29,649 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:16:29,679 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:16:29,679 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:16:44,690 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:16:44,731 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:16:44,731 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:16:59,749 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:16:59,783 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:16:59,783 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:17:14,799 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:17:14,837 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:17:14,838 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:17:29,850 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:17:29,884 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:17:29,884 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:17:44,900 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:17:44,942 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:17:44,942 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:17:59,959 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:17:59,994 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:17:59,994 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:18:15,009 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:18:15,050 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:18:15,050 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:18:30,069 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:18:30,103 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:18:30,103 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:18:45,119 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:18:45,167 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:18:45,168 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:19:00,179 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:19:00,211 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:19:00,212 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:19:15,230 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:19:15,275 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:19:15,276 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:19:30,290 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:19:30,359 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:19:30,360 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:19:45,380 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:19:45,457 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:19:45,457 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:20:00,470 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:20:00,503 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:20:00,503 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:20:15,519 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:20:15,558 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:20:15,559 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:20:30,570 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:20:30,605 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:20:30,606 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:20:45,620 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:20:45,661 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:20:45,661 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 15:21:00,679 [goal-notifications-system-akka.actor.default-dispatcher-2] INFO  c.g.m.n.f.a.MatchDayObserverActor - Refreshing ...
+2014-01-02 15:21:00,715 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Got 10 matches of which 8 are live
+2014-01-02 15:21:00,716 [goal-notifications-system-akka.actor.default-dispatcher-9] INFO  c.g.m.n.f.a.MatchDayObserverActor - Currently live: Kilmarnock vs St Mirren at 15:0, Alloa vs Cowdenbeath at 15:0, Raith vs Dundee at 15:0, Brechin vs Forfar at 15:0, East Fife vs Arbroath at 15:0, Stenhousemuir vs Dunfermline at 15:0, Montrose vs Berwick at 15:0, Peterhead vs Elgin at 15:0
+2014-01-02 16:27:57,663 [test-akka.actor.default-dispatcher-3] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+2014-01-02 16:36:50,545 [test-akka.actor.default-dispatcher-3] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+2014-01-02 16:39:05,335 [test-akka.actor.default-dispatcher-2] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
