@@ -2,6 +2,7 @@ package com.gu.mobile.notifications.football.management
 
 import com.gu.management.internal.{ManagementServer, ManagementHandler}
 import com.gu.management.{StatusPage, ManifestPage, ManagementPage}
+import com.gu.management.logback.LogbackLevelPage
 
 object MobileNotificationsManagementServer {
   private val handler = new ManagementHandler {
@@ -9,7 +10,8 @@ object MobileNotificationsManagementServer {
 
     def pages: List[ManagementPage] = List(
       new ManifestPage(),
-      new StatusPage(applicationName, () => Metrics.all)
+      new StatusPage(applicationName, () => Metrics.all),
+      new LogbackLevelPage(applicationName)
     )
   }
 
