@@ -8,4 +8,6 @@ object GoalNotificationsConfig {
   )
 
   lazy val paApiKey = configuration("pa.api_key")
+
+  lazy val guardianNotificationsHost = configuration("notifications.host")
 }
