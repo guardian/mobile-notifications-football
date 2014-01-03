@@ -32,7 +32,8 @@ libraryDependencies ++= {
     "com.gu"              %%  "mobile-notifications-client" % "0.3-SNAPSHOT",
     "com.gu"              %%  "pa-client"     % "4.0",
     "org.scalaj" 	  %   "scalaj-time_2.10.0-M7" % "0.6",
-    "ch.qos.logback"	  %   "logback-classic" % "1.0.13"
+    "ch.qos.logback"	  %   "logback-classic" % "1.0.13",
+    "com.netflix.rxjava"  %   "rxjava-scala" % "0.15.1"
   )
 }
 

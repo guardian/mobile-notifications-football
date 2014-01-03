@@ -6,7 +6,7 @@ import com.gu.mobile.notifications.client.ApiClient
 import akka.util.Timeout
 import akka.pattern.{ask, pipe}
 import scala.concurrent.duration._
-import com.gu.mobile.notifications.football.lib.MatchDayClient
+import com.gu.mobile.notifications.football.lib.{PaMatchDayClient, MatchDayClient}
 
 object GoalNotificationsManagerActor {
   sealed trait Message
@@ -31,7 +31,7 @@ class GoalNotificationsManagerActor(matchDayClient: MatchDayClient, notification
 
   import context.dispatcher
 
-  val matchDayObserver = context.system.actorOf(MatchDayObserverActor.props(matchDayClient))
+  val matchDayObserver = context.system.actorOf(MatchDayObserverActor.props())
   val goalNotificationSender = context.system.actorOf(GoalNotificationSenderActor.props(notificationsApi))
   val notificationsHistory = context.system.actorOf(GoalNotificationHistoryActor.props())
 
@@ -39,11 +39,17 @@ class GoalNotificationsManagerActor(matchDayClient: MatchDayClient, notification
 
   implicit val getTimeout = Timeout(500 millis)
 
+  val matchDaySubscription = matchDayClient.observable subscribe { matchDayObserver ! _ }
+
   def receive = {
     case goalEvent: GoalEvent => goalNotificationSender ! goalEvent
     case notificationSent: SentNotification => notificationsHistory ! notificationSent
 
     case GetHistory => (notificationsHistory ? Get) pipeTo sender
     case GetLiveMatches => (matchDayObserver ? GetCurrentLiveMatches) pipeTo sender
+  }
+
+  override def postStop() {
+    matchDaySubscription.unsubscribe()
   }
 }
