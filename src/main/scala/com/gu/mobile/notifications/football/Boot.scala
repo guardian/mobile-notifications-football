@@ -7,20 +7,43 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.gu.mobile.notifications.football.management.MobileNotificationsManagementServer
-import com.gu.mobile.notifications.football.actors.{GoalNotificationsManagerActor, GoalNotificationSenderActor, MatchDayObserverActor}
-import com.gu.mobile.notifications.football.lib.{PaMatchDayClient, NotificationsClient, PaFootballClient}
+import com.gu.mobile.notifications.football.lib._
+import com.gu.mobile.notifications.football.lib.PaMatchDayClient
+import rx.lang.scala.Observable
+import lib.Observables._
+import scala.concurrent.ExecutionContext.Implicits.global
+import com.gu.mobile.notifications.football.models.{NotificationHistoryItem, NotificationFailed, NotificationSent}
+import org.joda.time.DateTime
 
 object Boot extends App {
+  val RetrySendNotifications = 5
+
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("goal-notifications-system")
 
-  val notificationsManager = system.actorOf(
-    GoalNotificationsManagerActor.props(PaMatchDayClient(PaFootballClient), NotificationsClient),
-    "goal-notifications-manager"
-  )
+  val goalEventStream = Pa.goalNotificationStream(PaMatchDayClient(PaFootballClient).observable)
+  val notificationStream = goalEventStream map {
+    case GoalEvent(goal, matchDay) => GoalNotificationBuilder(goal, matchDay)
+  }
+
+  val notificationSendHistory: Observable[NotificationHistoryItem] = notificationStream flatMap { notification =>
+    NotificationsClient.send(notification).asObservable.retry(RetrySendNotifications) map { reply =>
+      NotificationSent(
+        new DateTime(),
+        notification,
+        reply
+      )
+    } onErrorResumeNext {
+      Observable(NotificationFailed(
+        new DateTime(),
+        notification
+      ))
+    }
+  }
+
   // create and start our service actor
   val service = system.actorOf(
-    Props(classOf[GoalNotificationsServiceActor], notificationsManager),
+    Props(classOf[GoalNotificationsServiceActor]),
     "goal-notifications-http-service"
   )
 

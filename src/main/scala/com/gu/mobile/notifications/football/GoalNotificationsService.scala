@@ -4,15 +4,12 @@ import akka.actor.{ActorRef, Actor}
 import spray.routing._
 import spray.http._
 import MediaTypes._
-import akka.pattern.ask
-import com.gu.mobile.notifications.football.actors.GoalNotificationsManagerActor
-import com.gu.mobile.notifications.football.actors.MatchDayObserverActor.CurrentLiveMatches
 import com.gu.mobile.notifications.football.lib.Pa._
 import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.gu.mobile.notifications.football.actors.GoalNotificationSenderActor.SentNotification
-import com.gu.mobile.notifications.client.models.{AndroidMessagePayload, IOSMessagePayload, Topic}
+import com.gu.mobile.notifications.client.models.{Notification, AndroidMessagePayload, IOSMessagePayload, Topic}
+import pa.MatchDay
 
 class GoalNotificationsServiceActor(val notificationsManager: ActorRef) extends Actor with GoalNotificationsService {
 
@@ -26,9 +23,11 @@ class GoalNotificationsServiceActor(val notificationsManager: ActorRef) extends 
   def receive = runRoute(myRoute)
 }
 
+case class SentNotification(date: DateTime, notification: Notification)
+
 /** Horrid HTML-puking functions */
 trait Rendering {
-  def renderIndex(matches: CurrentLiveMatches, history: List[SentNotification]) =
+  def renderIndex(matches: List[MatchDay], history: List[SentNotification]) =
     <html>
       <head>
         <title>Goal Notifications Service</title>
@@ -38,7 +37,7 @@ trait Rendering {
 
       <h2>Current live matches</h2>
       {
-        for (matchDay <- matches.matchDays) yield <p>{matchDay.summaryString}</p>
+        for (matchDay <- matches) yield <p>{matchDay.summaryString}</p>
       }
 
       <h2>Goal notifications history</h2>
@@ -99,12 +98,7 @@ trait GoalNotificationsService extends HttpService with Rendering {
       get {
         respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
           complete {
-            val liveMatchesFuture = (notificationsManager ? GoalNotificationsManagerActor.GetLiveMatches).mapTo[CurrentLiveMatches]
-            val notificationHistoryFuture = (notificationsManager ? GoalNotificationsManagerActor.GetHistory).mapTo[List[SentNotification]]
-
-            (liveMatchesFuture zip notificationHistoryFuture).map {
-              case ((matches, history)) => renderIndex(matches, history)
-            }
+            <p>hi</p>
           }
         }
       }
