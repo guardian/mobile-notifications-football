@@ -7,19 +7,14 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.gu.mobile.notifications.football.management.MobileNotificationsManagementServer
-import com.gu.mobile.notifications.football.lib._
-import com.gu.mobile.notifications.football.lib.PaMatchDayClient
-import scala.concurrent.ExecutionContext.Implicits.global
 
-object Boot extends App {
-  val RetrySendNotifications = 5
-
+object SystemSetup {
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("goal-notifications-system")
+}
 
-  val goalEventStream = Streams.goalEvents(PaMatchDayClient(PaFootballClient).observable)
-  val notificationStream = Streams.guardianNotifications(goalEventStream)
-  val notificationSendHistory = Streams.notificationResponses(notificationStream, NotificationsClient, RetrySendNotifications)
+object Boot extends App {
+  import SystemSetup._
 
   // create and start our service actor
   val service = system.actorOf(
@@ -32,4 +27,5 @@ object Boot extends App {
   IO(Http) ? Http.Bind(service, interface = "localhost", port = 8080)
 
   MobileNotificationsManagementServer.start()
+  GoalNotificationsPipeline.start()
 }

@@ -10,8 +10,9 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.client.models.{Notification, AndroidMessagePayload, IOSMessagePayload, Topic}
 import pa.MatchDay
+import com.gu.mobile.notifications.football.models.{NotificationHistoryItem, NotificationSent}
 
-class GoalNotificationsServiceActor(val notificationsManager: ActorRef) extends Actor with GoalNotificationsService {
+class GoalNotificationsServiceActor extends Actor with GoalNotificationsService {
 
   // the HttpService trait defines only one abstract member, which
   // connects the services environment to the enclosing actor or test
@@ -23,11 +24,9 @@ class GoalNotificationsServiceActor(val notificationsManager: ActorRef) extends 
   def receive = runRoute(myRoute)
 }
 
-case class SentNotification(date: DateTime, notification: Notification)
-
 /** Horrid HTML-puking functions */
 trait Rendering {
-  def renderIndex(matches: List[MatchDay], history: List[SentNotification]) =
+  def renderIndex(matches: List[MatchDay], history: List[NotificationHistoryItem]) =
     <html>
       <head>
         <title>Goal Notifications Service</title>
@@ -42,7 +41,7 @@ trait Rendering {
 
       <h2>Goal notifications history</h2>
       {
-        for (SentNotification(when, notification) <- history) yield
+        for (NotificationSent(when, notification, _) <- history collect { case n: NotificationSent => n }) yield
           <dl>
             <dt>Time sent</dt>
             <dd>{ when.toString() }</dd>
@@ -89,8 +88,6 @@ trait Rendering {
 
 // this trait defines our service behavior independently from the service actor
 trait GoalNotificationsService extends HttpService with Rendering {
-  val notificationsManager: ActorRef
-
   implicit val timeout = Timeout(500 millis)
 
   val myRoute =
@@ -98,7 +95,10 @@ trait GoalNotificationsService extends HttpService with Rendering {
       get {
         respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
           complete {
-            <p>hi</p>
+            Agents.lastMatchDaysSeen.get() match {
+              case Some(matchDays) => renderIndex(matchDays, Agents.notificationsHistory.get())
+              case None => <p>Not contacted PA yet</p>
+            }
           }
         }
       }

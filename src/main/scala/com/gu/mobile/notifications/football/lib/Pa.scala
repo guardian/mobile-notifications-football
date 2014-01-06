@@ -12,7 +12,7 @@ object Pa {
   implicit class RichMatchDay(matchDay: MatchDay) {
     def summaryString: String =
       s"${matchDay.homeTeam.name} vs ${matchDay.awayTeam.name} at " +
-        s"${matchDay.date.hourOfDay.get()}:${matchDay.date.minuteOfHour.get()}"
+        s"${matchDay.date.hourOfDay.get()}:${matchDay.date.minuteOfHour.get()} (${matchDay.matchStatus})"
 
     def goals: Seq[Goal] = (matchDay.homeTeam.goals ++ matchDay.awayTeam.goals).sortBy(_.minute)
   }
