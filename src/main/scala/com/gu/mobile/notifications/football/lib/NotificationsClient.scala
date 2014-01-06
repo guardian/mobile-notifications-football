@@ -8,7 +8,7 @@ import com.gu.mobile.notifications.client.models.{SendNotificationReply, Notific
 import com.gu.mobile.notifications.football.lib.Futures._
 import com.gu.mobile.notifications.football.management.Metrics
 
-object NotificationsClient extends ApiClient {
+object NotificationsClient extends ApiClient with SendsNotifications {
   implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   def host: String = GoalNotificationsConfig.guardianNotificationsHost
@@ -21,4 +21,9 @@ object NotificationsClient extends ApiClient {
     ftr.recordTimeSpent(Metrics.notificationsResponseTime, Metrics.notificationsErrorResponseTime)
     ftr
   }
+}
+
+/** To allow stubbing in tests */
+trait SendsNotifications {
+  def send(notification: Notification): Future[SendNotificationReply]
 }

@@ -9,11 +9,7 @@ import scala.concurrent.duration._
 import com.gu.mobile.notifications.football.management.MobileNotificationsManagementServer
 import com.gu.mobile.notifications.football.lib._
 import com.gu.mobile.notifications.football.lib.PaMatchDayClient
-import rx.lang.scala.Observable
-import lib.Observables._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.gu.mobile.notifications.football.models.{NotificationHistoryItem, NotificationFailed, NotificationSent}
-import org.joda.time.DateTime
 
 object Boot extends App {
   val RetrySendNotifications = 5
@@ -22,24 +18,8 @@ object Boot extends App {
   implicit val system = ActorSystem("goal-notifications-system")
 
   val goalEventStream = Pa.goalNotificationStream(PaMatchDayClient(PaFootballClient).observable)
-  val notificationStream = goalEventStream map {
-    case GoalEvent(goal, matchDay) => GoalNotificationBuilder(goal, matchDay)
-  }
-
-  val notificationSendHistory: Observable[NotificationHistoryItem] = notificationStream flatMap { notification =>
-    NotificationsClient.send(notification).asObservable.retry(RetrySendNotifications) map { reply =>
-      NotificationSent(
-        new DateTime(),
-        notification,
-        reply
-      )
-    } onErrorResumeNext {
-      Observable(NotificationFailed(
-        new DateTime(),
-        notification
-      ))
-    }
-  }
+  val notificationStream = Streams.notifications(goalEventStream)
+  val notificationSendHistory = Streams.notificationResponses(notificationStream, NotificationsClient, RetrySendNotifications)
 
   // create and start our service actor
   val service = system.actorOf(
