@@ -5,10 +5,10 @@ import com.gu.mobile.notifications.football.lib.SendsNotifications
 import com.gu.mobile.notifications.client.models.{MessagePayloads, Target, SendNotificationReply, Notification}
 import scala.concurrent.Future
 import rx.lang.scala.Observable
-import com.gu.mobile.notifications.football.models.{NotificationHistoryItem, NotificationFailed, NotificationSent}
+import com.gu.mobile.notifications.football.models.{NotificationFailed, NotificationSent}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class StreamsSpec extends WordSpec with Matchers {
+class NotificationResponsesStreamSpec extends WordSpec with Matchers {
   val stubSuccessClient = new SendsNotifications {
     def send(notification: Notification): Future[SendNotificationReply] =
       Future.successful(SendNotificationReply("test"))

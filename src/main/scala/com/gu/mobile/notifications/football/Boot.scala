@@ -17,8 +17,8 @@ object Boot extends App {
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("goal-notifications-system")
 
-  val goalEventStream = Pa.goalNotificationStream(PaMatchDayClient(PaFootballClient).observable)
-  val notificationStream = Streams.notifications(goalEventStream)
+  val goalEventStream = Streams.goalEvents(PaMatchDayClient(PaFootballClient).observable)
+  val notificationStream = Streams.guardianNotifications(goalEventStream)
   val notificationSendHistory = Streams.notificationResponses(notificationStream, NotificationsClient, RetrySendNotifications)
 
   // create and start our service actor

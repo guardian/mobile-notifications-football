@@ -1,15 +1,27 @@
 package com.gu.mobile.notifications.football
 
-import com.gu.mobile.notifications.client.models.Notification
 import rx.lang.scala.Observable
 import com.gu.mobile.notifications.football.models.{NotificationHistoryItem, NotificationFailed, NotificationSent}
-import com.gu.mobile.notifications.football.lib.{SendsNotifications, GoalNotificationBuilder, GoalEvent}
+import com.gu.mobile.notifications.football.lib._
 import org.joda.time.DateTime
 import lib.Observables._
 import scala.concurrent.ExecutionContext
+import pa.MatchDay
+import com.gu.mobile.notifications.football.lib.GoalEvent
+import com.gu.mobile.notifications.client.models.Notification
 
 object Streams {
-  def notifications(goals: Observable[GoalEvent]): Observable[Notification] = goals map {
+  /** Given a stream of lists of MatchDay results, returns a stream of goal events */
+  def goalEvents(matchDays: Observable[List[MatchDay]]): Observable[GoalEvent] = {
+    matchDays.pairs flatMap { case (oldMatchDays, newMatchDays) =>
+      Observable((Lists.pairs(oldMatchDays, newMatchDays)(_.id) flatMap { case (oldMatchDay, newMatchDay) =>
+        Pa.delta(oldMatchDay, newMatchDay) map { goal => GoalEvent(goal, newMatchDay) }
+      }).toList: _*)
+    }
+  }
+  
+  /** Transforms a stream of Goal events into Notifications to be sent via Guardian Mobile Notifications */
+  def guardianNotifications(goals: Observable[GoalEvent]): Observable[Notification] = goals map {
     case GoalEvent(goal, matchDay) => GoalNotificationBuilder(goal, matchDay)
   }
 
