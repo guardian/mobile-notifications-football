@@ -1,4 +1,8 @@
-organization  := "com.gu.mobile.notifications"
+import AssemblyKeys._
+
+organization  := "com.gu"
+
+name          := "mobile-notifications"
 
 version       := "0.1"
 
@@ -37,5 +41,7 @@ libraryDependencies ++= {
     "com.netflix.rxjava"  %   "rxjava-scala" % "0.15.1"
   )
 }
+
+seq(assemblySettings: _*)
 
 seq(Revolver.settings: _*)
