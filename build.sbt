@@ -53,7 +53,8 @@ seq(distSettings :_*)
 distFiles <+= (assembly in Compile) map { _ -> "packages/mobile-notifications-football/mobile-notifications-football.jar" }
 
 distFiles <++= baseDirectory map { dir =>
-  (dir / "deploy" ***) x relativeTo(dir)
+  val deployRoot = dir / "deploy"
+  (deployRoot ***) x rebase (deployRoot, "")
 }
 
 seq(Revolver.settings: _*)
