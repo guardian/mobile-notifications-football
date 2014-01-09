@@ -1,5 +1,9 @@
 import AssemblyKeys._
 
+import sbtassembly.Plugin._
+
+import com.gu.SbtDistPlugin._
+
 organization  := "com.gu"
 
 name          := "mobile-notifications"
@@ -43,5 +47,13 @@ libraryDependencies ++= {
 }
 
 seq(assemblySettings: _*)
+
+seq(distSettings :_*)
+
+distFiles <+= (assembly in Compile) map { _ -> "packages/mobile-notifications-football/mobile-notifications-football.jar" }
+
+distFiles <++= baseDirectory map { dir =>
+  (dir / "deploy" ***) x relativeTo(dir)
+}
 
 seq(Revolver.settings: _*)
