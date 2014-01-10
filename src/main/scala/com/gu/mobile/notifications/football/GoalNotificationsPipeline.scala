@@ -13,7 +13,7 @@ import lib.Pa._
 import com.gu.mobile.notifications.client.models.Notification
 
 object GoalNotificationsPipeline extends Logging {
-  val UpdateInterval = 3 seconds
+  val UpdateInterval = 3.seconds
   val MaxHistoryLength = 100
   val RetrySendNotifications = 5
   
