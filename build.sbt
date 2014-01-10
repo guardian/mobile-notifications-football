@@ -6,7 +6,7 @@ import com.gu.SbtDistPlugin._
 
 organization  := "com.gu"
 
-name          := "mobile-notifications"
+name          := "mobile-notifications-football"
 
 version       := "0.1"
 
