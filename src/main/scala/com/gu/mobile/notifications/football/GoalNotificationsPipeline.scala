@@ -10,6 +10,7 @@ import scala.concurrent.duration._
 import com.gu.mobile.notifications.football.models.{NotificationFailed, NotificationSent}
 import grizzled.slf4j.Logging
 import lib.Pa._
+import com.gu.mobile.notifications.client.models.Notification
 
 object GoalNotificationsPipeline extends Logging {
   val UpdateInterval = 3 seconds
@@ -27,8 +28,12 @@ object GoalNotificationsPipeline extends Logging {
 
   val goalEventStream = Streams.goalEvents(matchDayPublishSubject)
   val notificationStream = Streams.guardianNotifications(goalEventStream)
+
+  val notificationPublishSubject = PublishSubject[Notification]()
+  notificationStream.subscribe(notificationPublishSubject)
+
   val notificationSendHistory = Streams.notificationResponses(
-    notificationStream, NotificationsClient, RetrySendNotifications)
+    notificationPublishSubject, NotificationsClient, RetrySendNotifications)
 
   def start() {
     notificationSendHistory subscribe { notificationResponse =>
@@ -44,6 +49,10 @@ object GoalNotificationsPipeline extends Logging {
     matchDayPublishSubject subscribe { matchDays =>
       info(s"Got new set of match days: ${matchDays.map(_.summaryString).mkString(", ")}")
       Agents.lastMatchDaysSeen send const(Some(matchDays))
+    }
+
+    notificationPublishSubject subscribe { notification =>
+      SNSQueue.publish("Goal notification created", notification.toString)
     }
   }
 }

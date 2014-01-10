@@ -17,6 +17,13 @@ object GoalNotificationsConfig {
     configuration.getStringProperty("credentials.dynamodb.secret_key", ""))
 
   lazy val dynamoDbEndpoint = configuration("dynamodb.endpoint")
-
   lazy val dynamoDbSwitchesTableName = configuration("dynamodb.switches_table")
+
+  lazy val snsQueuePublish = new BasicAWSCredentials(
+    configuration.getStringProperty("credentials.sns.access_key", ""),
+    configuration.getStringProperty("credentials.sns.secret_key", "")
+  )
+
+  lazy val snsEndpoint = configuration("sns.endpoint")
+  lazy val snsTopic = configuration("sns.topic")
 }

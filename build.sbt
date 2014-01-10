@@ -41,9 +41,10 @@ libraryDependencies ++= {
     "com.gu"              %%  "mobile-notifications-client" % "0.3-SNAPSHOT",
     "com.gu"              %%  "pa-client"     % "4.0",
     "com.gu"              %%  "dynamo-db-switches" % "0.2",
-    "org.scalaj" 	  %   "scalaj-time_2.10.0-M7" % "0.6",
+    "org.scalaj"          %   "scalaj-time_2.10.0-M7" % "0.6",
     "ch.qos.logback"	  %   "logback-classic" % "1.0.13",
-    "com.netflix.rxjava"  %   "rxjava-scala" % "0.15.1"
+    "com.netflix.rxjava"  %   "rxjava-scala" % "0.15.1",
+    "com.amazonaws"       %   "aws-java-sdk" % "1.6.3"
   )
 }
 
