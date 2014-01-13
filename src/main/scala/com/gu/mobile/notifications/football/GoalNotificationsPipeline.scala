@@ -11,6 +11,7 @@ import com.gu.mobile.notifications.football.models.{NotificationFailed, Notifica
 import grizzled.slf4j.Logging
 import lib.Pa._
 import com.gu.mobile.notifications.client.models.Notification
+import scala.util.{Failure, Success}
 
 object GoalNotificationsPipeline extends Logging {
   val UpdateInterval = 3.seconds
@@ -27,7 +28,10 @@ object GoalNotificationsPipeline extends Logging {
   matchDayStream.subscribe(matchDayPublishSubject)
 
   val goalEventStream = Streams.goalEvents(matchDayPublishSubject)
-  val notificationStream = Streams.guardianNotifications(goalEventStream)
+  val goalEventSubject = PublishSubject[GoalEvent]()
+  goalEventStream.subscribe(goalEventSubject)
+
+  val notificationStream = Streams.guardianNotifications(goalEventSubject)
 
   val notificationPublishSubject = PublishSubject[Notification]()
   notificationStream.subscribe(notificationPublishSubject)
@@ -46,13 +50,23 @@ object GoalNotificationsPipeline extends Logging {
       }
     }
 
+    goalEventSubject subscribe { goalEvent =>
+      logger.info(s"Goal event: ${goalEvent.goal.scorerName} scored for ${goalEvent.goal.scoringTeam.name} at " +
+        s"minute ${goalEvent.goal.minute}")
+    }
+
     matchDayPublishSubject subscribe { matchDays =>
       info(s"Got new set of match days: ${matchDays.map(_.summaryString).mkString(", ")}")
       Agents.lastMatchDaysSeen send const(Some(matchDays))
     }
 
     notificationPublishSubject subscribe { notification =>
-      SNSQueue.publish("Goal notification created", notification.toString)
+      SNSQueue.publish("Goal notification created", notification.toString) match {
+        case Success(publishResult) =>
+          logger.info(s"Successfully sent notification to SNS queue: ${publishResult.getMessageId}")
+        case Failure(error) =>
+          logger.error(s"Encountered error when trying to add notification to SNS queue", error)
+      }
     }
   }
 }
