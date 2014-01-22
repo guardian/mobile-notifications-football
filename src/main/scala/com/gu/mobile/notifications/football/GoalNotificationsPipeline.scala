@@ -1,8 +1,5 @@
 package com.gu.mobile.notifications.football
 
-import com.gu.mobile.notifications.football.lib._
-import rx.lang.scala.Observable
-import pa.MatchDay
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import com.gu.mobile.notifications.client.models.Notification
