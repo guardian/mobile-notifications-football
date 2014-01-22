@@ -5,7 +5,7 @@ import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 import com.amazonaws.services.sns.model.PublishRequest
 import scala.util.Try
 
-object SNSQueue {
+trait SNSQueue {
   private val client = {
     val client = new AmazonSNSClient(GoalNotificationsConfig.snsQueuePublish)
     client.setEndpoint("sns.eu-west-1.amazonaws.com")

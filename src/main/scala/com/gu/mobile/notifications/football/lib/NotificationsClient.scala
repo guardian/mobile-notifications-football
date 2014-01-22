@@ -8,7 +8,7 @@ import com.gu.mobile.notifications.client.models.{SendNotificationReply, Notific
 import com.gu.mobile.notifications.football.lib.Futures._
 import com.gu.mobile.notifications.football.management.Metrics
 
-object NotificationsClient extends ApiClient with SendsNotifications {
+trait NotificationsClient extends ApiClient with SendsNotifications {
   implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   def host: String = GoalNotificationsConfig.guardianNotificationsHost
