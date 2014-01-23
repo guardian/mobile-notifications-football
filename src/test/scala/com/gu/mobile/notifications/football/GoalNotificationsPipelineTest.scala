@@ -2,35 +2,29 @@ package com.gu.mobile.notifications.football
 
 import org.scalatest.{ShouldMatchers, FreeSpec}
 import rx.lang.scala.Observable
-import scala.util.Try
-import com.amazonaws.services.sns.model.PublishResult
-import scala.util.Success
 import pa.MatchDay
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration._
+import com.gu.mobile.notifications.client.models.Notification
 
 class GoalNotificationsPipelineTest extends FreeSpec with ShouldMatchers with GoalNotificationsPipeline {
 
   val retrySendNotifications: Int = 1
   val UpdateInterval: FiniteDuration = 4.seconds
-  val buffer = ListBuffer[String]()
   val MaxHistoryLength: Int = 2
 
-  var publishedMessages = ListBuffer[String]()
+  var publishedMessages: List[String] = Nil
 
   override def getMatchDayStream(): Observable[List[MatchDay]] = MatchDaysTestData.matchDays
 
-  override def publish(subject: String, message: String): Try[PublishResult] = {
-    publishedMessages+=subject + " | " + message
-    Success(new PublishResult())
+  override def publishNotifications: (Notification) => Unit = {
+    notification: Notification => publishedMessages ::= notification.toString
   }
-
 
   "GoalNotificationPipeline" - {
     "When a goal occurs" - {
-      "should send a message to the SNS Queue" in {
+      "should publish a message to the SNS Queue" in {
         start()
-        publishedMessages.head should (include ("Goal notification created | Notification(goal,mobile-notifications-football,"))
+        publishedMessages.head should (startWith("Notification(goal,mobile-notifications-football,"))
       }
     }
   }
