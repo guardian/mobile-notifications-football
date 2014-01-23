@@ -59,7 +59,12 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
   "Streams.notificationResponses" when {
     "run over an API client that always succeeds" should {
       "produce a stream of success responses" in {
-        val responses = Streams.notificationResponses(notificationFixturesObservable, stubSuccessClient, 0)
+        val stream = new NotificationResponseStream {
+          val retrySendNotifications: Int = 0
+          override def send(notification: Notification): Future[SendNotificationReply] =  stubSuccessClient.send(notification)
+        }
+
+        val responses = stream.getNotificationResponses(notificationFixturesObservable)
           .toBlockingObservable.toList
 
         responses should have length 2
@@ -72,7 +77,12 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
     "run over an API client that always fails" should {
       "produce a stream of failure responses" in {
-        val responses = Streams.notificationResponses(notificationFixturesObservable, stubFailureClient, 5)
+        val stream = new NotificationResponseStream {
+          val retrySendNotifications: Int = 5
+
+          override def send(notification: Notification): Future[SendNotificationReply] = stubFailureClient.send(notification)
+        }
+        val responses = stream.getNotificationResponses(notificationFixturesObservable)
           .toBlockingObservable.toList
 
         responses should have length 2
@@ -84,7 +94,12 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
     "run over an API client that fails once with more than 1 retries set" should {
       "produce a stream of success responses" in {
-        val responses = Streams.notificationResponses(notificationFixturesObservable, stubFailOnceClient, 2)
+        val stream = new NotificationResponseStream {
+          val retrySendNotifications: Int = 2
+          override def send(notification: Notification): Future[SendNotificationReply] = stubFailOnceClient.send(notification)
+        }
+
+        val responses = stream.getNotificationResponses(notificationFixturesObservable)
           .toBlockingObservable.toList
         responses should have length 2
         val successes = responses.withType[NotificationSent]
