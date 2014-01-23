@@ -14,7 +14,7 @@ trait SNSQueue extends Logging {
     client
   }
 
-  val topic = GoalNotificationsConfig.snsTopic
+  lazy val topic = GoalNotificationsConfig.snsTopic
 
   def publishNotifications: (Notification) => Unit = {
     notification =>
