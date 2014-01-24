@@ -6,12 +6,14 @@ import dispatch._
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 import com.gu.mobile.notifications.football.management.Metrics
 import com.gu.mobile.notifications.football.lib.Futures._
+import grizzled.slf4j.Logging
 
-trait DispatchHttp extends pa.Http {
+trait DispatchHttp extends pa.Http with Logging {
   def GET(urlString: String): Future[Response] = {
     /** This unfortunately has to be done here due to how pa.Http's interface is written */
     import ExecutionContext.Implicits.global
 
+    logger.debug("Http GET " + urlString)
     dispatch.Http(url(urlString) OK as.Response(r => Response(r.getStatusCode, r.getResponseBody, r.getStatusText)))
   }
 }

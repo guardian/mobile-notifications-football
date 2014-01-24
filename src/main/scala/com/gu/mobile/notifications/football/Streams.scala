@@ -19,14 +19,15 @@ trait MatchDayStream extends Logging {
   val UpdateInterval:FiniteDuration
 
   def getMatchDayStream(): Observable[List[MatchDay]] = {
-    val matchDayPublishSubject = PublishSubject[List[MatchDay]]()
-    // Use the subject below rather than subscribe to this directly - otherwise more calls are kicked off to PA than are
+    // Use the subject below rather than subscribe to the stream directly - otherwise more calls are kicked off to PA than are
     // required
-    val stream = Observable.interval(UpdateInterval).flatMap(
-      const(PaMatchDayClient(PaFootballClient).today.asObservable.completeOnError)
-    )
-    stream.subscribe(matchDayPublishSubject)
-    matchDayPublishSubject
+    val stream:Observable[List[MatchDay]] = Observable.interval(UpdateInterval).flatMap{
+      _:Long => PaMatchDayClient(PaFootballClient).today.asObservable.completeOnError
+    }
+
+    val subject = PublishSubject[List[MatchDay]]()
+    stream.subscribe(subject)
+    subject
   }
 }
 
