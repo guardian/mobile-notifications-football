@@ -3,8 +3,9 @@ package com.gu.mobile.notifications.football.lib
 import rx.lang.scala.{Subscription, Observable}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import grizzled.slf4j.Logging
 
-object Observables {
+object Observables extends Logging {
   implicit class RichObservableCompanion(obs: Observable.type) {
     val empty = Observable(List(): _*)
   }
@@ -26,7 +27,10 @@ object Observables {
             o.onNext(s)
             o.onCompleted()
           }
-          case Failure(s) => o.onError(s)
+          case Failure(s) =>{
+            logger.info("Error completing future -  " + s)
+            o.onError(s)
+          }
         }
 
         subs
