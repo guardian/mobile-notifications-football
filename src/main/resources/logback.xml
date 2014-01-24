@@ -29,7 +29,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.gu.mobile.notifications.football.lib.PaFootballClient" level="DEBUG">
+    <logger name="com.gu.mobile.notifications.football.lib.PaFootballClient" level="DEBUG" additivity="false">
         <appender-ref ref="OUTBOUND_HTTP_LOG"/>
     </logger>
 
