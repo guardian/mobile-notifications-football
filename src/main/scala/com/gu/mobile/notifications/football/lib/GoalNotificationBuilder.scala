@@ -11,9 +11,14 @@ object GoalNotificationBuilder {
   val FootballTeamTopicType = "football-team"
   val FootballMatchTopicType = "football-match"
 
+  def uniqueIdentifier(goal: Goal, matchDay: MatchDay) =
+    s"goalAlert/${matchDay.id}/${matchDay.homeTeam.score.getOrElse(0)}-${matchDay.awayTeam.score.getOrElse(0)}/" +
+      s"${goal.scoringTeam.id}/${goal.minute}"
+
   def apply(goal: Goal, matchDay: MatchDay): Notification = {
     Notification(
       `type` = "goal",
+      uniqueIdentifier = uniqueIdentifier(goal, matchDay),
       sender = "mobile-notifications-football",
       target = Target(
         regions = Set.empty,  /** Nothing ... is everything? :-O */

@@ -14,15 +14,14 @@ import rx.lang.scala.subjects.PublishSubject
 import scala.concurrent.duration.FiniteDuration
 import ExecutionContext.Implicits.global
 
-
 trait MatchDayStream extends Logging {
   val UpdateInterval:FiniteDuration
 
   def getMatchDayStream(): Observable[List[MatchDay]] = {
     // Use the subject below rather than subscribe to the stream directly - otherwise more calls are kicked off to PA than are
     // required
-    val stream:Observable[List[MatchDay]] = Observable.interval(UpdateInterval).flatMap{
-      _:Long => PaMatchDayClient(PaFootballClient).today.asObservable.completeOnError
+    val stream:Observable[List[MatchDay]] = Observable.interval(UpdateInterval) flatMap { _ =>
+      PaMatchDayClient(PaFootballClient).today.asObservable.completeOnError
     }
 
     val subject = PublishSubject[List[MatchDay]]()
@@ -32,7 +31,6 @@ trait MatchDayStream extends Logging {
 }
 
 trait GoalEventStream extends Logging {
-
   /** Given a stream of lists of MatchDay results, returns a stream of goal events */
   def getGoalEvents(matchDays: Observable[List[MatchDay]]): Observable[GoalEvent] = {
     matchDays.pairs flatMap { case (oldMatchDays, newMatchDays) =>
@@ -50,14 +48,11 @@ trait GuardianNotificationStream extends Logging {
   }
 }
 
-
 trait NotificationResponseStream extends NotificationsClient with Logging {
-
   /**
    * retrySendNotifications: If a notification could not be sent, how many times to retry
    */
   val retrySendNotifications: Int
-
 
   /** Given a stream of notifications to send, returns a stream of responses from having sent those notifications
     *
@@ -65,23 +60,20 @@ trait NotificationResponseStream extends NotificationsClient with Logging {
     * @return The stream
     */
   def getNotificationResponses(notifications: Observable[Notification])(implicit executionContext: ExecutionContext): Observable[NotificationHistoryItem] =
-    notifications flatMap {
-      notification =>
-        Observable.defer(send(notification).asObservable).retry(retrySendNotifications) map {
-          reply =>
-            NotificationSent(
-              new DateTime(),
-              notification,
-              reply
-            )
-        } onErrorResumeNext {
-          Observable(NotificationFailed(
-            new DateTime(),
-            notification
-          ))
-        }
+    notifications flatMap { notification =>
+      Observable.defer(send(notification).asObservable).retry(retrySendNotifications) map { reply =>
+        NotificationSent(
+          new DateTime(),
+          notification,
+          reply
+        )
+      } onErrorResumeNext {
+        Observable(NotificationFailed(
+          new DateTime(),
+          notification
+        ))
+      }
     }
 }
-
 
 trait Streams extends MatchDayStream with GoalEventStream with GuardianNotificationStream with NotificationResponseStream
