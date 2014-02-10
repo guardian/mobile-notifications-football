@@ -11,26 +11,23 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait GoalNotificationLogger extends Logging {
   val MaxHistoryLength: Int
 
-  def logLastMatchDay: (List[MatchDay]) => Unit = {
-    matchDays =>
-      info(s"Got new set of match days: ${matchDays.map(_.summaryString).mkString(", ")}")
-      Agents.lastMatchDaysSeen send const(Some(matchDays))
+  def logLastMatchDay(matchDays: List[MatchDay]) {
+    info(s"Got new set of match days: ${matchDays.map(_.summaryString).mkString(", ")}")
+    Agents.lastMatchDaysSeen send const(Some(matchDays))
   }
 
-  def logGoalEvents: (GoalEvent) => Unit = {
-    goalEvent =>
-      logger.info(s"Goal event: ${goalEvent.goal.scorerName} scored for ${goalEvent.goal.scoringTeam.name} at " +
-        s"minute ${goalEvent.goal.minute}")
+  def logGoalEvents(goalEvent: GoalEvent) {
+    logger.info(s"Goal event: ${goalEvent.goal.scorerName} scored for ${goalEvent.goal.scoringTeam.name} at " +
+      s"minute ${goalEvent.goal.minute}")
   }
 
-  def logNotificationHistory: (NotificationHistoryItem) => Unit = {
-    notificationResponse =>
-      Agents.notificationsHistory.sendOff(history => (notificationResponse :: history) take MaxHistoryLength)
+  def logNotificationHistory(notificationResponse: NotificationHistoryItem) {
+    Agents.notificationsHistory.sendOff(history => (notificationResponse :: history) take MaxHistoryLength)
 
-      // TODO better logging ... really
-      notificationResponse match {
-        case NotificationSent(when, notification, _) => info(s"Sent notification at $when")
-        case NotificationFailed(when, notification) => info(s"Failed to send notification at $when")
-      }
+    // TODO better logging ... really
+    notificationResponse match {
+      case NotificationSent(when, notification, _) => info(s"Sent notification at $when")
+      case NotificationFailed(when, notification) => info(s"Failed to send notification at $when")
+    }
   }
 }

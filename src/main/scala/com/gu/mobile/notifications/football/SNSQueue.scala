@@ -16,15 +16,17 @@ trait SNSQueue extends Logging {
 
   lazy val topic = GoalNotificationsConfig.snsTopic
 
-  def publishNotifications: (Notification) => Unit = {
-    notification =>
-      Try {
-        client.publish(new PublishRequest().withSubject("Goal notification created").withMessage(notification.toString).withTopicArn(topic))
-      } match {
-        case Success(publishResult) =>
-          logger.info(s"Successfully sent notification to SNS queue: ${publishResult.getMessageId}")
-        case Failure(error) =>
-          logger.error(s"Encountered error when trying to add notification to SNS queue", error)
-      }
+  def publishNotifications(notification: Notification) {
+    Try {
+      client.publish(new PublishRequest()
+        .withSubject("Goal notification created")
+        .withMessage(notification.toString)
+        .withTopicArn(topic))
+    } match {
+      case Success(publishResult) =>
+        logger.info(s"Successfully sent notification to SNS queue: ${publishResult.getMessageId}")
+      case Failure(error) =>
+        logger.error(s"Encountered error when trying to add notification to SNS queue", error)
+    }
   }
 }
