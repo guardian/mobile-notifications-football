@@ -23,7 +23,7 @@ class GoalNotificationsPipelineTest extends FreeSpec with ShouldMatchers with Go
     "When a goal occurs" - {
       "should publish a message to the SNS Queue" in {
         start()
-        publishedMessages.head should startWith("Notification(goal,mobile-notifications-football,")
+        publishedMessages.head should startWith("Notification(goal,goalAlert/test/1-0/manchester-united/10,mobile-notifications-football,")
       }
     }
   }

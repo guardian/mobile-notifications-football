@@ -32,6 +32,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
   val notificationFixture = Notification(
     "test",
+    "test",
     "test@theguardian.com",
     Target(Set.empty, Set.empty),
     3600,
@@ -39,6 +40,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
     Map.empty)
 
   val notificationFixture2 = Notification(
+    "test2",
     "test2",
     "test@gu.com",
     Target(Set.empty, Set.empty),
