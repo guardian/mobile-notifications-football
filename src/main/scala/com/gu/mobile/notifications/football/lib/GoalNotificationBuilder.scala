@@ -67,6 +67,7 @@ object AndroidPayloadBuilder {
   val HomeTeamScore = "HOME_TEAM_SCORE"
   val AwayTeamScore = "AWAY_TEAM_SCORE"
   val MatchId = "matchId"
+  val Debug = "debug"
 
   def apply(goal: Goal, matchDay: MatchDay): AndroidMessagePayload = {
     AndroidMessagePayload(Map(
@@ -79,7 +80,9 @@ object AndroidPayloadBuilder {
       ScorerName -> goal.scorerName,
       GoalMins -> goal.minute.toString,
       OtherTeamName -> (Set(matchDay.homeTeam, matchDay.awayTeam) - goal.scoringTeam).head.name,
-      MatchId -> matchDay.id
+      MatchId -> matchDay.id,
+      /** This flag exists for legacy reasons (the current PROD Android app will break if it's not here) */
+      Debug -> "false"
     ))
   }
 }
