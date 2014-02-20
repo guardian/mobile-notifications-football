@@ -7,8 +7,9 @@ import com.gu.mobile.notifications.football.conf.{MobileNotificationsFootballSwi
 import com.gu.mobile.notifications.client.models.{SendNotificationReply, Notification}
 import com.gu.mobile.notifications.football.lib.Futures._
 import com.gu.mobile.notifications.football.management.Metrics
+import grizzled.slf4j.Logging
 
-trait NotificationsClient extends ApiClient with SendsNotifications {
+trait NotificationsClient extends ApiClient with SendsNotifications with Logging {
   implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   def host: String = GoalNotificationsConfig.guardianNotificationsHost
@@ -20,6 +21,11 @@ trait NotificationsClient extends ApiClient with SendsNotifications {
     if (MobileNotificationsFootballSwitches.sendNotifications.enabled) {
       val ftr = super.send(notification)
       ftr.recordTimeSpent(Metrics.notificationsResponseTime, Metrics.notificationsErrorResponseTime)
+
+      ftr onFailure {
+        case error => logger.error("Error trying to send notification", error)
+      }
+
       ftr
     } else {
       Future.failed(new RuntimeException("Sending notifications is disabled."))
