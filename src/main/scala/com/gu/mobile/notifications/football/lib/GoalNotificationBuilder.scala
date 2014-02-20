@@ -34,6 +34,15 @@ object GoalNotificationBuilder {
           Topic(
             FootballMatchTopicType,
             matchDay.id
+          ),
+          /** Yes, the old apps registered by the team NAME. FFS **/
+          Topic(
+            FootballTeamTopicType,
+            matchDay.homeTeam.name
+          ),
+          Topic(
+            FootballTeamTopicType,
+            matchDay.awayTeam.name
           )
         )
       ),
