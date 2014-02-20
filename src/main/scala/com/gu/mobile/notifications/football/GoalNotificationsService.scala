@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.football
 
-import akka.actor.{ActorRef, Actor}
+import akka.actor.Actor
 import spray.routing._
 import spray.http._
 import MediaTypes._
@@ -8,12 +8,13 @@ import com.gu.mobile.notifications.football.lib.Pa._
 import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.gu.mobile.notifications.client.models.{Notification, AndroidMessagePayload, IOSMessagePayload, Topic}
+import com.gu.mobile.notifications.client.models.{AndroidMessagePayload, IOSMessagePayload, Topic}
 import pa.MatchDay
 import com.gu.mobile.notifications.football.models.{NotificationHistoryItem, NotificationSent}
+import com.gu.mobile.notifications.football.lib.{PaFootballClient, PaExpiringTopics, ExpiringTopics}
+import ExpirationJsonImplicits._
 
 class GoalNotificationsServiceActor extends Actor with GoalNotificationsService {
-
   // the HttpService trait defines only one abstract member, which
   // connects the services environment to the enclosing actor or test
   def actorRefFactory = context
@@ -22,6 +23,8 @@ class GoalNotificationsServiceActor extends Actor with GoalNotificationsService 
   // other things here, like request stream processing
   // or timeout handling
   def receive = runRoute(myRoute)
+
+  override val expiringTopics: ExpiringTopics = PaExpiringTopics(PaFootballClient)
 }
 
 /** Horrid HTML-puking functions */
@@ -90,6 +93,8 @@ trait Rendering {
 trait GoalNotificationsService extends HttpService with Rendering {
   implicit val timeout = Timeout(500 millis)
 
+  val expiringTopics: ExpiringTopics
+
   val myRoute =
     path("") {
       get {
@@ -98,6 +103,21 @@ trait GoalNotificationsService extends HttpService with Rendering {
             Agents.lastMatchDaysSeen.get() match {
               case Some(matchDays) => renderIndex(matchDays, Agents.notificationsHistory.get())
               case None => <p>Not contacted PA yet</p>
+            }
+          }
+        }
+      }
+    } ~
+    path("expired-topics") {
+      post {
+        decompressRequest() {
+          entity(as[ExpirationRequest]) { request =>
+            detach() {
+              complete {
+                expiringTopics.getExpired(request.topics) map { expiredTopics =>
+                  ExpirationResponse(expiredTopics)
+                }
+              }
             }
           }
         }

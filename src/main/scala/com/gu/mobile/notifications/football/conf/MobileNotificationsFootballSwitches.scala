@@ -12,7 +12,7 @@ object MobileNotificationsFootballSwitches extends Switches {
 
   override val dynamoDbTableName = GoalNotificationsConfig.dynamoDbSwitchesTableName
 
-  val sendNotifications = Switch("goal_notifications", default = false)
+  val sendNotifications = Switch("goal_notifications", default = true)
 
   val all: List[Switch] = List(sendNotifications)
 }
