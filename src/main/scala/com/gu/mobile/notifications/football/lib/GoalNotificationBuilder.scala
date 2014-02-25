@@ -101,11 +101,9 @@ object IOSPayloadBuilder {
   val IOSGoalAlertType = "g"
 
   def apply(goal: Goal, matchDay: MatchDay): IOSMessagePayload = {
-    val score = s"${matchDay.homeTeam.name} - ${matchDay.homeTeam.score.getOrElse(0)}\n" +
-      s"${matchDay.awayTeam.name} - ${matchDay.awayTeam.score.getOrElse(0)}"
-
-    val message = s"${goal.scorerName} scored for ${goal.scoringTeam.name}" +
-      s" (${goal.minute} min)\n$score"
+    val message = s"${matchDay.homeTeam.name} ${matchDay.homeTeam.score.getOrElse(0)}-" +
+      s"${matchDay.awayTeam.score.getOrElse(0)} ${matchDay.awayTeam.name}\n" +
+      s"${goal.scorerName} ${goal.minute}min"
 
     IOSMessagePayload(message, Map(IOSMessageType -> IOSGoalAlertType))
   }

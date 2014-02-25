@@ -9,8 +9,9 @@ import pa.MatchDay
 import pa.Response
 import com.gu.mobile.notifications.client.models.Topic
 import scala.concurrent.duration.Duration
+import com.gu.mobile.notifications.football.helpers.EmptyInstances
 
-class PaExpiringTopicsSpec extends WordSpec with Matchers {
+class PaExpiringTopicsSpec extends WordSpec with Matchers with EmptyInstances {
   trait NoHttp extends Http {
     override def GET(url: String): Future[Response] = Future.failed(new RuntimeException("This is a fixture HTTP only"))
   }
@@ -26,41 +27,6 @@ class PaExpiringTopicsSpec extends WordSpec with Matchers {
         }
       }
     })
-  }
-
-  implicit class RichMatchDayTeamCompanion(companion: MatchDayTeam.type) {
-    def empty = MatchDayTeam(
-      "",
-      "",
-      None,
-      None,
-      None,
-      None
-    )
-  }
-
-  implicit class RichMatchDayCompanion(companion: MatchDay.type) {
-    def empty = MatchDay(
-      "",
-      new DateTime(),
-      None,
-      None,
-      "",
-      false,
-      false,
-      false,
-      false,
-      false,
-      "",
-      None,
-      MatchDayTeam.empty,
-      MatchDayTeam.empty,
-      None,
-      None,
-      None
-    )
-
-    def forIdAndStatus(id: String, status: String) = empty.copy(id = id, matchStatus = status)
   }
 
   "PaExpiringTopics" should {
