@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.football.models
 
-import pa.{MatchEvent => PaMatchEvent}
+import pa.{MatchEvent => PaMatchEvent, MatchEvents}
 
 /** Match events we're interested in
   *
@@ -9,7 +9,12 @@ import pa.{MatchEvent => PaMatchEvent}
   * TODO: add notifications for kick off, red cards, results
   */
 object MatchEvent {
-  def fromPa(matchEvent: PaMatchEvent): Option[MatchEvent] = {
+  def fromMatchEvents(matchEvents: MatchEvents): List[MatchEvent] = {
+    val events = matchEvents.events.flatMap(fromMatchEvent)
+    events ++ (if (matchEvents.isResult) List(Result) else Nil)
+  }
+
+  def fromMatchEvent(matchEvent: PaMatchEvent): Option[MatchEvent] = {
     matchEvent.eventType match {
       case "timeline" if matchEvent.matchTime == Some("0:00") => Some(KickOff)
 
