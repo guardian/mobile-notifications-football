@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.football.models
 
-import pa.{MatchEvent => PaMatchEvent, MatchEvents}
+import pa.{MatchEvent => PaMatchEvent, Team, MatchEvents}
 
 /** Match events we're interested in
   *
@@ -10,32 +10,44 @@ import pa.{MatchEvent => PaMatchEvent, MatchEvents}
   */
 object MatchEvent {
   def fromMatchEvents(matchEvents: MatchEvents): List[MatchEvent] = {
-    val events = matchEvents.events.flatMap(fromMatchEvent)
+    val events = matchEvents.events.flatMap(fromMatchEvent(matchEvents) _)
     events ++ (if (matchEvents.isResult) List(Result) else Nil)
   }
 
-  def fromMatchEvent(matchEvent: PaMatchEvent): Option[MatchEvent] = {
+  def fromMatchEvent(matchEvents: MatchEvents)(matchEvent: PaMatchEvent): Option[MatchEvent] = {
+    def getTeam(id: String) =
+      List(matchEvents.homeTeam, matchEvents.awayTeam).find(_.id == id).map(MatchEventTeam.fromTeam)
+
     matchEvent.eventType match {
       case "timeline" if matchEvent.matchTime == Some("0:00") => Some(KickOff)
 
       case "goal" => for {
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
-      } yield Goal(scorer.name, scorer.teamID.toInt, eventTime.toInt)
+        team <- getTeam(scorer.teamID)
+      } yield Goal(scorer.name, team, eventTime.toInt)
 
       case "own goal" => for {
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
-      } yield OwnGoal(scorer.name, scorer.teamID.toInt, eventTime.toInt)
+        team <- getTeam(scorer.teamID)
+      } yield OwnGoal(scorer.name, team, eventTime.toInt)
 
       case _ => None
     }
   }
 }
 
-sealed trait MatchEvent
+object MatchEventTeam {
+  def fromTeam(team: Team) = MatchEventTeam(team.id.toInt, team.name)
+}
 
+case class MatchEventTeam(id: Int, name: String)
+
+sealed trait MatchEvent
 case object KickOff extends MatchEvent
-case class Goal(scorerName: String, teamId: Int, minute: Int) extends MatchEvent
-case class OwnGoal(scorerName: String, teamId: Int, minute: Int) extends MatchEvent
+case class Goal(scorerName: String, team: MatchEventTeam, minute: Int) extends MatchEvent
+
+/** NB: The team here is the team whose player scored the unfortunate goal, not the team who gets the point */
+case class OwnGoal(scorerName: String, team: MatchEventTeam, minute: Int) extends MatchEvent
 case object Result extends MatchEvent

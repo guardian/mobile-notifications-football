@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.football.models
 
-import pa.{MatchEvent => PaMatchEvent, Player}
+import pa.{MatchEvent => PaMatchEvent, Team, MatchEvents, Player}
 import pa.Parser.parseMatchEvents
 import org.scalatest.{WordSpec, Matchers}
 import com.gu.mobile.notifications.football.lib.ResourcesHelper
@@ -29,15 +29,22 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper {
     eventTime = Some(minute)
   )
 
+  val matchEventsFixture = MatchEvents(
+    Team("2", "Aston Villa"),
+    Team("14", "Norwich"),
+    Nil,
+    isResult = false
+  )
+
   "MatchEvent.fromMatchEvent" should {
     "interpret the first timeline event as a Kick Off event" in {
       val kickOffEvent = timelineFixture("0:00", "0")
-      MatchEvent.fromMatchEvent(kickOffEvent) should equal(Some(KickOff))
+      MatchEvent.fromMatchEvent(matchEventsFixture)(kickOffEvent) should equal(Some(KickOff))
     }
 
     "ignore other timeline events" in {
-      MatchEvent.fromMatchEvent(timelineFixture("0:01", "0")) should equal(None)
-      MatchEvent.fromMatchEvent(timelineFixture("1:34", "1")) should equal(None)
+      MatchEvent.fromMatchEvent(matchEventsFixture)(timelineFixture("0:01", "0")) should equal(None)
+      MatchEvent.fromMatchEvent(matchEventsFixture)(timelineFixture("1:34", "1")) should equal(None)
     }
 
     "interpret a goal event as a goal event" in {
@@ -55,7 +62,9 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper {
         whereTo = Some("Left Low")
       )
 
-      MatchEvent.fromMatchEvent(goalEvent) should equal(Some(Goal("Wes Hoolahan", 14, 3)))
+      MatchEvent.fromMatchEvent(matchEventsFixture)(goalEvent) should equal(Some(
+        Goal("Wes Hoolahan", MatchEventTeam(14, "Norwich"), 3))
+      )
     }
 
     "interpret an own goal event as an own goal event" in {
@@ -72,23 +81,23 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper {
         whereTo = Some("Right Low")
       )
 
-      MatchEvent.fromMatchEvent(ownGoalEvent) should equal(Some(OwnGoal("Sebastien Bassong", 14, 41)))
+      MatchEvent.fromMatchEvent(matchEventsFixture)(ownGoalEvent) should equal(Some(
+        OwnGoal("Sebastien Bassong", MatchEventTeam(14, "Norwich"), 41))
+      )
     }
   }
 
   "MatchEvent.fromMatchEvents" should {
     "correctly report the events from a match events feed" in {
-      val fixture = parseMatchEvents(slurpOrDie("pa/football/match/events/key/3704151.xml"))
-
-      val Some(matchEvents) = fixture
+      val Some(matchEvents) = parseMatchEvents(slurpOrDie("pa/football/match/events/key/3704151.xml"))
 
       MatchEvent.fromMatchEvents(matchEvents) should equal(List(
         KickOff,
-        Goal("Wes Hoolahan", 14, 3),
-        Goal("Christian Benteke", 2, 25),
-        Goal("Christian Benteke", 2, 27),
-        Goal("Leandro Bacuna", 2, 37),
-        OwnGoal("Sebastien Bassong", 14, 41),
+        Goal("Wes Hoolahan", MatchEventTeam(14, "Norwich"), 3),
+        Goal("Christian Benteke", MatchEventTeam(2, "Aston Villa"), 25),
+        Goal("Christian Benteke", MatchEventTeam(2, "Aston Villa"), 27),
+        Goal("Leandro Bacuna", MatchEventTeam(2, "Aston Villa"), 37),
+        OwnGoal("Sebastien Bassong", MatchEventTeam(14, "Norwich"), 41),
         Result
       ))
     }

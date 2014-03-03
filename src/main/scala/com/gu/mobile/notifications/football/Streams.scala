@@ -15,12 +15,12 @@ import scala.concurrent.duration.FiniteDuration
 import ExecutionContext.Implicits.global
 
 trait MatchDayStream extends Logging {
-  val UpdateInterval:FiniteDuration
+  val UpdateInterval: FiniteDuration
 
-  def getMatchDayStream(): Observable[List[MatchDay]] = {
-    // Use the subject below rather than subscribe to the stream directly - otherwise more calls are kicked off to PA than are
-    // required
-    val stream:Observable[List[MatchDay]] = Observable.interval(UpdateInterval) flatMap { _ =>
+  def getMatchDayStream: Observable[List[MatchDay]] = {
+    // Use the subject below rather than subscribe to the stream directly - otherwise more calls are kicked off to PA
+    // than are required
+    val stream: Observable[List[MatchDay]] = Observable.interval(UpdateInterval) flatMap { _ =>
       PaMatchDayClient(PaFootballClient).today.asObservable.completeOnError
     }
 
