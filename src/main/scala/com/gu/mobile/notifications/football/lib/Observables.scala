@@ -23,14 +23,12 @@ object Observables extends Logging {
         val subs = Subscription()
 
         f onComplete {
-          case Success(s) => {
+          case Success(s) =>
             o.onNext(s)
             o.onCompleted()
-          }
-          case Failure(s) =>{
+          case Failure(s) =>
             logger.info("Error completing future -  " + s)
             o.onError(s)
-          }
         }
 
         subs
