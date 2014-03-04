@@ -8,9 +8,10 @@ import rx.lang.scala.Observable
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import pa.MatchEvents
-import scala.util.Random
+import scala.util.{Failure, Success, Random}
+import grizzled.slf4j.Logging
 
-object MatchEventsObservable extends MatchEventsObservableLogic {
+object MatchEventsObservable extends MatchEventsObservableLogic with Logging {
   val apiClient = PaMatchDayClient(PaFootballClient)
 
   val pollingIntervalTolerance = 5.seconds
@@ -38,7 +39,7 @@ object MatchEventsObservableLogic {
   }
 }
 
-trait MatchEventsObservableLogic {
+trait MatchEventsObservableLogic { self: Logging =>
   import MatchEventsObservableLogic._
 
   protected val pollingInterval: FiniteDuration
@@ -62,8 +63,24 @@ trait MatchEventsObservableLogic {
     * @return The observable
     */
   def eventFeeds(id: String): Observable[MatchEvents] = {
-    (Observable.interval(randomPollingInterval) flatMap { _ =>
-      Observable.from(apiClient.matchEvents(id)).completeOnError
+    val pollingInterval = randomPollingInterval
+
+    logger.info(s"$id >>> polling every $pollingInterval")
+
+    (Observable.interval(pollingInterval) flatMap { _ =>
+      val eventsFuture = apiClient.matchEvents(id)
+
+      eventsFuture onComplete {
+        case Success(events) =>
+          logger.debug(s"$id >>> got ${events.events.length} events from feed")
+          if (events.isResult) {
+            logger.info(s"$id >>> match finished!")
+          }
+        case Failure(error) =>
+          logger.warn(s"$id >>> Error when polling: ", error)
+      }
+
+      Observable.from(eventsFuture).completeOnError
     }).completeOn(_.isResult)
   }
 
