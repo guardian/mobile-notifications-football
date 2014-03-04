@@ -43,6 +43,13 @@ object MatchEvent {
         otherTeam <- getTeam(scorer.teamID)
       } yield OwnGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt)
 
+      case "goal from penalty" => for {
+        scorer <- matchEvent.players.headOption
+        eventTime <- matchEvent.eventTime
+        scoringTeam <- getTeam(scorer.teamID)
+        otherTeam <- getOtherTeam(scorer.teamID)
+      } yield PenaltyGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt)
+
       case _ => None
     }
   }
@@ -72,6 +79,13 @@ case class Goal(
 ) extends ScoreEvent
 
 case class OwnGoal(
+  scorerName: String,
+  scoringTeam: MatchEventTeam,
+  otherTeam: MatchEventTeam,
+  minute: Int
+) extends ScoreEvent
+
+case class PenaltyGoal(
   scorerName: String,
   scoringTeam: MatchEventTeam,
   otherTeam: MatchEventTeam,

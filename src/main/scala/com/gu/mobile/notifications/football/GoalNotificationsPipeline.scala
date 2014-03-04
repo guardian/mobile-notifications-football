@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.football
 
 import scala.concurrent.duration._
-import com.gu.mobile.notifications.football.models.{EventFeedMetadata, OwnGoal, Goal}
+import com.gu.mobile.notifications.football.models.{PenaltyGoal, EventFeedMetadata, OwnGoal, Goal}
 
 object GoalNotificationsPipeline extends GoalNotificationsPipeline {
   val MaxHistoryLength: Int = 100
@@ -26,7 +26,10 @@ trait GoalNotificationsPipeline extends Streams with SNSQueue with GoalNotificat
           logger.info(s"$matchID >>> $scorerName scored for ${scoringTeam.name} at $minute min: " +
             s"${homeTeam.name} $homeScore - $awayScore ${awayTeam.name}")
         case OwnGoal(scorerName, scoringTeam, otherTeam, minute) =>
-          logger.info(s"$matchID >>> $scorerName (${otherTeam.name}}) scored an own goal! " +
+          logger.info(s"$matchID >>> $scorerName (${otherTeam.name}}) scored an own goal at $minute min! " +
+            s"${homeTeam.name} $homeScore - $awayScore ${awayTeam.name}")
+        case PenaltyGoal(scorerName, scoringTeam, otherTeam, minute) =>
+          logger.info(s"$matchID >>> $scorerName scored a penalty for ${scoringTeam.name} at $minute min: " +
             s"${homeTeam.name} $homeScore - $awayScore ${awayTeam.name}")
       }
     })
