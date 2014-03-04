@@ -11,14 +11,14 @@ object GoalNotificationsPipeline extends GoalNotificationsPipeline {
 trait GoalNotificationsPipeline extends Streams with SNSQueue with GoalNotificationLogger {
 
   def start(): Unit = {
-    val matchDayStream = getMatchDayStream
+    val matchDayStream = matchIdSets(getMatchDayStream)
     val goalEventStream = getGoalEvents(matchDayStream)
     val notificationStream = getGoalEventsAsNotifications(goalEventStream)
     val notificationSendHistory = getNotificationResponses(notificationStream)
 
     notificationSendHistory.subscribe(logNotificationHistory _)
-    goalEventStream.subscribe(logGoalEvents _)
-    matchDayStream.subscribe(logLastMatchDay _)
+   // goalEventStream.subscribe(logGoalEvents _)
+   // matchDayStream.subscribe(logLastMatchDay _)
     notificationStream.subscribe(publishNotifications _)
   }
 }

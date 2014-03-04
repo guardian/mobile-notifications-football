@@ -1,12 +1,11 @@
 package com.gu.mobile.notifications.football.models
 
-
-object EventFeedMetaData {
-  def incrementHomeScore(metadata: EventFeedMetaData) = {
+object EventFeedMetadata {
+  def incrementHomeScore(metadata: EventFeedMetadata) = {
     metadata.copy(homeTeamScore = metadata.homeTeamScore + 1)
   }
 
-  def incrementAwayScore(metadata: EventFeedMetaData) = {
+  def incrementAwayScore(metadata: EventFeedMetadata) = {
     metadata.copy(awayTeamScore = metadata.awayTeamScore + 1)
   }
 
@@ -14,8 +13,8 @@ object EventFeedMetaData {
     /** Given a list of events, zips each event with the current state of the EventFeedMetaData */
     def zipWithMetadata(
       matchID: String, homeTeam: MatchEventTeam, awayTeam: MatchEventTeam
-    ): Seq[(MatchEvent, EventFeedMetaData)] = {
-      val initialMetaData = EventFeedMetaData(
+    ): Seq[(MatchEvent, EventFeedMetadata)] = {
+      val initialMetaData = EventFeedMetadata(
         matchID,
         homeTeam,
         0,
@@ -24,15 +23,11 @@ object EventFeedMetaData {
       )
 
       val metas = events.scanLeft(initialMetaData) { (metaData, event) =>
-        val transform: EventFeedMetaData => EventFeedMetaData = event match {
-          case Goal(_, scoringTeam, _) if scoringTeam == metaData.homeTeam =>
+        val transform: EventFeedMetadata => EventFeedMetadata = event match {
+          case event: ScoreEvent if event.scoringTeam == metaData.homeTeam =>
             incrementHomeScore
-          case Goal(_, scoringTeam, _) if scoringTeam == metaData.awayTeam =>
+          case event: ScoreEvent if event.scoringTeam == metaData.awayTeam =>
             incrementAwayScore
-          case OwnGoal(_, ownScoringTeam, _) if ownScoringTeam == metaData.homeTeam =>
-            incrementAwayScore
-          case OwnGoal(_, ownScoringTeam, _) if ownScoringTeam == metaData.awayTeam =>
-            incrementHomeScore
           case _ => identity
         }
 
@@ -48,7 +43,7 @@ object EventFeedMetaData {
 /** Stores additional information essential for notifications, including the match ID, what the home and away team are,
   * and the current score after the event occurs
   */
-case class EventFeedMetaData(
+case class EventFeedMetadata(
     matchID: String,
     homeTeam: MatchEventTeam,
     homeTeamScore: Int,

@@ -1,62 +1,59 @@
 package com.gu.mobile.notifications.football.lib
 
-import scalaz._
-import Scalaz._
 import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.football.lib.Pa.Goal
-import pa.MatchDay
 import com.gu.mobile.notifications.client.models.Notification
+import com.gu.mobile.notifications.football.models.{ScoreEvent, EventFeedMetadata}
 
 object GoalNotificationBuilder {
   val FootballTeamTopicType = "football-team"
   val FootballMatchTopicType = "football-match"
 
-  def uniqueIdentifier(goal: Goal, matchDay: MatchDay) =
-    s"goalAlert/${matchDay.id}/${matchDay.homeTeam.score.getOrElse(0)}-${matchDay.awayTeam.score.getOrElse(0)}/" +
+  def uniqueIdentifier(goal: ScoreEvent, metadata: EventFeedMetadata) =
+    s"goalAlert/${metadata.matchID}/${metadata.homeTeamScore}-${metadata.awayTeamScore}/" +
       s"${goal.scoringTeam.id}/${goal.minute}"
 
-  def apply(goal: Goal, matchDay: MatchDay): Notification = {
+  def apply(goal: ScoreEvent, metadata: EventFeedMetadata): Notification = {
     Notification(
       `type` = "goal",
-      uniqueIdentifier = uniqueIdentifier(goal, matchDay),
+      uniqueIdentifier = uniqueIdentifier(goal, metadata),
       sender = "mobile-notifications-football",
       target = Target(
         regions = Set.empty,  /** Nothing ... is everything? :-O */
         topics = Set(
           Topic(
             FootballTeamTopicType,
-            matchDay.homeTeam.id
+            metadata.homeTeam.id.toString
           ),
           Topic(
             FootballTeamTopicType,
-            matchDay.awayTeam.id
+            metadata.awayTeam.id.toString
           ),
           Topic(
             FootballMatchTopicType,
-            matchDay.id
+            metadata.matchID
           ),
           /** Yes, the old apps registered by the team NAME. FFS **/
           Topic(
             FootballTeamTopicType,
-            matchDay.homeTeam.name
+            metadata.homeTeam.name
           ),
           Topic(
             FootballTeamTopicType,
-            matchDay.awayTeam.name
+            metadata.awayTeam.name
           )
         )
       ),
       timeToLiveInSeconds = (150 - goal.minute) * 60,
       payloads = MessagePayloads(
-        android = Some(AndroidPayloadBuilder(goal, matchDay)),
-        ios = Some(IOSPayloadBuilder(goal, matchDay))
+        android = Some(AndroidPayloadBuilder(goal, metadata)),
+        ios = Some(IOSPayloadBuilder(goal, metadata))
       ),
       metadata = Map(
-        "matchId" -> matchDay.id,
-        "homeTeamName" -> matchDay.homeTeam.name,
-        "homeTeamScore" -> matchDay.homeTeam.score.foldMap(_.toString),
-        "awayTeamName" -> matchDay.awayTeam.name,
-        "awayTeamScore" -> matchDay.awayTeam.score.foldMap(_.toString),
+        "matchId" -> metadata.matchID,
+        "homeTeamName" -> metadata.homeTeam.name,
+        "homeTeamScore" -> metadata.homeTeamScore.toString,
+        "awayTeamName" -> metadata.awayTeam.name,
+        "awayTeamScore" -> metadata.awayTeamScore.toString,
         "scorer" -> goal.scorerName,
         "minute" -> goal.minute.toString
       )
@@ -78,18 +75,18 @@ object AndroidPayloadBuilder {
   val MatchId = "matchId"
   val Debug = "debug"
 
-  def apply(goal: Goal, matchDay: MatchDay): AndroidMessagePayload = {
+  def apply(goal: ScoreEvent, metadata: EventFeedMetadata): AndroidMessagePayload = {
     AndroidMessagePayload(Map(
       Type -> GoalAlertType,
-      AwayTeamName -> matchDay.awayTeam.name,
-      AwayTeamScore -> matchDay.awayTeam.score.foldMap(_.toString),
-      HomeTeamName -> matchDay.homeTeam.name,
-      HomeTeamScore -> matchDay.homeTeam.score.foldMap(_.toString),
+      AwayTeamName -> metadata.awayTeam.name,
+      AwayTeamScore -> metadata.awayTeamScore.toString,
+      HomeTeamName -> metadata.homeTeam.name,
+      HomeTeamScore -> metadata.homeTeamScore.toString,
       ScoringTeamName -> goal.scoringTeam.name,
       ScorerName -> goal.scorerName,
       GoalMins -> goal.minute.toString,
-      OtherTeamName -> (Set(matchDay.homeTeam, matchDay.awayTeam) - goal.scoringTeam).head.name,
-      MatchId -> matchDay.id,
+      OtherTeamName -> goal.otherTeam.name,
+      MatchId -> metadata.matchID,
       /** This flag exists for legacy reasons (the current PROD Android app will break if it's not here) */
       Debug -> "false"
     ))
@@ -100,9 +97,9 @@ object IOSPayloadBuilder {
   val IOSMessageType = "t"
   val IOSGoalAlertType = "g"
 
-  def apply(goal: Goal, matchDay: MatchDay): IOSMessagePayload = {
-    val message = s"${matchDay.homeTeam.name} ${matchDay.homeTeam.score.getOrElse(0)}-" +
-      s"${matchDay.awayTeam.score.getOrElse(0)} ${matchDay.awayTeam.name}\n" +
+  def apply(goal: ScoreEvent, metadata: EventFeedMetadata): IOSMessagePayload = {
+    val message = s"${metadata.homeTeam.name} ${metadata.homeTeamScore}-" +
+      s"${metadata.awayTeamScore} ${metadata.awayTeam.name}\n" +
       s"${goal.scorerName} ${goal.minute}min"
 
     IOSMessagePayload(message, Map(IOSMessageType -> IOSGoalAlertType))

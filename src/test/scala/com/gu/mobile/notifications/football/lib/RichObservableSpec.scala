@@ -7,34 +7,10 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RichObservableSpec extends WordSpec with ShouldMatchers {
-  "Observable.empty" should {
-    "immediately return" in {
-      Observable.empty.toBlockingObservable.toList shouldEqual Nil
-    }
-  }
-
   "Observable.pairs" when {
     "applied to an Observable of x | 0 <= x < 10" should {
       "return an Observable of (x, x + 1) | 0 <= x < 9" in {
-        Observable(0 to 9).pairs.toBlockingObservable.toList shouldEqual (0 to 8).map(i => (i, i + 1)).toList
-      }
-    }
-  }
-
-  "Future.asObservable" when {
-    "applied to Future.successful(1)" should {
-      "return an Observable containing a single '1'" in {
-        Future.successful(1).asObservable.toBlockingObservable.toList shouldEqual List(1)
-      }
-    }
-
-    "applied to Future.failed(err)" should {
-      "return an Observable that fails on err" in {
-        val err = new Exception("hi")
-
-        intercept[Exception] {
-          Future.failed(err).asObservable.toBlockingObservable.toList
-        }
+        Observable.items(0 to 9: _*).pairs.toBlockingObservable.toList shouldEqual (0 to 8).map(i => (i, i + 1)).toList
       }
     }
   }
@@ -44,8 +20,28 @@ class RichObservableSpec extends WordSpec with ShouldMatchers {
       "complete rather than emitting err" in {
         val err = new Exception("argh!")
 
-        Future.failed(err).asObservable.completeOnError.toBlockingObservable.toList shouldEqual Nil
+        Observable.from(Future.failed(err)).completeOnError.toBlockingObservable.toList shouldEqual Nil
       }
+    }
+  }
+
+  "Observable.completeOn" should {
+    "act like takeWhile on the complement of f, but also emit the first A for which f is true" in {
+      val numbers = Observable.items(0 to 20: _*)
+
+      numbers.completeOn(_ > 10).toBlockingObservable.toList shouldEqual (0 to 11).toList
+    }
+  }
+
+  "Observable.collect" should {
+    "act like the standard collect function" in {
+      sealed trait A
+      case class B(i: Int) extends A
+      case class C(s: String) extends A
+
+      Observable.items(B(12), C("hi"), B(4), C("world")).collect({
+        case b @ B(_) => b
+      }).toBlockingObservable.toList shouldEqual List(B(12), B(4))
     }
   }
 }

@@ -15,8 +15,16 @@ object MatchEvent {
   }
 
   def fromMatchEvent(matchEvents: MatchEvents)(matchEvent: PaMatchEvent): Option[MatchEvent] = {
+    val teams = List(matchEvents.homeTeam, matchEvents.awayTeam).map(MatchEventTeam.fromTeam)
+
     def getTeam(id: String) =
-      List(matchEvents.homeTeam, matchEvents.awayTeam).find(_.id == id).map(MatchEventTeam.fromTeam)
+      teams.find(_.id == id.toInt)
+
+    def getOtherTeam(id: String) =
+      teams.filter(_.id != id.toInt) match {
+        case team :: Nil => Some(team)
+        case _ => None
+      }
 
     matchEvent.eventType match {
       case "timeline" if matchEvent.matchTime == Some("0:00") => Some(KickOff)
@@ -24,14 +32,16 @@ object MatchEvent {
       case "goal" => for {
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
-        team <- getTeam(scorer.teamID)
-      } yield Goal(scorer.name, team, eventTime.toInt)
+        scoringTeam <- getTeam(scorer.teamID)
+        otherTeam <- getOtherTeam(scorer.teamID)
+      } yield Goal(scorer.name, scoringTeam, otherTeam, eventTime.toInt)
 
       case "own goal" => for {
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
-        team <- getTeam(scorer.teamID)
-      } yield OwnGoal(scorer.name, team, eventTime.toInt)
+        scoringTeam <- getOtherTeam(scorer.teamID)
+        otherTeam <- getTeam(scorer.teamID)
+      } yield OwnGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt)
 
       case _ => None
     }
@@ -46,8 +56,26 @@ case class MatchEventTeam(id: Int, name: String)
 
 sealed trait MatchEvent
 case object KickOff extends MatchEvent
-case class Goal(scorerName: String, team: MatchEventTeam, minute: Int) extends MatchEvent
 
-/** NB: The team here is the team whose player scored the unfortunate goal, not the team who gets the point */
-case class OwnGoal(scorerName: String, team: MatchEventTeam, minute: Int) extends MatchEvent
+sealed trait ScoreEvent extends MatchEvent {
+  val scorerName: String
+  val scoringTeam: MatchEventTeam
+  val otherTeam: MatchEventTeam
+  val minute: Int
+}
+
+case class Goal(
+  scorerName: String,
+  scoringTeam: MatchEventTeam,
+  otherTeam: MatchEventTeam,
+  minute: Int
+) extends ScoreEvent
+
+case class OwnGoal(
+  scorerName: String,
+  scoringTeam: MatchEventTeam,
+  otherTeam: MatchEventTeam,
+  minute: Int
+) extends ScoreEvent
+
 case object Result extends MatchEvent

@@ -1,40 +1,30 @@
 package com.gu.mobile.notifications.football.models
 
-import pa.{MatchEvent => PaMatchEvent, Team, MatchEvents, Player}
+import pa.{Team, MatchEvents, Player}
 import pa.Parser.parseMatchEvents
 import org.scalatest.{WordSpec, Matchers}
 import com.gu.mobile.notifications.football.lib.ResourcesHelper
+import com.gu.mobile.notifications.football.helpers.EmptyInstances
 
-class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper {
-  object PaMatchEvent {
-    def empty = new PaMatchEvent(
-      None,
-      None,
-      "",
-      None,
-      None,
-      Nil,
-      None,
-      None,
-      None,
-      None,
-      None,
-      None
-    )
-  }
-
+class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with EmptyInstances {
   def timelineFixture(matchTime: String, minute: String) = PaMatchEvent.empty.copy(
     eventType = "timeline",
     matchTime = Some(matchTime),
     eventTime = Some(minute)
   )
 
+  val homeTeamFixture = Team("2", "Aston Villa")
+  val awayTeamFixture = Team("14", "Norwich")
+
   val matchEventsFixture = MatchEvents(
-    Team("2", "Aston Villa"),
-    Team("14", "Norwich"),
+    homeTeamFixture,
+    awayTeamFixture,
     Nil,
     isResult = false
   )
+
+  val homeTeam = MatchEventTeam(2, "Aston Villa")
+  val awayTeam = MatchEventTeam(14, "Norwich")
 
   "MatchEvent.fromMatchEvent" should {
     "interpret the first timeline event as a Kick Off event" in {
@@ -63,7 +53,7 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper {
       )
 
       MatchEvent.fromMatchEvent(matchEventsFixture)(goalEvent) should equal(Some(
-        Goal("Wes Hoolahan", MatchEventTeam(14, "Norwich"), 3))
+        Goal("Wes Hoolahan", awayTeam, homeTeam, 3))
       )
     }
 
@@ -82,7 +72,7 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper {
       )
 
       MatchEvent.fromMatchEvent(matchEventsFixture)(ownGoalEvent) should equal(Some(
-        OwnGoal("Sebastien Bassong", MatchEventTeam(14, "Norwich"), 41))
+        OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41))
       )
     }
   }
@@ -93,11 +83,11 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper {
 
       MatchEvent.fromMatchEvents(matchEvents) should equal(List(
         KickOff,
-        Goal("Wes Hoolahan", MatchEventTeam(14, "Norwich"), 3),
-        Goal("Christian Benteke", MatchEventTeam(2, "Aston Villa"), 25),
-        Goal("Christian Benteke", MatchEventTeam(2, "Aston Villa"), 27),
-        Goal("Leandro Bacuna", MatchEventTeam(2, "Aston Villa"), 37),
-        OwnGoal("Sebastien Bassong", MatchEventTeam(14, "Norwich"), 41),
+        Goal("Wes Hoolahan", awayTeam, homeTeam, 3),
+        Goal("Christian Benteke", homeTeam, awayTeam, 25),
+        Goal("Christian Benteke", homeTeam, awayTeam, 27),
+        Goal("Leandro Bacuna", homeTeam, awayTeam, 37),
+        OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41),
         Result
       ))
     }

@@ -1,18 +1,18 @@
 package com.gu.mobile.notifications.football
 
-import rx.lang.scala.Observable
-import com.gu.mobile.notifications.football.models.{NotificationHistoryItem, NotificationFailed, NotificationSent}
+import rx.lang.scala.{Subject, Observable}
+import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.lib._
 import org.joda.time.DateTime
 import lib.Observables._
 import scala.concurrent.ExecutionContext
-import pa.MatchDay
-import com.gu.mobile.notifications.football.lib.GoalEvent
-import com.gu.mobile.notifications.client.models.Notification
 import grizzled.slf4j.Logging
-import rx.lang.scala.subjects.PublishSubject
 import scala.concurrent.duration.FiniteDuration
 import ExecutionContext.Implicits.global
+import com.gu.mobile.notifications.football.observables.MatchEventsObservable
+import pa.MatchDay
+import com.gu.mobile.notifications.football.lib.PaMatchDayClient
+import com.gu.mobile.notifications.client.models.Notification
 
 trait MatchDayStream extends Logging {
   val UpdateInterval: FiniteDuration
@@ -21,30 +21,40 @@ trait MatchDayStream extends Logging {
     // Use the subject below rather than subscribe to the stream directly - otherwise more calls are kicked off to PA
     // than are required
     val stream: Observable[List[MatchDay]] = Observable.interval(UpdateInterval) flatMap { _ =>
-      PaMatchDayClient(PaFootballClient).today.asObservable.completeOnError
+      Observable.from(PaMatchDayClient(PaFootballClient).today).completeOnError
     }
 
-    val subject = PublishSubject[List[MatchDay]]()
+    val subject = Subject[List[MatchDay]]()
     stream.subscribe(subject)
     subject
+  }
+
+  def matchIdSets(matchDays: Observable[List[MatchDay]]): Observable[Set[String]] = {
+    /** The set of match IDs will change exactly once per day. No two sets will contain the same match IDs.
+      * This ensures that the observable does not emit the same IDs repeatedly (so when we flatMap it later into match
+      * event Observables we don't end up creating duplicates) but also ensures that the Observable always occupies
+      * constant space (as it only remembers the previously seen set of IDs, rather than every ID it's ever seen).
+      */
+    matchDays.map(_.map(_.id).toSet).distinctUntilChanged
   }
 }
 
 trait GoalEventStream extends Logging {
   /** Given a stream of lists of MatchDay results, returns a stream of goal events */
-  def getGoalEvents(matchDays: Observable[List[MatchDay]]): Observable[GoalEvent] = {
-    matchDays.pairs flatMap { case (oldMatchDays, newMatchDays) =>
-      Observable((Lists.pairs(oldMatchDays, newMatchDays)(_.id) flatMap { case (oldMatchDay, newMatchDay) =>
-        Pa.delta(oldMatchDay, newMatchDay) map { goal => GoalEvent(goal, newMatchDay) }
-      }).toList: _*)
+  def getGoalEvents(matchIdSets: Observable[Set[String]]): Observable[(ScoreEvent, EventFeedMetadata)] = {
+    matchIdSets flatMap { ids =>
+      ids.map(MatchEventsObservable.forMatchId).fold(Observable.empty)(_.merge(_)) collect {
+        case (goal @ Goal(_, _, _, _), metadata) => (goal, metadata)
+        case (ownGoal @ OwnGoal(_, _, _, _), metadata) => (ownGoal, metadata)
+      }
     }
   }
 }
 
 trait GuardianNotificationStream extends Logging {
   /** Transforms a stream of Goal events into Notifications to be sent via Guardian Mobile Notifications */
-  def getGoalEventsAsNotifications(goals: Observable[GoalEvent]): Observable[Notification] = goals map {
-    case GoalEvent(goal, matchDay) => GoalNotificationBuilder(goal, matchDay)
+  def getGoalEventsAsNotifications(goals: Observable[(ScoreEvent, EventFeedMetadata)]): Observable[Notification] = goals map {
+    case (event, metadata) => GoalNotificationBuilder(event, metadata)
   }
 }
 
@@ -61,14 +71,14 @@ trait NotificationResponseStream extends NotificationsClient with Logging {
     */
   def getNotificationResponses(notifications: Observable[Notification])(implicit executionContext: ExecutionContext): Observable[NotificationHistoryItem] =
     notifications flatMap { notification =>
-      Observable.defer(send(notification).asObservable).retry(retrySendNotifications) map { reply =>
+      Observable.defer(Observable.from(send(notification))).retry(retrySendNotifications) map { reply =>
         NotificationSent(
           new DateTime(),
           notification,
           reply
         )
       } onErrorResumeNext {
-        Observable(NotificationFailed(
+        Observable.items(NotificationFailed(
           new DateTime(),
           notification
         ))

@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.football.models
 
 import org.scalatest.{Matchers, WordSpec}
-import EventFeedMetaData._
+import EventFeedMetadata._
 
 class EventFeedMetaDataSpec extends WordSpec with Matchers {
   val homeTeam = MatchEventTeam(14, "Norwich")
@@ -10,11 +10,11 @@ class EventFeedMetaDataSpec extends WordSpec with Matchers {
 
   val eventsList = List(
     KickOff,
-    Goal("Wes Hoolahan", homeTeam, 3),
-    Goal("Christian Benteke", awayTeam, 25),
-    Goal("Christian Benteke", awayTeam, 27),
-    Goal("Leandro Bacuna", awayTeam, 37),
-    OwnGoal("Sebastien Bassong", homeTeam, 41),
+    Goal("Wes Hoolahan", homeTeam, awayTeam, 3),
+    Goal("Christian Benteke", awayTeam, homeTeam, 25),
+    Goal("Christian Benteke", awayTeam, homeTeam, 27),
+    Goal("Leandro Bacuna", awayTeam, homeTeam, 37),
+    OwnGoal("Sebastien Bassong", awayTeam, homeTeam, 41),
     Result
   )
 

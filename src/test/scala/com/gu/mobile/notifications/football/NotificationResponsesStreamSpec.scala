@@ -51,7 +51,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
   val notificationFixtures = List(notificationFixture, notificationFixture2)
 
-  val notificationFixturesObservable = Observable(notificationFixtures: _*)
+  val notificationFixturesObservable = Observable.items(notificationFixtures: _*)
 
   implicit class RichSeq[A](xs: Seq[A]) {
     /** Filters the list for items of the given subtype of A */
