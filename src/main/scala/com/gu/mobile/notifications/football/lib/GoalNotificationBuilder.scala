@@ -2,7 +2,15 @@ package com.gu.mobile.notifications.football.lib
 
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.Notification
-import com.gu.mobile.notifications.football.models.{ScoreEvent, EventFeedMetadata}
+import com.gu.mobile.notifications.football.models._
+import com.gu.mobile.notifications.client.models.IOSMessagePayload
+import com.gu.mobile.notifications.client.models.Target
+import com.gu.mobile.notifications.client.models.AndroidMessagePayload
+import com.gu.mobile.notifications.football.models.OwnGoal
+import scala.Some
+import com.gu.mobile.notifications.client.models.MessagePayloads
+import com.gu.mobile.notifications.client.models.Topic
+import com.gu.mobile.notifications.client.models.Notification
 
 object GoalNotificationBuilder {
   val FootballTeamTopicType = "football-team"
@@ -98,9 +106,15 @@ object IOSPayloadBuilder {
   val IOSGoalAlertType = "g"
 
   def apply(goal: ScoreEvent, metadata: EventFeedMetadata): IOSMessagePayload = {
+    val extraInfo = goal match {
+      case OwnGoal(_, _, _, _) => " (o.g.)"
+      case PenaltyGoal(_, _, _, _) => " (pen)"
+      case _ => ""
+    }
+
     val message = s"${metadata.homeTeam.name} ${metadata.homeTeamScore}-" +
       s"${metadata.awayTeamScore} ${metadata.awayTeam.name}\n" +
-      s"${goal.scorerName} ${goal.minute}min"
+      s"${goal.scorerName} ${goal.minute}min$extraInfo"
 
     IOSMessagePayload(message, Map(IOSMessageType -> IOSGoalAlertType))
   }

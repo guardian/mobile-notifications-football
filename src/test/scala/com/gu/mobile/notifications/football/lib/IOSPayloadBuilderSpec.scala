@@ -2,7 +2,10 @@ package com.gu.mobile.notifications.football.lib
 
 import org.scalatest.{ShouldMatchers, WordSpec}
 import com.gu.mobile.notifications.client.models.IOSMessagePayload
-import com.gu.mobile.notifications.football.models.{OwnGoal, MatchEventTeam, EventFeedMetadata, Goal}
+import com.gu.mobile.notifications.football.models._
+import com.gu.mobile.notifications.football.models.Goal
+import com.gu.mobile.notifications.client.models.IOSMessagePayload
+import com.gu.mobile.notifications.football.models.OwnGoal
 
 class IOSPayloadBuilderSpec extends WordSpec with ShouldMatchers {
   val manchesterUnited = MatchEventTeam(
@@ -36,7 +39,15 @@ class IOSPayloadBuilderSpec extends WordSpec with ShouldMatchers {
       val eventFixture = OwnGoal("David Beckham", manchesterUnited, boltonWanderers, 34)
 
       IOSPayloadBuilder.apply(eventFixture, metadataFixture) should equal(
-        IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 34min", Map("t" -> "g"))
+        IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 34min (o.g.)", Map("t" -> "g"))
+      )
+    }
+
+    "build an appropriate message for a penalty goal event" in {
+      val eventFixture = PenaltyGoal("David Beckham", manchesterUnited, boltonWanderers, 82)
+
+      IOSPayloadBuilder.apply(eventFixture, metadataFixture) should equal(
+        IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 82min (pen)", Map("t" -> "g"))
       )
     }
   }
