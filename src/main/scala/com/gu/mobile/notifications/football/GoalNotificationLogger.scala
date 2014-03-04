@@ -4,7 +4,7 @@ import grizzled.slf4j.Logging
 import com.gu.mobile.notifications.football.lib._
 import pa.MatchDay
 import scala.Some
-import com.gu.mobile.notifications.football.models.{NotificationFailed, NotificationSent, NotificationHistoryItem}
+import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.lib.Pa._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -16,9 +16,9 @@ trait GoalNotificationLogger extends Logging {
     Agents.lastMatchDaysSeen send const(Some(matchDays))
   }
 
-  def logGoalEvents(goalEvent: GoalEvent) {
-    logger.info(s"Goal event: ${goalEvent.goal.scorerName} scored for ${goalEvent.goal.scoringTeam.name} at " +
-      s"minute ${goalEvent.goal.minute}")
+  def logGoalEvents(goalEvent: ScoreEvent) {
+    logger.info(s"Goal event: ${goalEvent.scorerName} scored for ${goalEvent.scoringTeam.name} at " +
+      s"minute ${goalEvent.minute}")
   }
 
   def logNotificationHistory(notificationResponse: NotificationHistoryItem) {

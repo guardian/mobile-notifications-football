@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.football.helpers
 
-import pa.{MatchDay, MatchDayTeam}
+import pa.{MatchEvent, MatchDay, MatchDayTeam}
 import org.joda.time.DateTime
 
 trait EmptyInstances {
@@ -8,6 +8,23 @@ trait EmptyInstances {
     def empty = MatchDayTeam(
       "",
       "",
+      None,
+      None,
+      None,
+      None
+    )
+  }
+
+  object PaMatchEvent {
+    def empty = new MatchEvent(
+      None,
+      None,
+      "",
+      None,
+      None,
+      Nil,
+      None,
+      None,
       None,
       None,
       None,
