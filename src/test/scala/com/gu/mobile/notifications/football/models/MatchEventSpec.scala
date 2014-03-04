@@ -75,6 +75,26 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
         OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41))
       )
     }
+
+    "interpret a penalty goal as a penalty goal event" in {
+      val penaltyGoalEvent = PaMatchEvent.empty.copy(
+        teamID = Some("14"),
+        id = Some("18879192"),
+        eventType = "goal from penalty",
+        matchTime = Some("(82)"),
+        eventTime = Some("82"),
+        players = List(
+          Player("285753", "14", "Glenn Murray")
+        ),
+        how = Some("Right Foot"),
+        whereFrom = Some("Penalty Spot"),
+        whereTo = Some("Right High")
+      )
+
+      MatchEvent.fromMatchEvent(matchEventsFixture)(penaltyGoalEvent) should equal(Some(
+        PenaltyGoal("Glenn Murray", awayTeam, homeTeam, 82)
+      ))
+    }
   }
 
   "MatchEvent.fromMatchEvents" should {

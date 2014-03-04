@@ -14,9 +14,9 @@ class MatchEventsObservableLogicSpec extends WordSpec with Matchers with Resourc
     "correctly reproduce the sequence of events without duplicates" in {
       val Some(finalFixture) = parseMatchEvents(slurpOrDie("pa/football/match/events/key/3704151.xml"))
 
-      val fixture1 = finalFixture.copy(isResult = false, events = finalFixture.events.take(10))
-      val fixture2 = finalFixture.copy(isResult = false, events = finalFixture.events.take(20))
-      val fixture3 = finalFixture.copy(isResult = false, events = finalFixture.events.take(30))
+      val fixture1 = finalFixture.copy(isResult = false, events = finalFixture.events.take(20))
+      val fixture2 = finalFixture.copy(isResult = false, events = finalFixture.events.take(40))
+      val fixture3 = finalFixture.copy(isResult = false, events = finalFixture.events.take(60))
 
       val matchEventsSequence = Observable.items(fixture1, fixture1, fixture2, fixture3, fixture3, finalFixture)
 
@@ -30,6 +30,37 @@ class MatchEventsObservableLogicSpec extends WordSpec with Matchers with Resourc
           Goal("Christian Benteke", homeTeam, awayTeam, 27),
           Goal("Leandro Bacuna", homeTeam, awayTeam, 37),
           OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41),
+          Result
+        )
+      )
+    }
+
+    "correctly reproduce another series of events without duplicates" in {
+      val Some(finalFixture) = parseMatchEvents(slurpOrDie("pa/football/match/events/key/3693727.xml"))
+
+      val fixture1 = finalFixture.copy(isResult = false, events = finalFixture.events.take(25))
+      val fixture2 = finalFixture.copy(isResult = false, events = finalFixture.events.take(50))
+      val fixture3 = finalFixture.copy(isResult = false, events = finalFixture.events.take(80))
+
+      val matchEventsSequence = Observable.items(fixture1, fixture1, fixture2, fixture3, fixture3, finalFixture)
+
+      MatchEventsObservableLogic
+        .eventsFromFeeds("3693727", matchEventsSequence)
+        .toBlockingObservable.toList.map(_._1) should be(
+        List(
+          KickOff,
+          Goal(
+            "Jonathan de Guzman",
+            MatchEventTeam(65, "Swansea"),
+            MatchEventTeam(5, "Crystal Palace"),
+            25
+          ),
+          PenaltyGoal(
+            "Glenn Murray",
+            MatchEventTeam(5, "Crystal Palace"),
+            MatchEventTeam(65, "Swansea"),
+            82
+          ),
           Result
         )
       )
