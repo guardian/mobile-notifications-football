@@ -53,7 +53,7 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
       )
 
       MatchEvent.fromMatchEvent(matchEventsFixture)(goalEvent) should equal(Some(
-        Goal("Wes Hoolahan", awayTeam, homeTeam, 3))
+        Goal("Wes Hoolahan", awayTeam, homeTeam, 3, None))
       )
     }
 
@@ -72,7 +72,7 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
       )
 
       MatchEvent.fromMatchEvent(matchEventsFixture)(ownGoalEvent) should equal(Some(
-        OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41))
+        OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41, None))
       )
     }
 
@@ -92,7 +92,7 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
       )
 
       MatchEvent.fromMatchEvent(matchEventsFixture)(penaltyGoalEvent) should equal(Some(
-        PenaltyGoal("Glenn Murray", awayTeam, homeTeam, 82)
+        PenaltyGoal("Glenn Murray", awayTeam, homeTeam, 82, None)
       ))
     }
   }
@@ -103,11 +103,25 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
 
       MatchEvent.fromMatchEvents(matchEvents) should equal(List(
         KickOff,
-        Goal("Wes Hoolahan", awayTeam, homeTeam, 3),
-        Goal("Christian Benteke", homeTeam, awayTeam, 25),
-        Goal("Christian Benteke", homeTeam, awayTeam, 27),
-        Goal("Leandro Bacuna", homeTeam, awayTeam, 37),
-        OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41),
+        Goal("Wes Hoolahan", awayTeam, homeTeam, 3, None),
+        Goal("Christian Benteke", homeTeam, awayTeam, 25, None),
+        Goal("Christian Benteke", homeTeam, awayTeam, 27, None),
+        Goal("Leandro Bacuna", homeTeam, awayTeam, 37, None),
+        OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41, None),
+        Result
+      ))
+    }
+
+    "correctly report events in extra time from a match events feed" in {
+      val Some(matchEvents) = parseMatchEvents(slurpOrDie("pa/football/match/events/key/3704203.xml"))
+
+      val stevenage = MatchEventTeam(1073, "Stevenage")
+      val crawleyTown = MatchEventTeam(188, "Crawley Town")
+
+      MatchEvent.fromMatchEvents(matchEvents) should equal(List(
+        KickOff,
+        Goal("Bira Dembele", stevenage, crawleyTown, 21, None),
+        Goal("Matt Tubbs", crawleyTown, stevenage, 90, Some("1:15")),
         Result
       ))
     }

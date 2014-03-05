@@ -28,7 +28,7 @@ class IOSPayloadBuilderSpec extends WordSpec with ShouldMatchers {
 
   "IOSPayloadBuilder" should {
     "build an appropriate message for a goal event" in {
-      val eventFixture = Goal("David Beckham", manchesterUnited, boltonWanderers, 34)
+      val eventFixture = Goal("David Beckham", manchesterUnited, boltonWanderers, 34, None)
 
       IOSPayloadBuilder.apply(eventFixture, metadataFixture) should equal(
         IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 34min", Map("t" -> "g"))
@@ -36,7 +36,7 @@ class IOSPayloadBuilderSpec extends WordSpec with ShouldMatchers {
     }
 
     "build an appropriate message for an own goal event" in {
-      val eventFixture = OwnGoal("David Beckham", manchesterUnited, boltonWanderers, 34)
+      val eventFixture = OwnGoal("David Beckham", manchesterUnited, boltonWanderers, 34, None)
 
       IOSPayloadBuilder.apply(eventFixture, metadataFixture) should equal(
         IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 34min (o.g.)", Map("t" -> "g"))
@@ -44,10 +44,34 @@ class IOSPayloadBuilderSpec extends WordSpec with ShouldMatchers {
     }
 
     "build an appropriate message for a penalty goal event" in {
-      val eventFixture = PenaltyGoal("David Beckham", manchesterUnited, boltonWanderers, 82)
+      val eventFixture = PenaltyGoal("David Beckham", manchesterUnited, boltonWanderers, 82, None)
 
       IOSPayloadBuilder.apply(eventFixture, metadataFixture) should equal(
         IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 82min (pen)", Map("t" -> "g"))
+      )
+    }
+
+    "build an appropriate message for a goal event in extra time" in {
+      val eventFixture = Goal("David Beckham", manchesterUnited, boltonWanderers, 90, Some("5:23"))
+
+      IOSPayloadBuilder.apply(eventFixture, metadataFixture) should equal(
+        IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 90min (+5:23)", Map("t" -> "g"))
+      )
+    }
+
+    "build an appropriate message for an own goal event in extra time" in {
+      val eventFixture = OwnGoal("David Beckham", manchesterUnited, boltonWanderers, 90, Some("1:23"))
+
+      IOSPayloadBuilder.apply(eventFixture, metadataFixture) should equal(
+        IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 90min (o.g. +1:23)", Map("t" -> "g"))
+      )
+    }
+
+    "build an appropriate message for a penalty goal event in extra time" in {
+      val eventFixture = PenaltyGoal("David Beckham", manchesterUnited, boltonWanderers, 90, Some("2:00"))
+
+      IOSPayloadBuilder.apply(eventFixture, metadataFixture) should equal(
+        IOSMessagePayload("Manchester United 2-1 Bolton Wanderers\nDavid Beckham 90min (pen +2:00)", Map("t" -> "g"))
       )
     }
   }

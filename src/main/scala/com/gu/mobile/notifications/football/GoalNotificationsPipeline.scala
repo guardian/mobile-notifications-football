@@ -22,13 +22,13 @@ trait GoalNotificationsPipeline extends Streams with SNSQueue with GoalNotificat
       val (event, EventFeedMetadata(matchID, homeTeam, homeScore, awayTeam, awayScore)) = pair
 
       event match {
-        case Goal(scorerName, scoringTeam, otherTeam, minute) =>
+        case Goal(scorerName, scoringTeam, otherTeam, minute, _) =>
           logger.info(s"$matchID >>> $scorerName scored for ${scoringTeam.name} at $minute min: " +
             s"${homeTeam.name} $homeScore - $awayScore ${awayTeam.name}")
-        case OwnGoal(scorerName, scoringTeam, otherTeam, minute) =>
+        case OwnGoal(scorerName, scoringTeam, otherTeam, minute, _) =>
           logger.info(s"$matchID >>> $scorerName (${otherTeam.name}}) scored an own goal at $minute min! " +
             s"${homeTeam.name} $homeScore - $awayScore ${awayTeam.name}")
-        case PenaltyGoal(scorerName, scoringTeam, otherTeam, minute) =>
+        case PenaltyGoal(scorerName, scoringTeam, otherTeam, minute, _) =>
           logger.info(s"$matchID >>> $scorerName scored a penalty for ${scoringTeam.name} at $minute min: " +
             s"${homeTeam.name} $homeScore - $awayScore ${awayTeam.name}")
       }

@@ -1,6 +1,8 @@
 package com.gu.mobile.notifications.football.lib
 
-import pa.MatchDay
+import pa.{MatchEvent, MatchDay}
+import org.joda.time.Duration
+import org.joda.time.format.PeriodFormatter
 
 object Pa {
   val MatchEndedStatuses = List(

@@ -44,8 +44,9 @@ trait GoalEventStream extends Logging {
   def getGoalEvents(matchIdSets: Observable[Set[String]]): Observable[(ScoreEvent, EventFeedMetadata)] = {
     matchIdSets flatMap { ids =>
       ids.map(MatchEventsObservable.forMatchId).fold(Observable.empty)(_.merge(_)) collect {
-        case (goal @ Goal(_, _, _, _), metadata) => (goal, metadata)
-        case (ownGoal @ OwnGoal(_, _, _, _), metadata) => (ownGoal, metadata)
+        case (goal @ Goal(_, _, _, _, _), metadata) => (goal, metadata)
+        case (ownGoal @ OwnGoal(_, _, _, _, _), metadata) => (ownGoal, metadata)
+        case (penalty @ PenaltyGoal(_, _, _, _, _), metadata) => (penalty, metadata)
       }
     }
   }

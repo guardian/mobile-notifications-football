@@ -22,6 +22,7 @@ trait EmptyInstances {
       "",
       None,
       None,
+      None,
       Nil,
       None,
       None,

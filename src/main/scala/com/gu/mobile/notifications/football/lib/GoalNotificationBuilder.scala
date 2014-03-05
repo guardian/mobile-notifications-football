@@ -106,10 +106,15 @@ object IOSPayloadBuilder {
   val IOSGoalAlertType = "g"
 
   def apply(goal: ScoreEvent, metadata: EventFeedMetadata): IOSMessagePayload = {
-    val extraInfo = goal match {
-      case OwnGoal(_, _, _, _) => " (o.g.)"
-      case PenaltyGoal(_, _, _, _) => " (pen)"
-      case _ => ""
+    val goalTypeInfo = goal match {
+      case OwnGoal(_, _, _, _, _) => Some("o.g.")
+      case PenaltyGoal(_, _, _, _, _) => Some("pen")
+      case _ => None
+    }
+
+    val extraInfo = List(goalTypeInfo, goal.addedTime.map("+" + _)).flatten match {
+      case Nil => ""
+      case xs => s" (${xs mkString " "})"
     }
 
     val message = s"${metadata.homeTeam.name} ${metadata.homeTeamScore}-" +

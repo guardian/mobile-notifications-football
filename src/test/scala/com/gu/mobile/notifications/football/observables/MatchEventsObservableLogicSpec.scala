@@ -25,11 +25,11 @@ class MatchEventsObservableLogicSpec extends WordSpec with Matchers with Resourc
         .toBlockingObservable.toList.map(_._1) should be(
         List(
           KickOff,
-          Goal("Wes Hoolahan", awayTeam, homeTeam, 3),
-          Goal("Christian Benteke", homeTeam, awayTeam, 25),
-          Goal("Christian Benteke", homeTeam, awayTeam, 27),
-          Goal("Leandro Bacuna", homeTeam, awayTeam, 37),
-          OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41),
+          Goal("Wes Hoolahan", awayTeam, homeTeam, 3, None),
+          Goal("Christian Benteke", homeTeam, awayTeam, 25, None),
+          Goal("Christian Benteke", homeTeam, awayTeam, 27, None),
+          Goal("Leandro Bacuna", homeTeam, awayTeam, 37, None),
+          OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41, None),
           Result
         )
       )
@@ -53,13 +53,15 @@ class MatchEventsObservableLogicSpec extends WordSpec with Matchers with Resourc
             "Jonathan de Guzman",
             MatchEventTeam(65, "Swansea"),
             MatchEventTeam(5, "Crystal Palace"),
-            25
+            25,
+            None
           ),
           PenaltyGoal(
             "Glenn Murray",
             MatchEventTeam(5, "Crystal Palace"),
             MatchEventTeam(65, "Swansea"),
-            82
+            82,
+            None
           ),
           Result
         )

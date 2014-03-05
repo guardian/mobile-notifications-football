@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.football.models
 
 import pa.{MatchEvent => PaMatchEvent, Team, MatchEvents}
+import org.joda.time.Duration
 
 /** Match events we're interested in
   *
@@ -34,21 +35,21 @@ object MatchEvent {
         eventTime <- matchEvent.eventTime
         scoringTeam <- getTeam(scorer.teamID)
         otherTeam <- getOtherTeam(scorer.teamID)
-      } yield Goal(scorer.name, scoringTeam, otherTeam, eventTime.toInt)
+      } yield Goal(scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
 
       case "own goal" => for {
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
         scoringTeam <- getOtherTeam(scorer.teamID)
         otherTeam <- getTeam(scorer.teamID)
-      } yield OwnGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt)
+      } yield OwnGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
 
       case "goal from penalty" => for {
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
         scoringTeam <- getTeam(scorer.teamID)
         otherTeam <- getOtherTeam(scorer.teamID)
-      } yield PenaltyGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt)
+      } yield PenaltyGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
 
       case _ => None
     }
@@ -69,27 +70,34 @@ sealed trait ScoreEvent extends MatchEvent {
   val scoringTeam: MatchEventTeam
   val otherTeam: MatchEventTeam
   val minute: Int
+  /** A String because I'm not exactly sure what PA can give us here (their documentation is not exactly extensive).
+    * TODO: At some point maybe convert to a Joda Time Period?
+    */
+  val addedTime: Option[String]
 }
 
 case class Goal(
   scorerName: String,
   scoringTeam: MatchEventTeam,
   otherTeam: MatchEventTeam,
-  minute: Int
+  minute: Int,
+  addedTime: Option[String]
 ) extends ScoreEvent
 
 case class OwnGoal(
   scorerName: String,
   scoringTeam: MatchEventTeam,
   otherTeam: MatchEventTeam,
-  minute: Int
+  minute: Int,
+  addedTime: Option[String]
 ) extends ScoreEvent
 
 case class PenaltyGoal(
   scorerName: String,
   scoringTeam: MatchEventTeam,
   otherTeam: MatchEventTeam,
-  minute: Int
+  minute: Int,
+  addedTime: Option[String]
 ) extends ScoreEvent
 
 case object Result extends MatchEvent
