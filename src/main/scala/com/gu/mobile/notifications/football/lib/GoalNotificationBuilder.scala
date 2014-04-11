@@ -1,16 +1,7 @@
 package com.gu.mobile.notifications.football.lib
 
-import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.client.models.Notification
 import com.gu.mobile.notifications.football.models._
-import com.gu.mobile.notifications.client.models.IOSMessagePayload
-import com.gu.mobile.notifications.client.models.Target
-import com.gu.mobile.notifications.client.models.AndroidMessagePayload
-import com.gu.mobile.notifications.football.models.OwnGoal
-import scala.Some
-import com.gu.mobile.notifications.client.models.MessagePayloads
-import com.gu.mobile.notifications.client.models.Topic
-import com.gu.mobile.notifications.client.models.Notification
+import com.gu.mobile.notifications.client.models._
 
 object GoalNotificationBuilder {
   val FootballTeamTopicType = "football-team"

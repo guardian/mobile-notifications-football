@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.football.management
 
 import com.gu.management.internal.{ManagementServer, ManagementHandler}
-import com.gu.management.{HealthcheckManagementPage, StatusPage, ManifestPage, ManagementPage}
+import com.gu.management.{StatusPage, ManifestPage, ManagementPage}
 import com.gu.management.logback.LogbackLevelPage
 
 object MobileNotificationsManagementServer {
@@ -12,7 +12,7 @@ object MobileNotificationsManagementServer {
       new ManifestPage(),
       new StatusPage(applicationName, () => Metrics.all),
       new LogbackLevelPage(applicationName),
-      new HealthcheckManagementPage()
+      new GoalAlertsHealthcheckPage()
     )
   }
 
