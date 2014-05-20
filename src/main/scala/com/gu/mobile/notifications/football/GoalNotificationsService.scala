@@ -12,7 +12,6 @@ import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaFootballClient, ExpiringTopics, PaExpiringTopics}
 import ExpirationJsonImplicits._
 import pa.MatchDay
-import scala.Some
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.football.models.NotificationSent
 
@@ -90,8 +89,6 @@ trait Rendering {
     }
   </table>
 }
-
-case class GoalAndMetadata(goal: Goal, metadata: EventFeedMetadata)
 
 // this trait defines our service behavior independently from the service actor
 trait GoalNotificationsService extends HttpService with Rendering {
