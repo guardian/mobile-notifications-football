@@ -8,6 +8,8 @@ object GoalNotificationsConfig {
     "mobile-notifications-football", "conf/mobile-notifications-football"
   )
 
+  lazy val mapiFootballHost = configuration("mobile_apps_api.football_host")
+
   lazy val paApiKey = configuration("pa.api_key")
 
   lazy val guardianNotificationsHost = configuration("notifications.host")

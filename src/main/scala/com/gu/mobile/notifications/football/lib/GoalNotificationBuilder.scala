@@ -2,6 +2,7 @@ package com.gu.mobile.notifications.football.lib
 
 import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.client.models._
+import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 
 object GoalNotificationBuilder {
   val FootballTeamTopicType = "football-team"
@@ -73,6 +74,7 @@ object AndroidPayloadBuilder {
   val AwayTeamScore = "AWAY_TEAM_SCORE"
   val MatchId = "matchId"
   val Debug = "debug"
+  val MapiUrl = "mapiUrl"
 
   def apply(goal: ScoreEvent, metadata: EventFeedMetadata): AndroidMessagePayload = {
     AndroidMessagePayload(Map(
@@ -86,6 +88,7 @@ object AndroidPayloadBuilder {
       GoalMins -> goal.minute.toString,
       OtherTeamName -> goal.otherTeam.name,
       MatchId -> metadata.matchID,
+      MapiUrl -> s"${GoalNotificationsConfig.mapiFootballHost}/match-info/${metadata.matchID}",
       /** This flag exists for legacy reasons (the current PROD Android app will break if it's not here) */
       Debug -> "false"
     ))
