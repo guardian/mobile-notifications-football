@@ -9,11 +9,10 @@ import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.football.models._
-import com.gu.mobile.notifications.football.lib.{PaFootballClient, ExpiringTopics}
+import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaFootballClient, ExpiringTopics, PaExpiringTopics}
 import ExpirationJsonImplicits._
 import pa.MatchDay
 import scala.Some
-import com.gu.mobile.notifications.football.lib.PaExpiringTopics
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.football.models.NotificationSent
 
@@ -92,6 +91,8 @@ trait Rendering {
   </table>
 }
 
+case class GoalAndMetadata(goal: Goal, metadata: EventFeedMetadata)
+
 // this trait defines our service behavior independently from the service actor
 trait GoalNotificationsService extends HttpService with Rendering {
   implicit val timeout = Timeout(500 millis)
@@ -128,10 +129,16 @@ trait GoalNotificationsService extends HttpService with Rendering {
     } ~
     path("send-test-notification") {
       post {
-        respondWithMediaType(`text/html`) {
-          complete {
-            GoalNotificationsPipeline.send(TestNotification.get) map { _ =>
-              <p>Sent a test notification</p>
+        decompressRequest() {
+          entity(as[GoalAndMetadata]) { case GoalAndMetadata(goal, metadata) =>
+            detach() {
+              respondWithMediaType(`text/html`) {
+                complete {
+                  GoalNotificationsPipeline.send(GoalNotificationBuilder(goal, metadata)) map { _ =>
+                    <p>Sent a test notification</p>
+                  }
+                }
+              }
             }
           }
         }
