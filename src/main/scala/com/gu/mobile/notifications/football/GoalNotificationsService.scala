@@ -8,21 +8,14 @@ import com.gu.mobile.notifications.football.lib.Pa._
 import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.gu.mobile.notifications.client.models.{Notification, AndroidMessagePayload, IOSMessagePayload, Topic}
-import pa.{MatchDayTeam, MatchDay}
 import com.gu.mobile.notifications.football.models._
-import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaFootballClient, PaExpiringTopics, ExpiringTopics}
+import com.gu.mobile.notifications.football.lib.{PaFootballClient, ExpiringTopics}
 import ExpirationJsonImplicits._
-import com.gu.mobile.notifications.football.models.Goal
 import pa.MatchDay
 import scala.Some
 import com.gu.mobile.notifications.football.lib.PaExpiringTopics
-import com.gu.mobile.notifications.client.models.Topic
-import com.gu.mobile.notifications.football.ExpirationResponse
-import com.gu.mobile.notifications.client.models.IOSMessagePayload
-import com.gu.mobile.notifications.client.models.AndroidMessagePayload
+import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.football.models.NotificationSent
-import com.gu.mobile.notifications.football.ExpirationRequest
 
 class GoalNotificationsServiceActor extends Actor with GoalNotificationsService {
   // the HttpService trait defines only one abstract member, which
