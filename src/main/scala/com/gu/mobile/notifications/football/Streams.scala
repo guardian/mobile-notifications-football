@@ -20,8 +20,15 @@ trait MatchDayStream extends Logging {
   def getMatchDayStream: Observable[List[MatchDay]] = {
     // Use the subject below rather than subscribe to the stream directly - otherwise more calls are kicked off to PA
     // than are required
-    val stream: Observable[List[MatchDay]] = Observable.interval(UpdateInterval) flatMap { _ =>
-      Observable.from(PaMatchDayClient(PaFootballClient).today).completeOnError
+    val stream = Observable.interval(UpdateInterval) flatMap { _ =>
+      val todaysMatchesFuture = PaMatchDayClient(PaFootballClient).today
+
+      todaysMatchesFuture onFailure {
+        case error =>
+          logger.error("Error getting today's matches from PA", error)
+      }
+
+      Observable.from(todaysMatchesFuture).completeOnError
     }
 
     val subject = Subject[List[MatchDay]]()
@@ -44,9 +51,9 @@ trait GoalEventStream extends Logging {
   def getGoalEvents(matchIdSets: Observable[Set[String]]): Observable[(ScoreEvent, EventFeedMetadata)] = {
     matchIdSets flatMap { ids =>
       ids.map(MatchEventsObservable.forMatchId).fold(Observable.empty)(_.merge(_)) collect {
-        case (goal @ Goal(_, _, _, _, _), metadata) => (goal, metadata)
-        case (ownGoal @ OwnGoal(_, _, _, _, _), metadata) => (ownGoal, metadata)
-        case (penalty @ PenaltyGoal(_, _, _, _, _), metadata) => (penalty, metadata)
+        case (goal: Goal, metadata) => (goal, metadata)
+        case (ownGoal: OwnGoal, metadata) => (ownGoal, metadata)
+        case (penalty: PenaltyGoal, metadata) => (penalty, metadata)
       }
     }
   }

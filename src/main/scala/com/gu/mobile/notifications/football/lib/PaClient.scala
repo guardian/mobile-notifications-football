@@ -10,7 +10,6 @@ import grizzled.slf4j.Logging
 
 trait DispatchHttp extends pa.Http with Logging {
   def GET(urlString: String): Future[Response] = {
-    /** This unfortunately has to be done here due to how pa.Http's interface is written */
     import ExecutionContext.Implicits.global
 
     logger.debug("Http GET " + urlString)
@@ -19,7 +18,7 @@ trait DispatchHttp extends pa.Http with Logging {
 }
 
 object PaFootballClient extends PaClient with DispatchHttp {
-  def apiKey: String = GoalNotificationsConfig.paApiKey
+  def apiKey = GoalNotificationsConfig.paApiKey
 
   override protected def get(suffix: String)(implicit context: ExecutionContext): Future[String] = {
     val ftr = super.get(suffix)(context)
