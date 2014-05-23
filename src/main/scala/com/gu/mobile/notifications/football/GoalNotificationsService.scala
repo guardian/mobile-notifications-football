@@ -8,11 +8,12 @@ import com.gu.mobile.notifications.football.lib.Pa._
 import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.gu.mobile.notifications.client.models.{AndroidMessagePayload, IOSMessagePayload, Topic}
-import pa.MatchDay
-import com.gu.mobile.notifications.football.models.{NotificationHistoryItem, NotificationSent}
-import com.gu.mobile.notifications.football.lib.{PaFootballClient, PaExpiringTopics, ExpiringTopics}
+import com.gu.mobile.notifications.football.models._
+import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaFootballClient, ExpiringTopics, PaExpiringTopics}
 import ExpirationJsonImplicits._
+import pa.MatchDay
+import com.gu.mobile.notifications.client.models._
+import com.gu.mobile.notifications.football.models.NotificationSent
 
 class GoalNotificationsServiceActor extends Actor with GoalNotificationsService {
   // the HttpService trait defines only one abstract member, which
@@ -116,6 +117,23 @@ trait GoalNotificationsService extends HttpService with Rendering {
               complete {
                 expiringTopics.getExpired(request.topics) map { expiredTopics =>
                   ExpirationResponse(expiredTopics)
+                }
+              }
+            }
+          }
+        }
+      }
+    } ~
+    path("send-test-notification") {
+      post {
+        decompressRequest() {
+          entity(as[GoalAndMetadata]) { case GoalAndMetadata(goal, metadata) =>
+            detach() {
+              respondWithMediaType(`text/html`) {
+                complete {
+                  GoalNotificationsPipeline.send(GoalNotificationBuilder(goal, metadata)) map { _ =>
+                    <p>Sent a test notification</p>
+                  }
                 }
               }
             }

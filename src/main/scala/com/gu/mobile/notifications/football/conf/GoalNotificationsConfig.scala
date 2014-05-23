@@ -14,18 +14,13 @@ object GoalNotificationsConfig {
 
   lazy val guardianNotificationsHost = configuration("notifications.host")
 
-  lazy val dynamoDbReadOnly = new BasicAWSCredentials(
-    configuration.getStringProperty("credentials.dynamodb.access_key", ""),
-    configuration.getStringProperty("credentials.dynamodb.secret_key", ""))
+  lazy val snsAccessKey = configuration.getStringProperty("credentials.sns.access_key")
+  lazy val snsSecretKey = configuration.getStringProperty("credentials.sns.secret_key")
+  lazy val snsEndpoint = configuration.getStringProperty("sns.endpoint")
+  lazy val snsTopic = configuration.getStringProperty("sns.topic")
 
-  lazy val dynamoDbEndpoint = configuration("dynamodb.endpoint")
-  lazy val dynamoDbSwitchesTableName = configuration("dynamodb.switches_table")
-
-  lazy val snsQueuePublish = new BasicAWSCredentials(
-    configuration.getStringProperty("credentials.sns.access_key", ""),
-    configuration.getStringProperty("credentials.sns.secret_key", "")
-  )
-
-  lazy val snsEndpoint = configuration("sns.endpoint")
-  lazy val snsTopic = configuration("sns.topic")
+  lazy val snsQueuePublishCredentials = for {
+    accessKey <- snsAccessKey
+    secretKey <- snsSecretKey
+  } yield new BasicAWSCredentials(accessKey, secretKey)
 }

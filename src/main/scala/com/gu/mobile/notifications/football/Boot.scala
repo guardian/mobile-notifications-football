@@ -8,7 +8,6 @@ import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.football.management.MobileNotificationsManagementServer
-import com.gu.mobile.notifications.football.conf.MobileNotificationsFootballSwitches
 
 object SystemSetup {
   // we need an ActorSystem to host our application in
@@ -17,6 +16,9 @@ object SystemSetup {
 
 object Boot extends App {
   import SystemSetup._
+
+  MobileNotificationsManagementServer.start()
+  GoalNotificationsPipeline.start()
 
   // create and start our service actor
   val service = system.actorOf(
@@ -27,11 +29,4 @@ object Boot extends App {
   implicit val timeout = Timeout(5.seconds)
   // start a new HTTP server on port 8080 with our service actor as the handler
   IO(Http) ? Http.Bind(service, interface = "0.0.0.0", port = 8080)
-
-  MobileNotificationsManagementServer.start()
-  GoalNotificationsPipeline.start()
-
-  system.scheduler.schedule(0.seconds, 1.minute) {
-    MobileNotificationsFootballSwitches.update()
-  }
 }

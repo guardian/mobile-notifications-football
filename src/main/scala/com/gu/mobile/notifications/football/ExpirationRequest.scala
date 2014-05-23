@@ -4,7 +4,7 @@ import spray.json._
 import spray.httpx.SprayJsonSupport
 import com.gu.mobile.notifications.client.models.Topic
 
-object ExpirationJsonImplicits extends DefaultJsonProtocol with SprayJsonSupport {
+object ExpirationJsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GoalAndMetadataImplicits {
   implicit val topicFormat = jsonFormat2(Topic)
   implicit val expirationRequestFormat = jsonFormat1(ExpirationRequest)
   implicit val expirationResponseFormat = jsonFormat1(ExpirationResponse)
