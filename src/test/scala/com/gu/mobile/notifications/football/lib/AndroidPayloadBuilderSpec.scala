@@ -29,7 +29,7 @@ class AndroidPayloadBuilderSpec extends WordSpec with ShouldMatchers {
     "build an appropriate message for a goal event" in {
       val eventFixture = Goal("David Beckham", manchesterUnited, boltonWanderers, 34, None)
 
-      AndroidPayloadBuilder(eventFixture, metadataFixture) should equal(
+      AndroidPayloadBuilder.fromGoalAlertPayload(GoalAlertPayload(eventFixture, metadataFixture)) should equal(
         AndroidMessagePayload(Map(
           "type" -> "goalAlert",
           "SCORING_TEAM_NAME" -> "Manchester United",
