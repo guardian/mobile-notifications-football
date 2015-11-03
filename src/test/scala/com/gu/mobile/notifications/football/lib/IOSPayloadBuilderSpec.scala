@@ -1,10 +1,9 @@
 package com.gu.mobile.notifications.football.lib
 
 import org.scalatest.{ShouldMatchers, WordSpec}
-import com.gu.mobile.notifications.client.models.IOSMessagePayload
+import com.gu.mobile.notifications.client.models.legacy.IOSMessagePayload
 import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.models.Goal
-import com.gu.mobile.notifications.client.models.IOSMessagePayload
 import com.gu.mobile.notifications.football.models.OwnGoal
 
 class IOSPayloadBuilderSpec extends WordSpec with ShouldMatchers {

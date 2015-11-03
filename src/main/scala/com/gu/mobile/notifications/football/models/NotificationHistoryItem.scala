@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.football.models
 
-import com.gu.mobile.notifications.client.models.{Notification, SendNotificationReply}
+import com.gu.mobile.notifications.client.models.legacy.Notification
+import com.gu.mobile.notifications.client.models.SendNotificationReply
 import org.joda.time.DateTime
 
 sealed trait NotificationHistoryItem {

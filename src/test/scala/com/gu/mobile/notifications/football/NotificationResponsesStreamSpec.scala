@@ -1,37 +1,18 @@
 package com.gu.mobile.notifications.football
 
+import com.gu.mobile.notifications.client.HttpProvider
 import org.scalatest.{Matchers, WordSpec}
-import com.gu.mobile.notifications.football.lib.SendsNotifications
-import com.gu.mobile.notifications.client.models.{MessagePayloads, Target, SendNotificationReply, Notification}
+import com.gu.mobile.notifications.client.models.legacy.{MessagePayloads, Target, Notification}
 import scala.concurrent.Future
 import rx.lang.scala.Observable
 import com.gu.mobile.notifications.football.models.{NotificationFailed, NotificationSent}
 import scala.concurrent.ExecutionContext.Implicits.global
+import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
 
 class NotificationResponsesStreamSpec extends WordSpec with Matchers {
-  val stubSuccessClient = new SendsNotifications {
-    def send(notification: Notification): Future[SendNotificationReply] =
-      Future.successful(SendNotificationReply("test"))
-  }
-
-  val stubFailureClient = new SendsNotifications {
-    def send(notification: Notification): Future[SendNotificationReply] = Future.failed(new RuntimeException)
-  }
-
-  /** Simulates a client that intermittently fails, so that we can check whether temporary errors are swallowed below */
-  val stubFailOnceClient = new SendsNotifications {
-    var hasFailed = false
-
-    def send(notification: Notification): Future[SendNotificationReply] = if (hasFailed) {
-        stubSuccessClient.send(notification)
-      } else {
-        hasFailed = true
-        stubFailureClient.send(notification)
-      }
-  }
 
   val notificationFixture = Notification(
-    "test",
+    BreakingNews,
     "test",
     "test@theguardian.com",
     Target(Set.empty, Set.empty),
@@ -40,7 +21,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
     Map.empty)
 
   val notificationFixture2 = Notification(
-    "test2",
+    BreakingNews,
     "test2",
     "test@gu.com",
     Target(Set.empty, Set.empty),
@@ -61,9 +42,8 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
   "Streams.notificationResponses" when {
     "run over an API client that always succeeds" should {
       "produce a stream of success responses" in {
-        val stream = new NotificationResponseStream {
+        val stream = new NotificationResponseStream with StubSuccessClient {
           val retrySendNotifications: Int = 0
-          override def send(notification: Notification): Future[SendNotificationReply] =  stubSuccessClient.send(notification)
         }
 
         val responses = stream.getNotificationResponses(notificationFixturesObservable)
@@ -79,10 +59,8 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
     "run over an API client that always fails" should {
       "produce a stream of failure responses" in {
-        val stream = new NotificationResponseStream {
+        val stream = new NotificationResponseStream with StubFailureClient {
           val retrySendNotifications: Int = 5
-
-          override def send(notification: Notification): Future[SendNotificationReply] = stubFailureClient.send(notification)
         }
         val responses = stream.getNotificationResponses(notificationFixturesObservable)
           .toBlockingObservable.toList
@@ -96,9 +74,8 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
     "run over an API client that fails once with more than 1 retries set" should {
       "produce a stream of success responses" in {
-        val stream = new NotificationResponseStream {
+        val stream = new NotificationResponseStream with StubFailOnceClient {
           val retrySendNotifications: Int = 2
-          override def send(notification: Notification): Future[SendNotificationReply] = stubFailOnceClient.send(notification)
         }
 
         val responses = stream.getNotificationResponses(notificationFixturesObservable)
@@ -110,5 +87,34 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
         successes.map(_.notification).toSet shouldEqual notificationFixtures.toSet
       }
     }
+  }
+
+  trait StubSuccessClient extends HttpProvider {
+    self: NotificationResponseStream =>
+    override val host = ""
+    override def get(url: String): Future[HttpResponse] = Future.successful(HttpOk(200, "OK"))
+    override def post(urlString: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] =
+      Future.successful(HttpOk(200, """{"messageId":"test"}"""))
+  }
+
+  trait StubFailureClient extends HttpProvider {
+    self: NotificationResponseStream =>
+    override val host = ""
+    override def get(url: String): Future[HttpResponse] = Future.successful(HttpError(500, "Boom"))
+    override def post(urlString: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] =
+      Future.successful(HttpError(500, "Kaboom"))
+  }
+
+  trait StubFailOnceClient extends HttpProvider {
+    self: NotificationResponseStream =>
+    override val host = ""
+    var hasFailed = false
+    override def post(urlString: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = if (hasFailed) {
+      Future.successful(HttpOk(200, """{"messageId":"test"}"""))
+    } else {
+      hasFailed = true
+      Future.successful(HttpError(500, "Kaboom"))
+    }
+    override def get(url: String): Future[HttpResponse] = Future.successful(HttpError(500, "Boom"))
   }
 }

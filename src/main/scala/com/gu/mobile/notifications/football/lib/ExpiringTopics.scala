@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.football.lib
 
-import com.gu.mobile.notifications.client.models.Topic
+import com.gu.mobile.notifications.client.models.legacy.Topic
 import scala.concurrent.{ExecutionContext, Future}
 import pa.PaClient
 import Pa._

@@ -12,7 +12,7 @@ import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaFootballClient, ExpiringTopics, PaExpiringTopics}
 import ExpirationJsonImplicits._
 import pa.MatchDay
-import com.gu.mobile.notifications.client.models._
+import com.gu.mobile.notifications.client.models.legacy._
 import com.gu.mobile.notifications.football.models.NotificationSent
 
 class GoalNotificationsServiceActor extends Actor with GoalNotificationsService {

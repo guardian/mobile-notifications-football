@@ -1,7 +1,8 @@
 package com.gu.mobile.notifications.football.lib
 
+import com.gu.mobile.notifications.client.models.NotificationTypes.GoalAlert
 import com.gu.mobile.notifications.football.models._
-import com.gu.mobile.notifications.client.models._
+import com.gu.mobile.notifications.client.models.legacy._
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 
 object GoalNotificationBuilder {
@@ -15,7 +16,7 @@ object GoalNotificationBuilder {
   def apply(goal: ScoreEvent, metadata: EventFeedMetadata): Notification = {
     val genericPayload = GoalAlertPayload(goal, metadata)
     Notification(
-      `type` = "goal",
+      `type` = GoalAlert,
       uniqueIdentifier = uniqueIdentifier(goal, metadata),
       sender = "mobile-notifications-football",
       target = Target(

@@ -2,7 +2,7 @@ package com.gu.mobile.notifications.football.lib
 
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 import org.scalatest.{ShouldMatchers, WordSpec}
-import com.gu.mobile.notifications.client.models.AndroidMessagePayload
+import com.gu.mobile.notifications.client.models.legacy.AndroidMessagePayload
 import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.models.Goal
 

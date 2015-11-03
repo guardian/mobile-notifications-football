@@ -4,7 +4,7 @@ import com.amazonaws.services.sns.AmazonSNSClient
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 import com.amazonaws.services.sns.model.PublishRequest
 import scala.util.{Failure, Success, Try}
-import com.gu.mobile.notifications.client.models.Notification
+import com.gu.mobile.notifications.client.models.legacy.Notification
 import grizzled.slf4j.Logging
 
 trait SNSQueue extends Logging {
