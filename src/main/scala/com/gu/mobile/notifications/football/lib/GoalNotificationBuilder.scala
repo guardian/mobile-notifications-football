@@ -1,5 +1,6 @@
 package com.gu.mobile.notifications.football.lib
 
+import com.gu.mobile.notifications.client.models.{DefaultGoalType, PenaltyGoalType, OwnGoalType, GoalAlertPayload}
 import com.gu.mobile.notifications.client.models.NotificationTypes.GoalAlert
 import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.client.models.legacy._
@@ -14,7 +15,7 @@ object GoalNotificationBuilder {
       s"${goal.scoringTeam.id}/${goal.minute}"
 
   def apply(goal: ScoreEvent, metadata: EventFeedMetadata): Notification = {
-    val genericPayload = GoalAlertPayload(goal, metadata)
+    val genericPayload = GenericPayload(goal, metadata)
     Notification(
       `type` = GoalAlert,
       uniqueIdentifier = uniqueIdentifier(goal, metadata),
@@ -63,31 +64,7 @@ object GoalNotificationBuilder {
   }
 }
 
-sealed trait GoalType
-object OwnGoalType extends GoalType
-object PenaltyGoalType extends GoalType
-object DefaultGoalType extends GoalType
-
-case class GoalAlertPayload(
-  `type`: String,
-  awayTeamName: String,
-  awayTeamScore: Int,
-  homeTeamName: String,
-  homeTeamScore: Int,
-  scoringTeamName: String,
-  scorerName: String,
-  goalMins: Int,
-  otherTeamName: String,
-  matchId: String,
-  mapiUrl: String,
-  debug: Boolean,
-  addedTime: Option[String],
-  goalType: GoalType
-)
-
-object GoalAlertPayload {
-
-  val GoalAlertType = "goalAlert"
+object GenericPayload {
 
   def apply(goal: ScoreEvent, metadata: EventFeedMetadata): GoalAlertPayload = {
     val goalType = goal match {
@@ -96,8 +73,25 @@ object GoalAlertPayload {
       case _ => DefaultGoalType
     }
 
+    val goalTypeInfo = goalType match {
+      case OwnGoalType => Some("o.g.")
+      case PenaltyGoalType => Some("pen")
+      case _ => None
+    }
+
+    val extraInfo = List(goalTypeInfo, goal.addedTime.map("+" + _)).flatten match {
+      case Nil => ""
+      case xs => s" (${xs mkString " "})"
+    }
+
+    val message = s"${metadata.homeTeam.name} ${metadata.homeTeamScore}-" +
+      s"${metadata.awayTeamScore} ${metadata.awayTeam.name}\n" +
+      s"${goal.scorerName} ${goal.minute}min$extraInfo"
+
     GoalAlertPayload(
-      `type` = GoalAlertType,
+      notificationType = "goalAlert",
+      title = "The Guardian",
+      message = message,
       awayTeamName = metadata.awayTeam.name,
       awayTeamScore = metadata.awayTeamScore,
       homeTeamName = metadata.homeTeam.name,
@@ -132,7 +126,7 @@ object AndroidPayloadBuilder {
 
   def fromGoalAlertPayload(generic: GoalAlertPayload): AndroidMessagePayload = {
     AndroidMessagePayload(Map(
-      Type -> generic.`type`,
+      Type -> generic.notificationType,
       AwayTeamName -> generic.awayTeamName,
       AwayTeamScore -> generic.awayTeamScore.toString,
       HomeTeamName -> generic.homeTeamName,
@@ -153,21 +147,6 @@ object IOSPayloadBuilder {
   val IOSGoalAlertType = "g"
 
   def fromGoalAlertPayload(generic: GoalAlertPayload): IOSMessagePayload = {
-    val goalTypeInfo = generic.goalType match {
-      case OwnGoalType => Some("o.g.")
-      case PenaltyGoalType => Some("pen")
-      case _ => None
-    }
-
-    val extraInfo = List(goalTypeInfo, generic.addedTime.map("+" + _)).flatten match {
-      case Nil => ""
-      case xs => s" (${xs mkString " "})"
-    }
-
-    val message = s"${generic.homeTeamName} ${generic.homeTeamScore}-" +
-      s"${generic.awayTeamScore} ${generic.awayTeamName}\n" +
-      s"${generic.scorerName} ${generic.goalMins}min$extraInfo"
-
-    IOSMessagePayload(message, Map(IOSMessageType -> IOSGoalAlertType))
+    IOSMessagePayload(generic.message, Map(IOSMessageType -> IOSGoalAlertType))
   }
 }
