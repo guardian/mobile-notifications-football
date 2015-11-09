@@ -2,6 +2,7 @@ package com.gu.mobile.notifications.football
 
 import scala.concurrent.duration._
 import com.gu.mobile.notifications.football.models.{PenaltyGoal, EventFeedMetadata, OwnGoal, Goal}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object GoalNotificationsPipeline extends GoalNotificationsPipeline {
   val MaxHistoryLength: Int = 100

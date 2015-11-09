@@ -7,7 +7,7 @@ import ExecutionContext.Implicits.global
 import org.joda.time.DateTime
 import pa.MatchDay
 import pa.Response
-import com.gu.mobile.notifications.client.models.Topic
+import com.gu.mobile.notifications.client.models.legacy.Topic
 import scala.concurrent.duration.Duration
 import com.gu.mobile.notifications.football.helpers.EmptyInstances
 

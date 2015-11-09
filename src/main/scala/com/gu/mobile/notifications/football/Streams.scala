@@ -12,7 +12,7 @@ import ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.football.observables.MatchEventsObservable
 import pa.MatchDay
 import com.gu.mobile.notifications.football.lib.PaMatchDayClient
-import com.gu.mobile.notifications.client.models.Notification
+import com.gu.mobile.notifications.client.models.legacy.Notification
 
 trait MatchDayStream extends Logging {
   val UpdateInterval: FiniteDuration

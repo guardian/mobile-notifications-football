@@ -1,7 +1,9 @@
 package com.gu.mobile.notifications.football.lib
 
+import com.gu.mobile.notifications.client.models.{DefaultGoalType, PenaltyGoalType, OwnGoalType, GoalAlertPayload}
+import com.gu.mobile.notifications.client.models.NotificationTypes.GoalAlert
 import com.gu.mobile.notifications.football.models._
-import com.gu.mobile.notifications.client.models._
+import com.gu.mobile.notifications.client.models.legacy._
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 
 object GoalNotificationBuilder {
@@ -13,8 +15,9 @@ object GoalNotificationBuilder {
       s"${goal.scoringTeam.id}/${goal.minute}"
 
   def apply(goal: ScoreEvent, metadata: EventFeedMetadata): Notification = {
+    val genericPayload = GenericPayload(goal, metadata)
     Notification(
-      `type` = "goal",
+      `type` = GoalAlert,
       uniqueIdentifier = uniqueIdentifier(goal, metadata),
       sender = "mobile-notifications-football",
       target = Target(
@@ -45,8 +48,8 @@ object GoalNotificationBuilder {
       ),
       timeToLiveInSeconds = (150 - goal.minute) * 60,
       payloads = MessagePayloads(
-        android = Some(AndroidPayloadBuilder(goal, metadata)),
-        ios = Some(IOSPayloadBuilder(goal, metadata))
+        android = Some(AndroidPayloadBuilder.fromGoalAlertPayload(genericPayload)),
+        ios = Some(IOSPayloadBuilder.fromGoalAlertPayload(genericPayload))
       ),
       metadata = Map(
         "matchId" -> metadata.matchID,
@@ -57,6 +60,51 @@ object GoalNotificationBuilder {
         "scorer" -> goal.scorerName,
         "minute" -> goal.minute.toString
       )
+    )
+  }
+}
+
+object GenericPayload {
+
+  def apply(goal: ScoreEvent, metadata: EventFeedMetadata): GoalAlertPayload = {
+    val goalType = goal match {
+      case OwnGoal(_, _, _, _, _) => OwnGoalType
+      case PenaltyGoal(_, _, _, _, _) => PenaltyGoalType
+      case _ => DefaultGoalType
+    }
+
+    val goalTypeInfo = goalType match {
+      case OwnGoalType => Some("o.g.")
+      case PenaltyGoalType => Some("pen")
+      case _ => None
+    }
+
+    val extraInfo = List(goalTypeInfo, goal.addedTime.map("+" + _)).flatten match {
+      case Nil => ""
+      case xs => s" (${xs mkString " "})"
+    }
+
+    val message = s"${metadata.homeTeam.name} ${metadata.homeTeamScore}-" +
+      s"${metadata.awayTeamScore} ${metadata.awayTeam.name}\n" +
+      s"${goal.scorerName} ${goal.minute}min$extraInfo"
+
+    GoalAlertPayload(
+      notificationType = "goalAlert",
+      title = "The Guardian",
+      message = message,
+      awayTeamName = metadata.awayTeam.name,
+      awayTeamScore = metadata.awayTeamScore,
+      homeTeamName = metadata.homeTeam.name,
+      homeTeamScore = metadata.homeTeamScore,
+      scoringTeamName = goal.scoringTeam.name,
+      scorerName = goal.scorerName,
+      goalMins = goal.minute,
+      otherTeamName = goal.otherTeam.name,
+      matchId = metadata.matchID,
+      mapiUrl = s"${GoalNotificationsConfig.mapiFootballHost}/match-info/${metadata.matchID}",
+      debug = false, // This flag exists for legacy reasons (the current PROD Android app will break if it's not here)
+      addedTime = goal.addedTime,
+      goalType = goalType
     )
   }
 }
@@ -76,21 +124,20 @@ object AndroidPayloadBuilder {
   val Debug = "debug"
   val MapiUrl = "mapiUrl"
 
-  def apply(goal: ScoreEvent, metadata: EventFeedMetadata): AndroidMessagePayload = {
+  def fromGoalAlertPayload(generic: GoalAlertPayload): AndroidMessagePayload = {
     AndroidMessagePayload(Map(
-      Type -> GoalAlertType,
-      AwayTeamName -> metadata.awayTeam.name,
-      AwayTeamScore -> metadata.awayTeamScore.toString,
-      HomeTeamName -> metadata.homeTeam.name,
-      HomeTeamScore -> metadata.homeTeamScore.toString,
-      ScoringTeamName -> goal.scoringTeam.name,
-      ScorerName -> goal.scorerName,
-      GoalMins -> goal.minute.toString,
-      OtherTeamName -> goal.otherTeam.name,
-      MatchId -> metadata.matchID,
-      MapiUrl -> s"${GoalNotificationsConfig.mapiFootballHost}/match-info/${metadata.matchID}",
-      /** This flag exists for legacy reasons (the current PROD Android app will break if it's not here) */
-      Debug -> "false"
+      Type -> generic.notificationType,
+      AwayTeamName -> generic.awayTeamName,
+      AwayTeamScore -> generic.awayTeamScore.toString,
+      HomeTeamName -> generic.homeTeamName,
+      HomeTeamScore -> generic.homeTeamScore.toString,
+      ScoringTeamName -> generic.scoringTeamName,
+      ScorerName -> generic.scorerName,
+      GoalMins -> generic.goalMins.toString,
+      OtherTeamName -> generic.otherTeamName,
+      MatchId -> generic.matchId,
+      MapiUrl -> generic.mapiUrl,
+      Debug -> generic.debug.toString
     ))
   }
 }
@@ -99,22 +146,7 @@ object IOSPayloadBuilder {
   val IOSMessageType = "t"
   val IOSGoalAlertType = "g"
 
-  def apply(goal: ScoreEvent, metadata: EventFeedMetadata): IOSMessagePayload = {
-    val goalTypeInfo = goal match {
-      case OwnGoal(_, _, _, _, _) => Some("o.g.")
-      case PenaltyGoal(_, _, _, _, _) => Some("pen")
-      case _ => None
-    }
-
-    val extraInfo = List(goalTypeInfo, goal.addedTime.map("+" + _)).flatten match {
-      case Nil => ""
-      case xs => s" (${xs mkString " "})"
-    }
-
-    val message = s"${metadata.homeTeam.name} ${metadata.homeTeamScore}-" +
-      s"${metadata.awayTeamScore} ${metadata.awayTeam.name}\n" +
-      s"${goal.scorerName} ${goal.minute}min$extraInfo"
-
-    IOSMessagePayload(message, Map(IOSMessageType -> IOSGoalAlertType))
+  def fromGoalAlertPayload(generic: GoalAlertPayload): IOSMessagePayload = {
+    IOSMessagePayload(generic.message, Map(IOSMessageType -> IOSGoalAlertType))
   }
 }

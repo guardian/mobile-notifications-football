@@ -6,6 +6,7 @@ import scala.concurrent.duration._
 import scala.concurrent.Await
 import com.gu.mobile.notifications.client.models.{Unhealthy, Ok}
 import com.gu.management.{HttpRequest, PlainTextResponse}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class GoalAlertsHealthcheckPage extends ManagementPage {
   val HealthCheckWait = 200.millis
@@ -16,7 +17,7 @@ class GoalAlertsHealthcheckPage extends ManagementPage {
     /** TODO this sucks - fix the API for ManagementPages so it will accept Futures */
     Await.result(GoalNotificationsPipeline.healthcheck, HealthCheckWait) match {
       case Ok => PlainTextResponse("OK")
-      case Unhealthy(errorCode) => ErrorResponse(errorCode, "Unable to contact push API")
+      case Unhealthy(errorCode) => ErrorResponse(errorCode.getOrElse(-1), "Unable to contact push API")
     }
   }
 }
