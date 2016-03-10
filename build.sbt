@@ -18,7 +18,8 @@ resolvers ++= Seq(
   "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases",
   "spray repo" at "http://repo.spray.io/",
   "Guardian GitHub Releases" at "http://guardian.github.io/maven/repo-releases",
-  "Guardian GitHub Snapshots" at "http://guardian.github.io/maven/repo-snapshots"
+  "Guardian GitHub Snapshots" at "http://guardian.github.io/maven/repo-snapshots",
+  "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
 libraryDependencies ++= {
