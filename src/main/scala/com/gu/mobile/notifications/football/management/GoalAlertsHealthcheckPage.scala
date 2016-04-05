@@ -13,11 +13,6 @@ class GoalAlertsHealthcheckPage extends ManagementPage {
 
   override val path = "/management/healthcheck"
 
-  override def get(req: HttpRequest): Response = {
-    /** TODO this sucks - fix the API for ManagementPages so it will accept Futures */
-    Await.result(GoalNotificationsPipeline.healthcheck, HealthCheckWait) match {
-      case Ok => PlainTextResponse("OK")
-      case Unhealthy(errorCode) => ErrorResponse(errorCode.getOrElse(-1), "Unable to contact push API")
-    }
-  }
+  override def get(req: HttpRequest) = PlainTextResponse("OK")
+
 }

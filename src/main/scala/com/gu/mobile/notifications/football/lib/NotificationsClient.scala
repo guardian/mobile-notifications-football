@@ -1,16 +1,20 @@
 package com.gu.mobile.notifications.football.lib
 
-import com.gu.mobile.notifications.client.{HttpProvider, ApiClient}
+import com.gu.mobile.notifications.client.models.GoalAlertPayload
+import com.gu.mobile.notifications.client._
 import dispatch._
+
 import scala.concurrent.Future
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 import com.gu.mobile.notifications.football.lib.Futures._
 import com.gu.mobile.notifications.football.management.Metrics
 import grizzled.slf4j.Logging
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait NotificationHttpProvider extends HttpProvider with Logging {
+object NotificationHttpProvider extends HttpProvider with Logging {
   override def get(urlString: String): Future[HttpResponse] = execute(url(urlString))
+
   override def post(urlString: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = {
     val ftr = execute(url(urlString)
       .setMethod("POST")
@@ -35,6 +39,24 @@ trait NotificationHttpProvider extends HttpProvider with Logging {
   }
 }
 
-trait NotificationsClient extends ApiClient with NotificationHttpProvider {
-  def host: String = GoalNotificationsConfig.guardianNotificationsHost
+class NotificationClientException(message: String) extends Exception(message)
+
+trait NotificationsClient {
+  val apiClient :ApiClient
+
+  def send(notification: GoalAlertPayload): Future[Unit] = apiClient.send(notification).map {
+    case Left(e) => throw new NotificationClientException(e.description)
+    case Right(_) => Unit
+  }
+}
+
+trait GuardianNotificationsClient extends NotificationsClient {
+  override val apiClient = ApiClient(
+    host = GoalNotificationsConfig.guardianNotificationsHost,
+    apiKey = GoalNotificationsConfig.guardianNotificationsApiKey,
+    legacyHost = GoalNotificationsConfig.guardianNotificationsLegacyHost,
+    legacyApiKey = GoalNotificationsConfig.guardianNotificationsLegacyApiKey,
+    httpProvider = NotificationHttpProvider
+  )
+
 }

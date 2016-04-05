@@ -1,20 +1,18 @@
 package com.gu.mobile.notifications.football.models
 
-import com.gu.mobile.notifications.client.models.legacy.Notification
-import com.gu.mobile.notifications.client.models.SendNotificationReply
+import com.gu.mobile.notifications.client.models.GoalAlertPayload
 import org.joda.time.DateTime
 
 sealed trait NotificationHistoryItem {
-  val notification: Notification
+  val notification: GoalAlertPayload
 }
 
 case class NotificationSent(
   sentAt: DateTime,
-  notification: Notification,
-  reply: SendNotificationReply
+  notification: GoalAlertPayload
 ) extends NotificationHistoryItem
 
 case class NotificationFailed(
   gaveUpAt: DateTime,
-  notification: Notification
+  notification: GoalAlertPayload
 ) extends NotificationHistoryItem

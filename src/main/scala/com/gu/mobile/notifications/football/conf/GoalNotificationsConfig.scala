@@ -13,6 +13,9 @@ object GoalNotificationsConfig {
   lazy val paApiKey = configuration("pa.api_key")
 
   lazy val guardianNotificationsHost = configuration("notifications.host")
+  lazy val guardianNotificationsApiKey = configuration("notifications.api.key")
+  lazy val guardianNotificationsLegacyHost = configuration("notifications.legacy.host")
+  lazy val guardianNotificationsLegacyApiKey = configuration("notifications.legacy.api.key")
 
   lazy val snsAccessKey = configuration.getStringProperty("credentials.sns.access_key")
   lazy val snsSecretKey = configuration.getStringProperty("credentials.sns.secret_key")

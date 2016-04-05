@@ -1,13 +1,14 @@
 package com.gu.mobile.notifications.football.lib
 
+import com.gu.mobile.notifications.client.models.{Topic, TopicTypes}
 import org.scalatest.{Matchers, WordSpec}
 import pa._
-import scala.concurrent.{ExecutionContext, Future, Await}
+
+import scala.concurrent.{Await, ExecutionContext, Future}
 import ExecutionContext.Implicits.global
-import org.joda.time.DateTime
 import pa.MatchDay
 import pa.Response
-import com.gu.mobile.notifications.client.models.legacy.Topic
+
 import scala.concurrent.duration.Duration
 import com.gu.mobile.notifications.football.helpers.EmptyInstances
 
@@ -40,27 +41,27 @@ class PaExpiringTopicsSpec extends WordSpec with Matchers with EmptyInstances {
       ))
 
       val topic1 = Topic(
-        "football-match",
+        TopicTypes.FootballMatch,
         "1"
       )
       val topic2 = Topic(
-        "football-match",
+        TopicTypes.FootballMatch,
         "2"
       )
       val topic3 = Topic(
-        "football-match",
+        TopicTypes.FootballMatch,
         "3"
       )
       val topic4 = Topic(
-        "football-match",
+        TopicTypes.FootballMatch,
         "4"
       )
       val topic5 = Topic(
-        "football-match",
+        TopicTypes.FootballMatch,
         "5"
       )
       val topic6 = Topic(
-        "football-match",
+        TopicTypes.FootballMatch,
         "6"
       )
 
