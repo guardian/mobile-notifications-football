@@ -44,9 +44,9 @@ class NotificationClientException(message: String) extends Exception(message)
 trait NotificationsClient {
   val apiClient :ApiClient
 
-  def send(notification: GoalAlertPayload): Future[Unit] = apiClient.send(notification).map {
-    case Left(e) => throw new NotificationClientException(e.description)
-    case Right(_) => Unit
+  def send(payload: GoalAlertPayload): Future[Either[ApiClientError, Unit]] = apiClient.send(payload).map {
+    case Left(e) if e.isInstanceOf[TotalApiError] => throw new NotificationClientException(e.description)
+    case x => x
   }
 }
 

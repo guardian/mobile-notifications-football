@@ -15,11 +15,11 @@ object ExpirationJsonImplicits extends DefaultJsonProtocol with SprayJsonSupport
       case JsString(TagContributor.toString) => TagContributor
       case JsString(TagKeyword.toString) => TagKeyword
       case JsString(TagSeries.toString) => TagSeries
-      case JsString((TagBlog.toString)) => TagBlog
-      case JsString((FootballMatch.toString)) => FootballMatch
-      case JsString((FootballTeam.toString)) => FootballTeam
-      case JsString((User.toString)) => User
-      case JsString((Newsstand.toString)) => Newsstand
+      case JsString(TagBlog.toString) => TagBlog
+      case JsString(FootballMatch.toString) => FootballMatch
+      case JsString(FootballTeam.toString) => FootballTeam
+      case JsString(User.toString) => User
+      case JsString(Newsstand.toString) => Newsstand
     }
   }
 

@@ -81,14 +81,12 @@ trait NotificationResponseStream extends Logging {
     * @return The stream
     */
   def getNotificationResponses(notifications: Observable[GoalAlertPayload])(implicit executionContext: ExecutionContext): Observable[NotificationHistoryItem] =
-    notifications flatMap { notification =>
-      Observable.defer(Observable.from(send(notification))).retry(retrySendNotifications) map {
-        _ => NotificationSent(new DateTime(), notification)
+    notifications flatMap { payload =>
+      Observable.defer(Observable.from(send(payload))).retry(retrySendNotifications) map {
+        case Right(_) => NotificationSent(new DateTime(), payload)
+        case Left(e) => NotificationFailed(new DateTime(), payload)
       } onErrorResumeNext {
-        Observable.items(NotificationFailed(
-          new DateTime(),
-          notification
-        ))
+        Observable.items(NotificationFailed(new DateTime(), payload))
       }
     }
 

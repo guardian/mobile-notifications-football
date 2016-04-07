@@ -19,14 +19,14 @@ trait SNSQueue extends Logging {
 
   lazy private val maybeTopic = GoalNotificationsConfig.snsTopic
 
-  def publishNotifications(notification: GoalAlertPayload) {
+  def publishNotifications(payload: GoalAlertPayload) {
     (for {
       client <- maybeClient
       topic <- maybeTopic
     } yield Try {
       client.publish(new PublishRequest()
         .withSubject("Goal notification created")
-        .withMessage(notification.toString)
+        .withMessage(payload.toString)
         .withTopicArn(topic))
     } match {
       case Success(publishResult) =>

@@ -4,15 +4,9 @@ import com.gu.mobile.notifications.client.models.GoalAlertPayload
 import org.joda.time.DateTime
 
 sealed trait NotificationHistoryItem {
-  val notification: GoalAlertPayload
+  val payload: GoalAlertPayload
 }
 
-case class NotificationSent(
-  sentAt: DateTime,
-  notification: GoalAlertPayload
-) extends NotificationHistoryItem
+case class NotificationSent(sentAt: DateTime, payload: GoalAlertPayload) extends NotificationHistoryItem
 
-case class NotificationFailed(
-  gaveUpAt: DateTime,
-  notification: GoalAlertPayload
-) extends NotificationHistoryItem
+case class NotificationFailed(gaveUpAt: DateTime, payload: GoalAlertPayload) extends NotificationHistoryItem

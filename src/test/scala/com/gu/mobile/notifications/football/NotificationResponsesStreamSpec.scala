@@ -88,7 +88,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
         val successes = responses.withType[NotificationSent]
         successes should have length 2
-        successes.map(_.notification).toSet shouldEqual notificationFixtures.toSet
+        successes.map(_.payload).toSet shouldEqual notificationFixtures.toSet
       }
     }
 
@@ -104,14 +104,14 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
         responses should have length 2
         val failures = responses.withType[NotificationFailed]
         failures should have length 2
-        failures.map(_.notification).toSet shouldEqual notificationFixtures.toSet
+        failures.map(_.payload).toSet shouldEqual notificationFixtures.toSet
       }
     }
 
-    "run over an API client that fails once with more than 1 retries set" should {
+    "run over an API client that fails with total failure once with more than 1 retries set" should {
       "produce a stream of success responses" in {
         val stream = new NotificationResponseStream with NotificationsClient {
-          override val apiClient = FailOnceClient
+          override val apiClient = FailOnceClient(totalApiError)
           val retrySendNotifications: Int = 2
         }
 
@@ -121,21 +121,42 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
         val successes = responses.withType[NotificationSent]
 
         successes should have length 2
-        successes.map(_.notification).toSet shouldEqual notificationFixtures.toSet
+        successes.map(_.payload).toSet shouldEqual notificationFixtures.toSet
+      }
+    }
+    "run over an API client that fails with partial failure once with more than 1 retries set" should {
+      "produce a stream of responses without retrying" in {
+        val stream = new NotificationResponseStream with NotificationsClient {
+          override val apiClient = FailOnceClient(partialApiError)
+          val retrySendNotifications: Int = 2
+        }
+
+        val responses = stream.getNotificationResponses(notificationFixturesObservable)
+          .toBlockingObservable.toList
+        responses should have length 2
+        val successes = responses.withType[NotificationSent]
+        successes should have length 1
       }
     }
   }
 
+  val totalApiError = TotalApiError(List(ErrorWithSource("clientId", ApiHttpError(500))))
+  val partialApiError = PartialApiError(List(ErrorWithSource("clientId1", ApiHttpError(500))))
+
+
   object FailureApiClient extends ApiClient {
     override def clientId: String = "failureClient"
-    override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext) = Future.successful(Left(ApiHttpError(500)))
+
+    override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext) = Future.successful(Left(totalApiError))
   }
+
   object SuccessApiClient extends ApiClient {
     override def clientId: String = "successClient"
+
     override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext) = Future.successful(Right())
   }
 
-  object FailOnceClient extends ApiClient {
+  case class FailOnceClient(error: ApiClientError) extends ApiClient {
     var hasFailed = false
 
     override def clientId: String = "failOnce"
@@ -144,8 +165,8 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
       if (hasFailed) Future.successful(Right())
       else {
         hasFailed = true
-        Future.successful(Left(ApiHttpError(500)))
+        Future.successful(Left(error))
       }
-
   }
+
 }
