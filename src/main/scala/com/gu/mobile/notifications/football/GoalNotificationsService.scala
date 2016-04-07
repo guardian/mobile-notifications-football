@@ -6,14 +6,20 @@ import spray.http._
 import MediaTypes._
 import com.gu.mobile.notifications.football.lib.Pa._
 import akka.util.Timeout
+
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.football.models._
-import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaFootballClient, ExpiringTopics, PaExpiringTopics}
+import com.gu.mobile.notifications.football.lib.{ExpiringTopics, GoalNotificationBuilder, PaExpiringTopics, PaFootballClient}
 import ExpirationJsonImplicits._
 import pa.MatchDay
 import com.gu.mobile.notifications.client.models.legacy._
+import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 import com.gu.mobile.notifications.football.models.NotificationSent
+import spray.routing.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
+import spray.routing.authentication.ContextAuthenticator
+
+import scala.concurrent.Future
 
 class GoalNotificationsServiceActor extends Actor with GoalNotificationsService {
   // the HttpService trait defines only one abstract member, which
@@ -94,6 +100,16 @@ trait Rendering {
 trait GoalNotificationsService extends HttpService with Rendering {
   implicit val timeout = Timeout(500 millis)
 
+  val authenticator: ContextAuthenticator[Unit] = { ctx =>
+    Future {
+      val maybeKey = ctx.request.headers.find(_.name == "api-key").map(_.value)
+      maybeKey match {
+        case None => Left(AuthenticationFailedRejection(CredentialsMissing, List()))
+        case Some(key) if (GoalNotificationsConfig.goalAlertsApiKey.exists(_ == key)) => Right()
+        case Some(_) => Left(AuthenticationFailedRejection(CredentialsRejected, List()))
+      }
+    }
+  }
   val expiringTopics: ExpiringTopics
 
   val myRoute =
@@ -127,12 +143,14 @@ trait GoalNotificationsService extends HttpService with Rendering {
     path("send-test-notification") {
       post {
         decompressRequest() {
-          entity(as[GoalAndMetadata]) { case GoalAndMetadata(goal, metadata) =>
-            detach() {
-              respondWithMediaType(`text/html`) {
-                complete {
-                  GoalNotificationsPipeline.send(GoalNotificationBuilder(goal, metadata)) map { _ =>
-                    <p>Sent a test notification</p>
+          authenticate(authenticator) { _ =>
+            entity(as[GoalAndMetadata]) { case GoalAndMetadata(goal, metadata) =>
+              detach() {
+                respondWithMediaType(`text/html`) {
+                  complete {
+                    GoalNotificationsPipeline.send(GoalNotificationBuilder(goal, metadata)) map { _ =>
+                      <p>Sent a test notification</p>
+                    }
                   }
                 }
               }
