@@ -46,7 +46,7 @@ object GoalNotificationBuilder {
         TopicTypes.FootballMatch,
         metadata.matchID
       ),
-      /** Yes, the old apps registered by the team NAME. FFS **/
+      //The old apps registered by the team NAME
       Topic(
         TopicTypes.FootballTeam,
         metadata.homeTeam.name

@@ -89,9 +89,6 @@ trait NotificationResponseStream extends Logging {
         Observable.items(NotificationFailed(new DateTime(), payload))
       }
     }
-
-
-
 }
 
 trait Streams extends MatchDayStream with GoalEventStream with GuardianNotificationStream with NotificationResponseStream with GuardianNotificationsClient
