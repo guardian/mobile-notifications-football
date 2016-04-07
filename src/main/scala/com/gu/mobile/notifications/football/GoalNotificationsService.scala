@@ -105,7 +105,7 @@ trait GoalNotificationsService extends HttpService with Rendering {
       val maybeKey = ctx.request.headers.find(_.name == "api-key").map(_.value)
       maybeKey match {
         case None => Left(AuthenticationFailedRejection(CredentialsMissing, List()))
-        case Some(key) if (GoalNotificationsConfig.goalAlertsApiKey.exists(_ == key)) => Right()
+        case Some(key) if (GoalNotificationsConfig.goalAlertsApiKey.filterNot(_ == "").exists(_ == key)) => Right()
         case Some(_) => Left(AuthenticationFailedRejection(CredentialsRejected, List()))
       }
     }
