@@ -18,6 +18,7 @@ object GoalNotificationsConfig {
   lazy val snsSecretKey = configuration.getStringProperty("credentials.sns.secret_key")
   lazy val snsEndpoint = configuration.getStringProperty("sns.endpoint")
   lazy val snsTopic = configuration.getStringProperty("sns.topic")
+  lazy val goalAlertsApiKey = configuration.getStringProperty("goal.alerts.api.key")
 
   lazy val snsQueuePublishCredentials = for {
     accessKey <- snsAccessKey
