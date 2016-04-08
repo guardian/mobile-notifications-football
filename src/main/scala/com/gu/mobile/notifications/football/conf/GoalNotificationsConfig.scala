@@ -1,9 +1,21 @@
 package com.gu.mobile.notifications.football.conf
 
-import com.gu.conf.ConfigurationFactory
+import com.gu.conf.{Configuration, ConfigurationFactory}
 import com.amazonaws.auth.BasicAWSCredentials
 
 object GoalNotificationsConfig {
+
+  implicit class RichConfiguration(config: Configuration) {
+    def getBooleanProperty(key: String, default: Boolean = false): Boolean =
+      config.getStringProperty(key) map {
+        _.toLowerCase match {
+          case "true" | "yes" | "on" => true
+          case "false" | "no" | "off" => false
+          case _ => default
+        }
+      } getOrElse default
+  }
+
   private lazy val configuration = ConfigurationFactory(
     "mobile-notifications-football", "conf/mobile-notifications-football"
   )
@@ -19,6 +31,7 @@ object GoalNotificationsConfig {
   lazy val snsEndpoint = configuration.getStringProperty("sns.endpoint")
   lazy val snsTopic = configuration.getStringProperty("sns.topic")
   lazy val goalAlertsApiKey = configuration.getStringProperty("goal.alerts.api.key")
+  lazy val testEndPointEnabled = configuration.getBooleanProperty("test_endpoint_enabled", false)
 
   lazy val snsQueuePublishCredentials = for {
     accessKey <- snsAccessKey

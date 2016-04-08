@@ -105,17 +105,18 @@ trait GoalNotificationsService extends HttpService with Rendering {
       val maybeKey = ctx.request.headers.find(_.name == "api-key").map(_.value)
       maybeKey match {
         case None => Left(AuthenticationFailedRejection(CredentialsMissing, List()))
-        case Some(key) if (GoalNotificationsConfig.goalAlertsApiKey.filterNot(_ == "").exists(_ == key)) => Right()
+        case GoalNotificationsConfig.goalAlertsApiKey => Right()
         case Some(_) => Left(AuthenticationFailedRejection(CredentialsRejected, List()))
       }
     }
   }
   val expiringTopics: ExpiringTopics
 
-  val myRoute =
+  val commonEndPoints =
     path("") {
       get {
-        respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
+        respondWithMediaType(`text/html`) {
+          // XML is marshalled to `text/xml` by default, so we simply override here
           complete {
             Agents.lastMatchDaysSeen.get() match {
               case Some(matchDays) => renderIndex(matchDays, Agents.notificationsHistory.get())
@@ -125,21 +126,22 @@ trait GoalNotificationsService extends HttpService with Rendering {
         }
       }
     } ~
-    path("expired-topics") {
-      post {
-        decompressRequest() {
-          entity(as[ExpirationRequest]) { request =>
-            detach() {
-              complete {
-                expiringTopics.getExpired(request.topics) map { expiredTopics =>
-                  ExpirationResponse(expiredTopics)
+      path("expired-topics") {
+        post {
+          decompressRequest() {
+            entity(as[ExpirationRequest]) { request =>
+              detach() {
+                complete {
+                  expiringTopics.getExpired(request.topics) map { expiredTopics =>
+                    ExpirationResponse(expiredTopics)
+                  }
                 }
               }
             }
           }
         }
       }
-    } ~
+  val testEndpoint =
     path("send-test-notification") {
       post {
         decompressRequest() {
@@ -159,4 +161,6 @@ trait GoalNotificationsService extends HttpService with Rendering {
         }
       }
     }
+
+  val myRoute = if (GoalNotificationsConfig.testEndPointEnabled) commonEndPoints ~ testEndpoint else commonEndPoints
 }
