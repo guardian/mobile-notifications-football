@@ -6,14 +6,20 @@ import spray.http._
 import MediaTypes._
 import com.gu.mobile.notifications.football.lib.Pa._
 import akka.util.Timeout
+
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.football.models._
-import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaFootballClient, ExpiringTopics, PaExpiringTopics}
+import com.gu.mobile.notifications.football.lib.{ExpiringTopics, GoalNotificationBuilder, PaExpiringTopics, PaFootballClient}
 import ExpirationJsonImplicits._
 import pa.MatchDay
 import com.gu.mobile.notifications.client.models.legacy._
+import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 import com.gu.mobile.notifications.football.models.NotificationSent
+import spray.routing.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
+import spray.routing.authentication.ContextAuthenticator
+
+import scala.concurrent.Future
 
 class GoalNotificationsServiceActor extends Actor with GoalNotificationsService {
   // the HttpService trait defines only one abstract member, which
@@ -94,12 +100,23 @@ trait Rendering {
 trait GoalNotificationsService extends HttpService with Rendering {
   implicit val timeout = Timeout(500 millis)
 
+  val authenticator: ContextAuthenticator[Unit] = { ctx =>
+    Future {
+      val maybeKey = ctx.request.headers.find(_.name == "api-key").map(_.value)
+      maybeKey match {
+        case None => Left(AuthenticationFailedRejection(CredentialsMissing, List()))
+        case GoalNotificationsConfig.goalAlertsApiKey => Right()
+        case Some(_) => Left(AuthenticationFailedRejection(CredentialsRejected, List()))
+      }
+    }
+  }
   val expiringTopics: ExpiringTopics
 
-  val myRoute =
+  val commonEndPoints =
     path("") {
       get {
-        respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
+        respondWithMediaType(`text/html`) {
+          // XML is marshalled to `text/xml` by default, so we simply override here
           complete {
             Agents.lastMatchDaysSeen.get() match {
               case Some(matchDays) => renderIndex(matchDays, Agents.notificationsHistory.get())
@@ -109,30 +126,33 @@ trait GoalNotificationsService extends HttpService with Rendering {
         }
       }
     } ~
-    path("expired-topics") {
-      post {
-        decompressRequest() {
-          entity(as[ExpirationRequest]) { request =>
-            detach() {
-              complete {
-                expiringTopics.getExpired(request.topics) map { expiredTopics =>
-                  ExpirationResponse(expiredTopics)
+      path("expired-topics") {
+        post {
+          decompressRequest() {
+            entity(as[ExpirationRequest]) { request =>
+              detach() {
+                complete {
+                  expiringTopics.getExpired(request.topics) map { expiredTopics =>
+                    ExpirationResponse(expiredTopics)
+                  }
                 }
               }
             }
           }
         }
       }
-    } ~
+  val testEndpoint =
     path("send-test-notification") {
       post {
         decompressRequest() {
-          entity(as[GoalAndMetadata]) { case GoalAndMetadata(goal, metadata) =>
-            detach() {
-              respondWithMediaType(`text/html`) {
-                complete {
-                  GoalNotificationsPipeline.send(GoalNotificationBuilder(goal, metadata)) map { _ =>
-                    <p>Sent a test notification</p>
+          authenticate(authenticator) { _ =>
+            entity(as[GoalAndMetadata]) { case GoalAndMetadata(goal, metadata) =>
+              detach() {
+                respondWithMediaType(`text/html`) {
+                  complete {
+                    GoalNotificationsPipeline.send(GoalNotificationBuilder(goal, metadata)) map { _ =>
+                      <p>Sent a test notification</p>
+                    }
                   }
                 }
               }
@@ -141,4 +161,6 @@ trait GoalNotificationsService extends HttpService with Rendering {
         }
       }
     }
+
+  val myRoute = if (GoalNotificationsConfig.testEndPointEnabled) commonEndPoints ~ testEndpoint else commonEndPoints
 }
