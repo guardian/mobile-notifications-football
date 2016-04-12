@@ -3,8 +3,9 @@ package com.gu.mobile.notifications.football
 import com.amazonaws.services.sns.AmazonSNSClient
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
 import com.amazonaws.services.sns.model.PublishRequest
+import com.gu.mobile.notifications.client.models.GoalAlertPayload
+
 import scala.util.{Failure, Success, Try}
-import com.gu.mobile.notifications.client.models.legacy.Notification
 import grizzled.slf4j.Logging
 
 trait SNSQueue extends Logging {
@@ -18,14 +19,14 @@ trait SNSQueue extends Logging {
 
   lazy private val maybeTopic = GoalNotificationsConfig.snsTopic
 
-  def publishNotifications(notification: Notification) {
+  def publishNotifications(payload: GoalAlertPayload) {
     (for {
       client <- maybeClient
       topic <- maybeTopic
     } yield Try {
       client.publish(new PublishRequest()
         .withSubject("Goal notification created")
-        .withMessage(notification.toString)
+        .withMessage(payload.toString)
         .withTopicArn(topic))
     } match {
       case Success(publishResult) =>

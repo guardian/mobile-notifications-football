@@ -1,18 +1,20 @@
 package com.gu.mobile.notifications.football
 
-import rx.lang.scala.{Subject, Observable}
+import com.gu.mobile.notifications.client.models.GoalAlertPayload
+import rx.lang.scala.{Observable, Subject}
 import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.lib._
 import org.joda.time.DateTime
 import lib.Observables._
-import scala.concurrent.ExecutionContext
+
+import scala.concurrent.{ExecutionContext, Future}
 import grizzled.slf4j.Logging
+
 import scala.concurrent.duration.FiniteDuration
 import ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.football.observables.MatchEventsObservable
 import pa.MatchDay
 import com.gu.mobile.notifications.football.lib.PaMatchDayClient
-import com.gu.mobile.notifications.client.models.legacy.Notification
 
 trait MatchDayStream extends Logging {
   val UpdateInterval: FiniteDuration
@@ -61,12 +63,13 @@ trait GoalEventStream extends Logging {
 
 trait GuardianNotificationStream extends Logging {
   /** Transforms a stream of Goal events into Notifications to be sent via Guardian Mobile Notifications */
-  def getGoalEventsAsNotifications(goals: Observable[(ScoreEvent, EventFeedMetadata)]): Observable[Notification] = goals map {
+  def getGoalEventsAsNotifications(goals: Observable[(ScoreEvent, EventFeedMetadata)]): Observable[GoalAlertPayload] = goals map {
     case (event, metadata) => GoalNotificationBuilder(event, metadata)
   }
 }
 
-trait NotificationResponseStream extends NotificationsClient with Logging {
+trait NotificationResponseStream extends Logging {
+  this: NotificationsClient =>
   /**
    * retrySendNotifications: If a notification could not be sent, how many times to retry
    */
@@ -77,21 +80,15 @@ trait NotificationResponseStream extends NotificationsClient with Logging {
     * @param notifications The notifications to send
     * @return The stream
     */
-  def getNotificationResponses(notifications: Observable[Notification])(implicit executionContext: ExecutionContext): Observable[NotificationHistoryItem] =
-    notifications flatMap { notification =>
-      Observable.defer(Observable.from(send(notification))).retry(retrySendNotifications) map { reply =>
-        NotificationSent(
-          new DateTime(),
-          notification,
-          reply
-        )
+  def getNotificationResponses(notifications: Observable[GoalAlertPayload])(implicit executionContext: ExecutionContext): Observable[NotificationHistoryItem] =
+    notifications flatMap { payload =>
+      Observable.defer(Observable.from(send(payload))).retry(retrySendNotifications) map {
+        case Right(_) => NotificationSent(new DateTime(), payload)
+        case Left(e) => NotificationFailed(new DateTime(), payload)
       } onErrorResumeNext {
-        Observable.items(NotificationFailed(
-          new DateTime(),
-          notification
-        ))
+        Observable.items(NotificationFailed(new DateTime(), payload))
       }
     }
 }
 
-trait Streams extends MatchDayStream with GoalEventStream with GuardianNotificationStream with NotificationResponseStream
+trait Streams extends MatchDayStream with GoalEventStream with GuardianNotificationStream with NotificationResponseStream with GuardianNotificationsClient

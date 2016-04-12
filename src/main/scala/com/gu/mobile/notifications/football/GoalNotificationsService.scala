@@ -12,6 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.lib.{ExpiringTopics, GoalNotificationBuilder, PaExpiringTopics, PaFootballClient}
 import ExpirationJsonImplicits._
+import com.gu.mobile.notifications.client.models.Topic
 import pa.MatchDay
 import com.gu.mobile.notifications.client.models.legacy._
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
@@ -51,22 +52,13 @@ trait Rendering {
 
       <h2>Goal notifications history</h2>
       {
-        for (NotificationSent(when, notification, _) <- history collect { case n: NotificationSent => n }) yield
+        for (NotificationSent(when, notification) <- history collect { case n: NotificationSent => n }) yield
           <dl>
             <dt>Time sent</dt>
             <dd>{ when.toString() }</dd>
 
-            <dt>TTL (secs)</dt>
-            <dd>{ notification.timeToLiveInSeconds }</dd>
-
             <dt>Topics</dt>
-            <dd>{ renderTopics(notification.target.topics.toSeq) }</dd>
-
-            <dt>Android Payload</dt>
-            <dd>{ renderAndroidPayload(notification.payloads.android.get) }</dd>
-
-            <dt>iOS Payload</dt>
-            <dd>{ renderIosPayload(notification.payloads.ios.get) }</dd>
+            <dd>{ renderTopics(notification.topic.toSeq) }</dd>
           </dl>
       }
     </html>
@@ -74,26 +66,6 @@ trait Rendering {
   def renderTopics(topics: Seq[Topic]) = <ul>{
      topics map { topic: Topic => <li>{ topic.`type` }: { topic.name }</li> }
     }</ul>
-
-  def renderIosPayload(payload: IOSMessagePayload) = <table>
-      <tr>
-        <th>Body</th>
-        <td>{ payload.body }</td>
-      </tr>
-      {
-        for {
-          (k, v) <- payload.customProperties
-        } yield <tr><th>{ k }</th><td>{ v }</td></tr>
-      }
-    </table>
-
-  def renderAndroidPayload(payload: AndroidMessagePayload) = <table>
-    {
-      for {
-        (k, v) <- payload.body
-      } yield <tr><th>{ k }</th><td>{ v }</td></tr>
-    }
-  </table>
 }
 
 // this trait defines our service behavior independently from the service actor
