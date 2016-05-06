@@ -20,7 +20,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
   val notificationFixture = GoalAlertPayload(
-    id = "test",
     title = "title",
     message = "message",
     sender = "test@theguardian.com",
@@ -42,7 +41,6 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
   )
 
   val notificationFixture2 = GoalAlertPayload(
-    id = "test2",
     title = "title1",
     message = "message2",
     sender = "test@gu.com",
