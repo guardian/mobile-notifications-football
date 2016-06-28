@@ -18,11 +18,11 @@ class MatchEventsObservableLogicSpec extends WordSpec with Matchers with Resourc
       val fixture2 = finalFixture.copy(isResult = false, events = finalFixture.events.take(40))
       val fixture3 = finalFixture.copy(isResult = false, events = finalFixture.events.take(60))
 
-      val matchEventsSequence = Observable.items(fixture1, fixture1, fixture2, fixture3, fixture3, finalFixture)
+      val matchEventsSequence = Observable.just(fixture1, fixture1, fixture2, fixture3, fixture3, finalFixture)
 
       MatchEventsObservableLogic
         .eventsFromFeeds("3704151", matchEventsSequence)
-        .toBlockingObservable.toList.map(_._1) should be(
+        .toBlocking.toList.map(_._1) should be(
         List(
           KickOff,
           Goal("Wes Hoolahan", awayTeam, homeTeam, 3, None),
@@ -42,11 +42,11 @@ class MatchEventsObservableLogicSpec extends WordSpec with Matchers with Resourc
       val fixture2 = finalFixture.copy(isResult = false, events = finalFixture.events.take(50))
       val fixture3 = finalFixture.copy(isResult = false, events = finalFixture.events.take(80))
 
-      val matchEventsSequence = Observable.items(fixture1, fixture1, fixture2, fixture3, fixture3, finalFixture)
+      val matchEventsSequence = Observable.just(fixture1, fixture1, fixture2, fixture3, fixture3, finalFixture)
 
       MatchEventsObservableLogic
         .eventsFromFeeds("3693727", matchEventsSequence)
-        .toBlockingObservable.toList.map(_._1) should be(
+        .toBlocking.toList.map(_._1) should be(
         List(
           KickOff,
           Goal(

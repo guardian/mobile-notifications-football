@@ -64,7 +64,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
 
   val notificationFixtures = List(notificationFixture, notificationFixture2)
 
-  val notificationFixturesObservable = Observable.items(notificationFixtures: _*)
+  val notificationFixturesObservable = Observable.just(notificationFixtures: _*)
 
   implicit class RichSeq[A](xs: Seq[A]) {
     /** Filters the list for items of the given subtype of A */
@@ -80,7 +80,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
         }
 
         val responses = stream.getNotificationResponses(notificationFixturesObservable)
-          .toBlockingObservable.toList
+          .toBlocking.toList
 
         responses should have length 2
 
@@ -97,7 +97,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
           val retrySendNotifications: Int = 5
         }
         val responses = stream.getNotificationResponses(notificationFixturesObservable)
-          .toBlockingObservable.toList
+          .toBlocking.toList
 
         responses should have length 2
         val failures = responses.withType[NotificationFailed]
@@ -114,7 +114,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
         }
 
         val responses = stream.getNotificationResponses(notificationFixturesObservable)
-          .toBlockingObservable.toList
+          .toBlocking.toList
         responses should have length 2
         val successes = responses.withType[NotificationSent]
 
@@ -130,7 +130,7 @@ class NotificationResponsesStreamSpec extends WordSpec with Matchers {
         }
 
         val responses = stream.getNotificationResponses(notificationFixturesObservable)
-          .toBlockingObservable.toList
+          .toBlocking.toList
         responses should have length 2
         val successes = responses.withType[NotificationSent]
         successes should have length 1
