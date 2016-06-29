@@ -6,8 +6,6 @@ import spray.can.Http
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
-import com.gu.mobile.notifications.football.management.MobileNotificationsManagementServer
 
 object SystemSetup {
   // we need an ActorSystem to host our application in
@@ -17,7 +15,6 @@ object SystemSetup {
 object Boot extends App {
   import SystemSetup._
 
-  MobileNotificationsManagementServer.start()
   GoalNotificationsPipeline.start()
 
   // create and start our service actor

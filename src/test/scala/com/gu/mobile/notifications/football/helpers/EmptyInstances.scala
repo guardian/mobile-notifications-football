@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.football.helpers
 
-import pa.{MatchEvent, MatchDay, MatchDayTeam}
+import pa.{Round, Stage, MatchEvent, MatchDay, MatchDayTeam}
 import org.joda.time.DateTime
 
 trait EmptyInstances {
@@ -35,23 +35,24 @@ trait EmptyInstances {
 
   implicit class RichMatchDayCompanion(companion: MatchDay.type) {
     def empty = MatchDay(
-      "",
-      new DateTime(),
-      None,
-      None,
-      "",
-      false,
-      false,
-      false,
-      false,
-      false,
-      "",
-      None,
-      MatchDayTeam.empty,
-      MatchDayTeam.empty,
-      None,
-      None,
-      None
+      id = "",
+      date = new DateTime(),
+      competition = None,
+      stage = Stage("1"),
+      round = Round("12", None),
+      leg = "",
+      liveMatch = false,
+      result = false,
+      previewAvailable = false,
+      reportAvailable = false,
+      lineupsAvailable = false,
+      matchStatus = "F",
+      attendance = None,
+      homeTeam = MatchDayTeam.empty,
+      awayTeam = MatchDayTeam.empty,
+      referee = None,
+      venue = None,
+      comments = None
     )
 
     def forIdAndStatus(id: String, status: String) = empty.copy(id = id, matchStatus = status)

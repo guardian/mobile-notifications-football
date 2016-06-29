@@ -6,8 +6,6 @@ import dispatch._
 
 import scala.concurrent.Future
 import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
-import com.gu.mobile.notifications.football.lib.Futures._
-import com.gu.mobile.notifications.football.management.Metrics
 import grizzled.slf4j.Logging
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -21,7 +19,6 @@ object NotificationHttpProvider extends HttpProvider with Logging {
       .setContentType(contentType.mediaType, contentType.charset)
       .setBody(body)
     )
-    ftr.recordTimeSpent(Metrics.notificationsResponseTime, Metrics.notificationsErrorResponseTime)
 
     ftr onFailure {
       case error => logger.error("Error trying to send notification", error)

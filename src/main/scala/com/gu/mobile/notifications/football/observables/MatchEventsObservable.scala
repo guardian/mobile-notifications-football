@@ -29,12 +29,12 @@ object MatchEventsObservableLogic {
       )
     }
 
-    (Observable.items(Seq.empty[(MatchEvent, EventFeedMetadata)]) ++ eventFeeds).pairs flatMap { case (events1, events2) =>
+    (Observable.just(Seq.empty[(MatchEvent, EventFeedMetadata)]) ++ eventFeeds).pairs flatMap { case (events1, events2) =>
       /** This should *theoretically* be good enough as the events should always occur in the same order
         *
         * I do, however, imagine I'll be revisiting this code at some point ...
         */
-      Observable.items(events2.drop(events1.length): _*)
+      Observable.just(events2.drop(events1.length): _*)
     }
   }
 }

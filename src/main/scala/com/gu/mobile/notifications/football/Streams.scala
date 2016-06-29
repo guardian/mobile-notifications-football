@@ -86,7 +86,7 @@ trait NotificationResponseStream extends Logging {
         case Right(_) => NotificationSent(new DateTime(), payload)
         case Left(e) => NotificationFailed(new DateTime(), payload)
       } onErrorResumeNext {
-        Observable.items(NotificationFailed(new DateTime(), payload))
+        Observable.just(NotificationFailed(new DateTime(), payload))
       }
     }
 }
