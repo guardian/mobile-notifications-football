@@ -29,8 +29,8 @@ trait MatchDayStream extends Logging {
       todaysMatchesFuture onFailure {
         case pae: PaClientErrorsException if pae.msg.contains("No data available") =>
           logger.info(s"No match data available for today [${LocalDate.now}]")
-        case error: Throwable =>
-          logger.error(s"Error getting today's matches from PA [${error.getMessage}]")
+        case e: Exception =>
+          logger.error(s"Error getting today's matches from PA [${e.getMessage}]", e)
       }
 
       Observable.from(todaysMatchesFuture).completeOnError
