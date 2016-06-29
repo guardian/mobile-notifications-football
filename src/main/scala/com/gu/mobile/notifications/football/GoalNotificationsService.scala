@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.football
 
 import akka.actor.Actor
+import spray.http.StatusCodes.Success
 import spray.routing._
 import spray.http._
 import MediaTypes._
@@ -110,6 +111,13 @@ trait GoalNotificationsService extends HttpService with Rendering {
                 }
               }
             }
+          }
+        }
+      } ~
+      path("healthcheck") {
+        get {
+          respondWithStatus(200) {
+            complete("Ok")
           }
         }
       }
