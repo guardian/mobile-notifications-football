@@ -1,19 +1,20 @@
 package com.gu.mobile.notifications.football
 
+import java.time.LocalDate
+
 import com.gu.mobile.notifications.client.models.GoalAlertPayload
 import rx.lang.scala.{Observable, Subject}
 import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.lib._
 import org.joda.time.DateTime
 import lib.Observables._
-
-import scala.concurrent.{ExecutionContext, Future}
 import grizzled.slf4j.Logging
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration
-import ExecutionContext.Implicits.global
 import com.gu.mobile.notifications.football.observables.MatchEventsObservable
-import pa.MatchDay
+import pa.{PaClientErrorsException, MatchDay}
 import com.gu.mobile.notifications.football.lib.PaMatchDayClient
 
 trait MatchDayStream extends Logging {
@@ -26,8 +27,10 @@ trait MatchDayStream extends Logging {
       val todaysMatchesFuture = PaMatchDayClient(PaFootballClient).today
 
       todaysMatchesFuture onFailure {
-        case error =>
-          logger.error("Error getting today's matches from PA", error)
+        case pae: PaClientErrorsException if pae.msg.contains("No data available") =>
+          logger.info(s"No match data available for today [${LocalDate.now}]")
+        case error: Throwable =>
+          logger.error(s"Error getting today's matches from PA [${error.getMessage}]")
       }
 
       Observable.from(todaysMatchesFuture).completeOnError
