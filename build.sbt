@@ -29,14 +29,10 @@ libraryDependencies ++= {
   Seq(
     "io.spray" %% "spray-can" % sprayV,
     "io.spray" %% "spray-routing" % sprayV,
-    "io.spray" %% "spray-testkit" % sprayV,
     "io.spray" %% "spray-json" % sprayV,
     "com.typesafe.akka" %% "akka-agent" % akkaV,
     "com.typesafe.akka" %% "akka-actor" % akkaV,
-    "com.typesafe.akka" %% "akka-testkit" % akkaV,
     "com.typesafe.akka" %% "akka-slf4j" % akkaV,
-    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
     "com.gu" %% "configuration" % "4.0",
     "com.gu" %% "mobile-notifications-client" % "0.5.27",
     "com.gu" %% "dynamo-db-switches" % "0.2",
@@ -45,7 +41,11 @@ libraryDependencies ++= {
     "ch.qos.logback" % "logback-classic" % "1.0.13",
     "com.netflix.rxjava" % "rxjava-scala" % "0.20.7",
     "com.amazonaws" % "aws-java-sdk" % "1.6.3",
-    "net.databinder.dispatch" %% "dispatch-core" % "0.11.1"
+    "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
+    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
+    "io.spray" %% "spray-testkit" % sprayV % "test",
+    "com.typesafe.akka" %% "akka-testkit" % akkaV % "test"
   )
 }
 
