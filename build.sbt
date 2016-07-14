@@ -34,7 +34,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-actor" % akkaV,
     "com.typesafe.akka" %% "akka-slf4j" % akkaV,
     "com.gu" %% "configuration" % "4.0",
-    "com.gu" %% "mobile-notifications-client" % "0.5.27",
+    "com.gu" %% "mobile-notifications-client" % "0.5.29",
     "com.gu" %% "dynamo-db-switches" % "0.2",
     "com.gu" %% "pa-client" % "6.0.2",
     "org.scalaj" % "scalaj-time_2.10.0-M7" % "0.6",

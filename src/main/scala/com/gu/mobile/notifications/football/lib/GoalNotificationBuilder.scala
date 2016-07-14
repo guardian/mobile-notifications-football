@@ -69,7 +69,7 @@ object GoalNotificationBuilder {
       goalMins = goal.minute,
       otherTeamName = goal.otherTeam.name,
       matchId = metadata.matchID,
-      mapiUrl = new URI(s"${GoalNotificationsConfig.mapiFootballHost}/match-info/${metadata.matchID}"),
+      mapiUrl = new URI(s"${GoalNotificationsConfig.mapiHost}/sport/football/matches/${metadata.matchID}"),
       debug = false, // This flag exists for legacy reasons (the current PROD Android app will break if it's not here)
       addedTime = goal.addedTime,
       goalType = goalType,
