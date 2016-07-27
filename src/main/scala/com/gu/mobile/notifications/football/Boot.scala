@@ -16,6 +16,7 @@ object Boot extends App {
   import SystemSetup._
 
   GoalNotificationsPipeline.start()
+  PAHealthCheck.startRefreshCycle()
 
   // create and start our service actor
   val service = system.actorOf(
