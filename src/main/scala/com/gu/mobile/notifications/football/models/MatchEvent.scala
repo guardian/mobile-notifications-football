@@ -1,7 +1,6 @@
 package com.gu.mobile.notifications.football.models
 
 import pa.{MatchEvent => PaMatchEvent, Team, MatchEvents}
-import org.joda.time.Duration
 
 /** Match events we're interested in
   *
@@ -28,28 +27,31 @@ object MatchEvent {
       }
 
     matchEvent.eventType match {
-      case "timeline" if matchEvent.matchTime == Some("0:00") => Some(KickOff)
+      case "timeline" if matchEvent.matchTime.contains("0:00") => Some(KickOff)
 
       case "goal" => for {
+        id <- matchEvent.id
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
         scoringTeam <- getTeam(scorer.teamID)
         otherTeam <- getOtherTeam(scorer.teamID)
-      } yield Goal(scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
+      } yield Goal(id, scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
 
       case "own goal" => for {
+        id <- matchEvent.id
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
         scoringTeam <- getOtherTeam(scorer.teamID)
         otherTeam <- getTeam(scorer.teamID)
-      } yield OwnGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
+      } yield OwnGoal(id, scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
 
       case "goal from penalty" => for {
+        id <- matchEvent.id
         scorer <- matchEvent.players.headOption
         eventTime <- matchEvent.eventTime
         scoringTeam <- getTeam(scorer.teamID)
         otherTeam <- getOtherTeam(scorer.teamID)
-      } yield PenaltyGoal(scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
+      } yield PenaltyGoal(id, scorer.name, scoringTeam, otherTeam, eventTime.toInt, matchEvent.addedTime.filterNot(_ == "0:00"))
 
       case _ => None
     }
@@ -62,8 +64,12 @@ object MatchEventTeam {
 
 case class MatchEventTeam(id: Int, name: String)
 
-sealed trait MatchEvent
-case object KickOff extends MatchEvent
+sealed trait MatchEvent {
+  def id: String
+}
+case object KickOff extends MatchEvent {
+  override val id = "kickoff"
+}
 
 sealed trait ScoreEvent extends MatchEvent {
   val scorerName: String
@@ -77,6 +83,7 @@ sealed trait ScoreEvent extends MatchEvent {
 }
 
 case class Goal(
+  id: String,
   scorerName: String,
   scoringTeam: MatchEventTeam,
   otherTeam: MatchEventTeam,
@@ -85,6 +92,7 @@ case class Goal(
 ) extends ScoreEvent
 
 case class OwnGoal(
+  id: String,
   scorerName: String,
   scoringTeam: MatchEventTeam,
   otherTeam: MatchEventTeam,
@@ -93,6 +101,7 @@ case class OwnGoal(
 ) extends ScoreEvent
 
 case class PenaltyGoal(
+  id: String,
   scorerName: String,
   scoringTeam: MatchEventTeam,
   otherTeam: MatchEventTeam,
@@ -100,4 +109,6 @@ case class PenaltyGoal(
   addedTime: Option[String]
 ) extends ScoreEvent
 
-case object Result extends MatchEvent
+case object Result extends MatchEvent {
+  override val id = "result"
+}

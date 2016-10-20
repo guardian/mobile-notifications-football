@@ -10,11 +10,11 @@ class EventFeedMetaDataSpec extends WordSpec with Matchers {
 
   val eventsList = List(
     KickOff,
-    Goal("Wes Hoolahan", homeTeam, awayTeam, 3, None),
-    Goal("Christian Benteke", awayTeam, homeTeam, 25, None),
-    Goal("Christian Benteke", awayTeam, homeTeam, 27, None),
-    Goal("Leandro Bacuna", awayTeam, homeTeam, 37, None),
-    OwnGoal("Sebastien Bassong", awayTeam, homeTeam, 41, None),
+    Goal("1", "Wes Hoolahan", homeTeam, awayTeam, 3, None),
+    Goal("2", "Christian Benteke", awayTeam, homeTeam, 25, None),
+    Goal("3", "Christian Benteke", awayTeam, homeTeam, 27, None),
+    Goal("4", "Leandro Bacuna", awayTeam, homeTeam, 37, None),
+    OwnGoal("5", "Sebastien Bassong", awayTeam, homeTeam, 41, None),
     Result
   )
 

@@ -13,8 +13,8 @@ object GoalNotificationBuilder {
   def apply(goal: ScoreEvent, metadata: EventFeedMetadata): GoalAlertPayload = {
 
     val goalType = goal match {
-      case OwnGoal(_, _, _, _, _) => OwnGoalType
-      case PenaltyGoal(_, _, _, _, _) => PenaltyGoalType
+      case _: OwnGoal => OwnGoalType
+      case _: PenaltyGoal => PenaltyGoalType
       case _ => DefaultGoalType
     }
 

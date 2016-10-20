@@ -6,7 +6,7 @@ import spray.httpx.SprayJsonSupport
 
 trait GoalAndMetadataImplicits { self: DefaultJsonProtocol with SprayJsonSupport =>
   implicit val matchEventTeamFormat = jsonFormat2(MatchEventTeam.apply)
-  implicit val goalFormat = jsonFormat5(Goal)
+  implicit val goalFormat = jsonFormat6(Goal)
   implicit val metadataFormat = jsonFormat5(EventFeedMetadata.apply)
   implicit val goalAndMetadataFormat = jsonFormat2(GoalAndMetadata)
 }

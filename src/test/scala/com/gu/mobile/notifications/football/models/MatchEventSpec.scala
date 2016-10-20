@@ -53,7 +53,7 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
       )
 
       MatchEvent.fromMatchEvent(matchEventsFixture)(goalEvent) should equal(Some(
-        Goal("Wes Hoolahan", awayTeam, homeTeam, 3, None))
+        Goal("18877842", "Wes Hoolahan", awayTeam, homeTeam, 3, None))
       )
     }
 
@@ -72,7 +72,7 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
       )
 
       MatchEvent.fromMatchEvent(matchEventsFixture)(ownGoalEvent) should equal(Some(
-        OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41, None))
+        OwnGoal("18878420", "Sebastien Bassong", homeTeam, awayTeam, 41, None))
       )
     }
 
@@ -92,7 +92,7 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
       )
 
       MatchEvent.fromMatchEvent(matchEventsFixture)(penaltyGoalEvent) should equal(Some(
-        PenaltyGoal("Glenn Murray", awayTeam, homeTeam, 82, None)
+        PenaltyGoal("18879192", "Glenn Murray", awayTeam, homeTeam, 82, None)
       ))
     }
   }
@@ -103,11 +103,11 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
 
       MatchEvent.fromMatchEvents(matchEvents) should equal(List(
         KickOff,
-        Goal("Wes Hoolahan", awayTeam, homeTeam, 3, None),
-        Goal("Christian Benteke", homeTeam, awayTeam, 25, None),
-        Goal("Christian Benteke", homeTeam, awayTeam, 27, None),
-        Goal("Leandro Bacuna", homeTeam, awayTeam, 37, None),
-        OwnGoal("Sebastien Bassong", homeTeam, awayTeam, 41, None),
+        Goal("18877842", "Wes Hoolahan", awayTeam, homeTeam, 3, None),
+        Goal("18878199", "Christian Benteke", homeTeam, awayTeam, 25, None),
+        Goal("18878239", "Christian Benteke", homeTeam, awayTeam, 27, None),
+        Goal("18878360", "Leandro Bacuna", homeTeam, awayTeam, 37, None),
+        OwnGoal("18878420", "Sebastien Bassong", homeTeam, awayTeam, 41, None),
         Result
       ))
     }
@@ -120,8 +120,8 @@ class MatchEventSpec extends WordSpec with Matchers with ResourcesHelper with Em
 
       MatchEvent.fromMatchEvents(matchEvents) should equal(List(
         KickOff,
-        Goal("Bira Dembele", stevenage, crawleyTown, 21, None),
-        Goal("Matt Tubbs", crawleyTown, stevenage, 90, Some("1:15")),
+        Goal("18881342", "Bira Dembele", stevenage, crawleyTown, 21, None),
+        Goal("18882739", "Matt Tubbs", crawleyTown, stevenage, 90, Some("1:15")),
         Result
       ))
     }
