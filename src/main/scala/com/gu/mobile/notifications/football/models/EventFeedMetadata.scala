@@ -15,11 +15,11 @@ object EventFeedMetadata {
       matchID: String, homeTeam: MatchEventTeam, awayTeam: MatchEventTeam
     ): Seq[(MatchEvent, EventFeedMetadata)] = {
       val initialMetaData = EventFeedMetadata(
-        matchID,
-        homeTeam,
-        0,
-        awayTeam,
-        0
+        matchID = matchID,
+        homeTeam = homeTeam,
+        homeTeamScore = 0,
+        awayTeam = awayTeam,
+        awayTeamScore = 0
       )
 
       val metas = events.scanLeft(initialMetaData) { (metaData, event) =>

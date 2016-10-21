@@ -3,63 +3,66 @@ package com.gu.mobile.notifications.football
 import java.time.LocalDate
 
 import com.gu.mobile.notifications.client.models.GoalAlertPayload
-import rx.lang.scala.{Observable, Subject}
+import rx.lang.scala.Observable
 import com.gu.mobile.notifications.football.models._
 import com.gu.mobile.notifications.football.lib._
 import org.joda.time.DateTime
-import lib.Observables._
 import grizzled.slf4j.Logging
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration
 import com.gu.mobile.notifications.football.observables.MatchEventsObservable
-import pa.{PaClientErrorsException, MatchDay}
+import pa.{MatchDay, PaClientErrorsException}
 import com.gu.mobile.notifications.football.lib.PaMatchDayClient
+import rx.lang.scala.subjects.AsyncSubject
+
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 trait MatchDayStream extends Logging {
   val UpdateInterval: FiniteDuration
 
-  def getMatchDayStream: Observable[List[MatchDay]] = {
-    // Use the subject below rather than subscribe to the stream directly - otherwise more calls are kicked off to PA
-    // than are required
-    val stream = Observable.interval(UpdateInterval) flatMap { _ =>
+  def getMatchDayStream: Observable[MatchDay] = {
+
+    def fullMatchDayStream(tick: Long): Observable[MatchDay] = {
+      val subject = AsyncSubject[MatchDay]()
+
       val todaysMatchesFuture = PaMatchDayClient(PaFootballClient).today
 
-      todaysMatchesFuture onFailure {
-        case pae: PaClientErrorsException if pae.msg.contains("No data available") =>
+      todaysMatchesFuture onComplete {
+        case Success(matchDays) =>
+          matchDays.foreach(subject.onNext)
+          subject.onCompleted()
+        case Failure(pae: PaClientErrorsException) if pae.msg.contains("No data available") =>
           logger.info(s"No match data available for today [${LocalDate.now}]")
-        case e: Exception =>
+        case Failure(e) =>
           logger.error(s"Error getting today's matches from PA [${e.getMessage}]", e)
       }
-
-      Observable.from(todaysMatchesFuture).completeOnError
+      subject
     }
 
-    val subject = Subject[List[MatchDay]]()
-    stream.subscribe(subject)
-    subject
-  }
+    def isLive(matchDay: MatchDay): Boolean = {
+      // I voluntarily avoid using the matchDay.liveMatch as we want to start polling slightly before the match starts
+      val startPolling = matchDay.date.minusMinutes(15)
+      val stopPolling = matchDay.date.plusHours(3)
+      (startPolling.isAfterNow && stopPolling.isBeforeNow) || matchDay.liveMatch
+    }
 
-  def matchIdSets(matchDays: Observable[List[MatchDay]]): Observable[Set[String]] = {
-    /** The set of match IDs will change exactly once per day. No two sets will contain the same match IDs.
-      * This ensures that the observable does not emit the same IDs repeatedly (so when we flatMap it later into match
-      * event Observables we don't end up creating duplicates) but also ensures that the Observable always occupies
-      * constant space (as it only remembers the previously seen set of IDs, rather than every ID it's ever seen).
-      */
-    matchDays.map(_.map(_.id).toSet).distinctUntilChanged
+    Observable.timer(0.seconds, UpdateInterval)
+      .flatMap(fullMatchDayStream)
+      .filter(isLive)
+      .distinct(_.id)
   }
 }
 
 trait GoalEventStream extends Logging {
   /** Given a stream of lists of MatchDay results, returns a stream of goal events */
-  def getGoalEvents(matchIdSets: Observable[Set[String]]): Observable[(ScoreEvent, EventFeedMetadata)] = {
-    matchIdSets flatMap { ids =>
-      ids.map(MatchEventsObservable.forMatchId).fold(Observable.empty)(_.merge(_)) collect {
-        case (goal: Goal, metadata) => (goal, metadata)
-        case (ownGoal: OwnGoal, metadata) => (ownGoal, metadata)
-        case (penalty: PenaltyGoal, metadata) => (penalty, metadata)
-      }
+  def getGoalEvents(matchDays: Observable[MatchDay]): Observable[(ScoreEvent, EventFeedMetadata)] = {
+    matchDays.flatMap(matchDay => MatchEventsObservable.forMatchId(matchDay.id)) collect {
+      case (goal: Goal, metadata) => (goal, metadata)
+      case (ownGoal: OwnGoal, metadata) => (ownGoal, metadata)
+      case (penalty: PenaltyGoal, metadata) => (penalty, metadata)
     }
   }
 }

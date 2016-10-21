@@ -10,7 +10,7 @@ trait DispatchHttp extends pa.Http with Logging {
   def GET(urlString: String): Future[Response] = {
     import ExecutionContext.Implicits.global
 
-    logger.debug("Http GET " + urlString.replaceAll(GoalNotificationsConfig.paApiKey, "<api-key>"))
+    logger.info("Http GET " + urlString.replaceAll(GoalNotificationsConfig.paApiKey, "<api-key>"))
     dispatch.Http(url(urlString) OK as.Response(r => Response(r.getStatusCode, r.getResponseBody, r.getStatusText)))
   }
 }
