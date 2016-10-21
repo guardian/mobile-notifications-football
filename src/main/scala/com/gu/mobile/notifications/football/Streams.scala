@@ -46,7 +46,7 @@ trait MatchDayStream extends Logging {
       // I voluntarily avoid using the matchDay.liveMatch as we want to start polling slightly before the match starts
       val startPolling = matchDay.date.minusMinutes(15)
       val stopPolling = matchDay.date.plusHours(3)
-      startPolling.isAfterNow && stopPolling.isBeforeNow
+      (startPolling.isAfterNow && stopPolling.isBeforeNow) || matchDay.liveMatch
     }
 
     Observable.timer(0.seconds, UpdateInterval)
