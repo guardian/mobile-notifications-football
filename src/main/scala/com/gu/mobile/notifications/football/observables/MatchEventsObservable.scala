@@ -15,9 +15,9 @@ import rx.lang.scala.subjects.PublishSubject
 object MatchEventsObservable extends MatchEventsObservableLogic with Logging {
   val apiClient = PaMatchDayClient(PaFootballClient)
 
-  val pollingIntervalTolerance = 5.seconds
+  val pollingIntervalTolerance = 10.seconds
 
-  val pollingInterval = 30.seconds
+  val pollingInterval = 60.seconds
 }
 
 trait MatchEventsObservableLogic { self: Logging =>

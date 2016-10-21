@@ -7,7 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object GoalNotificationsPipeline extends GoalNotificationsPipeline {
   val MaxHistoryLength: Int = 100
   val retrySendNotifications: Int = 5
-  val UpdateInterval = 5.minutes
+  val UpdateInterval = 1.hour
 }
 
 trait GoalNotificationsPipeline extends Streams with SNSQueue with GoalNotificationLogger {
