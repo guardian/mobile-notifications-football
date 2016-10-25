@@ -30,6 +30,7 @@ libraryDependencies ++= {
     "io.spray" %% "spray-can" % sprayV,
     "io.spray" %% "spray-routing" % sprayV,
     "io.spray" %% "spray-json" % sprayV,
+    "io.spray" %% "spray-caching" % sprayV,
     "com.typesafe.akka" %% "akka-agent" % akkaV,
     "com.typesafe.akka" %% "akka-actor" % akkaV,
     "com.typesafe.akka" %% "akka-slf4j" % akkaV,

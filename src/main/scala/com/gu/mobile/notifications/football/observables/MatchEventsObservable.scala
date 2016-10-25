@@ -16,7 +16,7 @@ object MatchEventsObservable extends MatchEventsObservableLogic with Logging {
 
   val pollingIntervalTolerance = 5.seconds
 
-  val pollingInterval = 15.seconds
+  val pollingInterval = 60.seconds
 }
 
 object MatchEventsObservableLogic {
