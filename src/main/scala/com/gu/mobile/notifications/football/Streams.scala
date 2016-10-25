@@ -16,6 +16,7 @@ import scala.concurrent.duration.FiniteDuration
 import com.gu.mobile.notifications.football.observables.MatchEventsObservable
 import pa.{PaClientErrorsException, MatchDay}
 import com.gu.mobile.notifications.football.lib.PaMatchDayClient
+import scala.concurrent.duration._
 
 trait MatchDayStream extends Logging {
   val UpdateInterval: FiniteDuration
@@ -23,7 +24,7 @@ trait MatchDayStream extends Logging {
   def getMatchDayStream: Observable[List[MatchDay]] = {
     // Use the subject below rather than subscribe to the stream directly - otherwise more calls are kicked off to PA
     // than are required
-    val stream = Observable.interval(UpdateInterval) flatMap { _ =>
+    val stream = Observable.timer(0.second, UpdateInterval) flatMap { _ =>
       val todaysMatchesFuture = PaMatchDayClient(PaFootballClient).today
 
       todaysMatchesFuture onFailure {
