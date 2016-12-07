@@ -2,15 +2,15 @@ stacks: [mobile-notifications]
 regions: [eu-west-1]
 
 deployments:
-  mobile-notifications-football-lambda:
+  football:
     type: aws-lambda
     parameters:
       bucket: mobile-dist
       functionNames: [-football-]
-      fileName: mobile-notifications-football-lambda.jar
+      fileName: football.jar
       prefixStack: true
-    dependencies: [mobile-notifications-football-cfn]
-  mobile-notifications-football-lambda-cfn:
+    dependencies: [football-cfn]
+  football-cfn:
     type: cloud-formation
     parameters:
       prependStackToCloudFormationStackName: true
