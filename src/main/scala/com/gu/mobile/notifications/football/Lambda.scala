@@ -10,6 +10,7 @@ import com.gu.football.PaFootballActor
 import com.gu.football.PaFootballActor.TriggerPoll
 import com.gu.mobile.notifications.football.lib.{PaFootballClient, PaMatchDayClient}
 import akka.pattern.ask
+import akka.util.Timeout
 
 import scala.beans.BeanProperty
 import scala.concurrent.Await
@@ -39,7 +40,8 @@ object Lambda extends App {
     "goal-notifications-actor-solution"
   )
 
-  def handler(lambdaInput: LambdaInput, context: Context): Unit = {
+  def handler(lambdaInput: LambdaInput, context: Context): String = {
+    implicit val timeout = Timeout(60.seconds)
     val done = footballActor ? TriggerPoll(context.getLogger)
     Await.ready(done, 60.seconds)
     "done"
