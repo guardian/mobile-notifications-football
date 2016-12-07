@@ -12,6 +12,7 @@ deployments:
     dependencies: [football-cfn]
   football-cfn:
     type: cloud-formation
+    app: football
     parameters:
       prependStackToCloudFormationStackName: true
       cloudFormationStackName: football
