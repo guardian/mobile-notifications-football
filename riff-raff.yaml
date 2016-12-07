@@ -1,0 +1,18 @@
+stacks: mobile-notifications
+regions: eu-west-1
+
+deployments:
+  mobile-notifications-football:
+    type: aws-lambda
+    parameters:
+      bucket: mobile-dist
+      functionNames: football-
+      fileName: mobile-notifications-football.jar
+      prefixStack: true
+    dependencies: mobile-notifications-football-cfn
+  mobile-notifications-football-cfn:
+    type: cloud-formation
+    parameters:
+      prependStackToCloudFormationStackName: true
+      cloudFormationStackName: football
+      templatePath: cfn.yaml
