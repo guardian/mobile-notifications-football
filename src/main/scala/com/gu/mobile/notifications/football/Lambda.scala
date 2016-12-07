@@ -9,8 +9,11 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.gu.football.PaFootballActor
 import com.gu.football.PaFootballActor.TriggerPoll
 import com.gu.mobile.notifications.football.lib.{PaFootballClient, PaMatchDayClient}
+import akka.pattern.ask
 
 import scala.beans.BeanProperty
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 /**
   * This is compatible with aws' lambda JSON to POJO conversion
@@ -37,6 +40,8 @@ object Lambda extends App {
   )
 
   def handler(lambdaInput: LambdaInput, context: Context): Unit = {
-    footballActor ! TriggerPoll(context.getLogger)
+    val done = footballActor ? TriggerPoll(context.getLogger)
+    Await.ready(done, 60.seconds)
+    "done"
   }
 }

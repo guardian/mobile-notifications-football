@@ -1,6 +1,6 @@
 package com.gu.football
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorRef}
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.gu.mobile.notifications.football.lib.PaMatchDayClient
@@ -16,8 +16,8 @@ import scala.util.{Failure, Success}
 object PaFootballActor {
   case class CachedValue[T](value: T, expiry: DateTime)
   case class TriggerPoll(logger: LambdaLogger)
-  case class PollFinished(logger: LambdaLogger)
-  case class ProcessedEvents(events: Set[String], logger: LambdaLogger)
+  case class PollFinished(logger: LambdaLogger, senderRef: ActorRef)
+  case class ProcessedEvents(events: Set[String], logger: LambdaLogger, senderRef: ActorRef)
 
   sealed trait DistinctStatus
   case object Distinct extends DistinctStatus
@@ -55,7 +55,7 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
 
     case TriggerPoll(logger) if ready =>
       implicit val lg = logger
-
+      val senderRef = sender()
       ready = false
       Logger.info("Starting poll for new match events")
 
@@ -68,20 +68,20 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
       matchEventIds andThen {
         case Success(ids) =>
           Logger.info("Finished polling with success")
-          self ! ProcessedEvents(ids, logger)
+          self ! ProcessedEvents(ids, logger, senderRef)
         case Failure(e) =>
           Logger.error(s"Finished polling with error ${e.getMessage}")
-          self ! PollFinished(logger)
+          self ! PollFinished(logger, senderRef)
       }
 
-    case ProcessedEvents(events, logger) =>
+    case ProcessedEvents(events, logger, senderRef) =>
       processedEvents = events
-      self ! PollFinished(logger)
+      self ! PollFinished(logger, senderRef)
 
-    case PollFinished(logger) =>
+    case PollFinished(logger, senderRef) =>
       ready = true
       Logger.info("Stopping lambda")(logger)
-      // notify amazon done
+      senderRef ! "done"
   }
 
 
