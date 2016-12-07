@@ -7,7 +7,7 @@ deployments:
     parameters:
       bucket: mobile-dist
       functionNames: [football-]
-      fileName: mobile-notifications-football.jar
+      fileName: mobile-notifications-football-lambda.jar
       prefixStack: true
     dependencies: [mobile-notifications-football-cfn]
   mobile-notifications-football-cfn:
