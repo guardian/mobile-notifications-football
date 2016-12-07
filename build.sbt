@@ -1,4 +1,4 @@
-name := "mobile-notifications-football"
+name := "mobile-notifications-football-lambda"
 
 version := "1.0"
 
