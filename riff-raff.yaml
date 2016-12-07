@@ -2,7 +2,7 @@ stacks: [mobile-notifications]
 regions: [eu-west-1]
 
 deployments:
-  mobile-notifications-football:
+  mobile-notifications-football-lambda:
     type: aws-lambda
     parameters:
       bucket: mobile-dist
