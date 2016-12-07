@@ -52,7 +52,7 @@ Resources:
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub ${App}-${Stage}
+      FunctionName: !Sub ${Stack}-${App}-${Stage}
       Code:
         S3Bucket:
           Ref: DeployBucket
