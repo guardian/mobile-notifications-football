@@ -63,7 +63,7 @@ Resources:
           Stack: !Ref Stack
           App: !Ref App
       Description: Your description here
-      Handler: com.gu.Lambda::handler
+      Handler: com.gu.mobile.notifications.football.Lambda::handler
       MemorySize: 128
       Role: !GetAtt ExecutionRole.Arn
       Runtime: java8
