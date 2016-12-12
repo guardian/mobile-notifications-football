@@ -56,6 +56,15 @@ Resources:
               Action:
                 - s3:GetObject
               Resource: !Sub arn:aws:s3:::mobile-notifications-dist/${Stage}/*
+        - PolicyName: dynamodb
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:Query
+              Resource: !Sub arn:aws:dynamodb:eu-west-1:201359054765:table/mobile-notifications-football-${Stage}
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
