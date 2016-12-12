@@ -28,7 +28,7 @@ class Configuration {
   val app = Option(System.getenv("App")).getOrElse("DEV")
 
   private val conf: Config = {
-    val dataStream = s3Client.getObject(s"mobile-dist/$stage", "mobile-notifications/football.conf").getObjectContent
+    val dataStream = s3Client.getObject("mobile-notifications-dist", s"$stage/football/football.conf").getObjectContent
     val data = new BufferedReader(new InputStreamReader(dataStream)).lines.collect(Collectors.joining("\n"))
     ConfigFactory.parseString(data)
   }
