@@ -49,6 +49,13 @@ Resources:
               Action:
                 - lambda:InvokeFunction
               Resource: "*"
+        - PolicyName: s3Config
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: !Sub arn:aws:s3:::mobile-notifications-dist/${Stage}/*
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
