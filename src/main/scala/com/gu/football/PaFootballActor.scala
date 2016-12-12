@@ -88,7 +88,7 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
   }
 
   private def isLive(m: MatchDay): Boolean =
-    m.date.isBefore(DateTime.now) // && !m.result
+    m.date.isBefore(DateTime.now) && !m.result
 
   private def runOncePerEvent(event: MatchEventWithId): Future[Unit] = {
     logger.info(s"Found unique event $event")
