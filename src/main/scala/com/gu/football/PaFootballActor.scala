@@ -2,7 +2,6 @@ package com.gu.football
 
 import akka.actor.{Actor, ActorRef}
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
-import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.gu.mobile.notifications.football.lib.PaMatchDayClient
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{ScanamoAsync, Table}
@@ -15,9 +14,9 @@ import scala.util.{Failure, Success}
 
 object PaFootballActor {
   case class CachedValue[T](value: T, expiry: DateTime)
-  case class TriggerPoll(logger: LambdaLogger)
-  case class PollFinished(logger: LambdaLogger, senderRef: ActorRef)
-  case class ProcessedEvents(events: Set[String], logger: LambdaLogger, senderRef: ActorRef)
+  case object TriggerPoll
+  case class PollFinished(senderRef: ActorRef)
+  case class ProcessedEvents(events: Set[String], senderRef: ActorRef)
 
   sealed trait DistinctStatus
   case object Distinct extends DistinctStatus
@@ -25,20 +24,7 @@ object PaFootballActor {
   case object Unknown extends DistinctStatus
 }
 
-object Logger {
-  def info(s: => String)(implicit logger: LambdaLogger): Unit =
-    logger.log(s"$s\n")
-
-  def warn(s: => String)(implicit logger: LambdaLogger): Unit =
-    logger.log(s"$s\n")
-
-  def error(s: => String)(implicit logger: LambdaLogger): Unit =
-    logger.log(s"$s\n")
-
-  def debug(s: => String)(implicit logger: LambdaLogger): Unit = {}
-}
-
-class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDBAsync, tableName: String) extends Actor {
+class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDBAsync, tableName: String) extends Actor with Logging {
 
   implicit val ec = context.dispatcher
 
@@ -50,14 +36,14 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
   var cachedMatches: Option[CachedValue[List[MatchDay]]] = None
 
   def receive = {
-    case TriggerPoll(logger) if !ready =>
-      Logger.warn("Poll triggered while existing poll still in progress, ignoring")(logger)
+    case TriggerPoll if !ready =>
+      logger.warn("Poll triggered while existing poll still in progress, ignoring")
 
-    case TriggerPoll(logger) if ready =>
+    case TriggerPoll if ready =>
       implicit val lg = logger
       val senderRef = sender()
       ready = false
-      Logger.info("Starting poll for new match events")
+      logger.info("Starting poll for new match events")
 
       val matchEventIds = for {
         matches <- todaysMatches
@@ -67,36 +53,36 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
 
       matchEventIds andThen {
         case Success(ids) =>
-          Logger.info("Finished polling with success")
-          self ! ProcessedEvents(ids, logger, senderRef)
+          logger.info("Finished polling with success")
+          self ! ProcessedEvents(ids, senderRef)
         case Failure(e) =>
-          Logger.error(s"Finished polling with error ${e.getMessage}")
-          self ! PollFinished(logger, senderRef)
+          logger.error(s"Finished polling with error ${e.getMessage}")
+          self ! PollFinished(senderRef)
       }
 
-    case ProcessedEvents(events, logger, senderRef) =>
+    case ProcessedEvents(events, senderRef) =>
       processedEvents = events
-      self ! PollFinished(logger, senderRef)
+      self ! PollFinished(senderRef)
 
-    case PollFinished(logger, senderRef) =>
+    case PollFinished(senderRef) =>
       ready = true
-      Logger.info("Stopping lambda")(logger)
+      logger.info("Stopping lambda")
       senderRef ! "done"
   }
 
 
-  def dynamoDistinctCheck(event: MatchEventWithId)(implicit logger: LambdaLogger): Future[DistinctStatus] = {
+  def dynamoDistinctCheck(event: MatchEventWithId): Future[DistinctStatus] = {
     val putResult = ScanamoAsync.exec(client)(eventsTable.given(not(attributeExists('id))).put(event))
     putResult map {
       case Right(s) =>
-        Logger.debug(s"Distinct event ${event.id} written to dynamodb")
+        logger.debug(s"Distinct event ${event.id} written to dynamodb")
         Distinct
       case Left(s) =>
-        Logger.debug(s"Event ${event.id} already exists in dynamodb - discarding")
+        logger.debug(s"Event ${event.id} already exists in dynamodb - discarding")
         Duplicate
     } recover {
       case e =>
-        Logger.error(s"Failure while writing to dynamodb: ${e.getMessage}.  Request will be retried on next poll")
+        logger.error(s"Failure while writing to dynamodb: ${e.getMessage}.  Request will be retried on next poll")
         Unknown
     }
   }
@@ -104,50 +90,50 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
   private def isLive(m: MatchDay): Boolean =
     m.date.isBefore(DateTime.now) // && !m.result
 
-  private def runOncePerEvent(event: MatchEventWithId)(implicit logger: LambdaLogger): Future[Unit] = {
-    Logger.info(s"Found unique event $event")
+  private def runOncePerEvent(event: MatchEventWithId): Future[Unit] = {
+    logger.info(s"Found unique event $event")
     Future.successful(())
   }
 
-  private def todaysMatches(implicit logger: LambdaLogger): Future[List[MatchDay]] = {
+  private def todaysMatches: Future[List[MatchDay]] = {
     val matches = for {
       matches <- cachedMatches if matches.expiry isAfter DateTime.now
     } yield {
-      Logger.info(s"Using cached value of today's matches (expires at ${matches.expiry})")
+      logger.info(s"Using cached value of today's matches (expires at ${matches.expiry})")
       Future.successful(matches.value)
     }
 
     matches.getOrElse {
-      Logger.info("Retrieving today's matches from PA")
+      logger.info("Retrieving today's matches from PA")
       paMatchDayClient.aroundToday.andThen {
         case Success(m) =>
-          Logger.info(s"Retrieved ${m.size} matches from PA")
+          logger.info(s"Retrieved ${m.size} matches from PA")
           cachedMatches = Some(CachedValue(m, DateTime.now.plusMinutes(30)))
 
         case Failure(e) =>
-          Logger.error(s"Failed to retrieve today's matches from PA: ${e.getMessage}")
+          logger.error(s"Failed to retrieve today's matches from PA: ${e.getMessage}")
       } recover {
         case e =>
           List.empty
       }
     }
   }
-  private def processMatch(matchDay: MatchDay)(implicit logger: LambdaLogger): Future[List[String]] =
+  private def processMatch(matchDay: MatchDay): Future[List[String]] =
     eventsForMatch(matchDay.id).flatMap(processMatchEvents)
 
-  private def eventsForMatch(id: String)(implicit logger: LambdaLogger): Future[List[MatchEventWithId]] =
+  private def eventsForMatch(id: String): Future[List[MatchEventWithId]] =
     paMatchDayClient.matchEvents(id).map { matchEvents =>
       matchEvents.events.flatMap(MatchEventWithId.fromMatchEvent)
     } recover {
       case e =>
-        Logger.error(s"Failed to fetch events for match $id: ${e.getMessage}")
+        logger.error(s"Failed to fetch events for match $id: ${e.getMessage}")
         List.empty
     }
 
-  private def processMatchEvents(events: List[MatchEventWithId])(implicit logger: LambdaLogger): Future[List[String]] =
+  private def processMatchEvents(events: List[MatchEventWithId]): Future[List[String]] =
     Future.traverse(events)(processMatchEvent).map(_.flatten)
 
-  private def processMatchEvent(event: MatchEventWithId)(implicit logger: LambdaLogger): Future[Option[String]] = {
+  private def processMatchEvent(event: MatchEventWithId): Future[Option[String]] = {
     if (!processedEvents.contains(event.id)) {
       dynamoDistinctCheck(event).flatMap {
         case Distinct =>
@@ -158,7 +144,7 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
           Future.successful(None)
       }
     } else {
-      Logger.debug(s"Event ${event.id} already exists in local cache - discarding")
+      logger.debug(s"Event ${event.id} already exists in local cache - discarding")
       Future.successful(Some(event.id))
     }
   }

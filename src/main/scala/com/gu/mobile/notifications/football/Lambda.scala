@@ -1,8 +1,6 @@
 package com.gu.mobile.notifications.football
 
 import akka.actor.{ActorSystem, Props}
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
-import com.amazonaws.auth.{AWSCredentialsProviderChain, InstanceProfileCredentialsProvider}
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
@@ -11,6 +9,7 @@ import com.gu.football.PaFootballActor.TriggerPoll
 import com.gu.mobile.notifications.football.lib.{PaFootballClient, PaMatchDayClient}
 import akka.pattern.ask
 import akka.util.Timeout
+import grizzled.slf4j.Logging
 
 import scala.beans.BeanProperty
 import scala.concurrent.Await
@@ -23,37 +22,32 @@ class LambdaInput() {
   @BeanProperty var name: String = _
 }
 
-object Lambda extends App {
+object Lambda extends App with Logging {
 
-  var globalContext: Option[Context] = None
-
-  lazy val tableName = {
-    println("Initialising table name")
-    "mobile-notifications-football-CODE"
-  }
+  def tableName = s"mobile-notifications-football-${configuration.stage}"
 
   implicit lazy val system = {
-    globalContext.foreach { _.getLogger.log("Creating actor system\n")}
-    ActorSystem("goal-notifications-system")
+    logger.debug("Creating actor system")
+    ActorSystem("mobile-notification-football")
   }
 
   lazy val configuration = {
-    globalContext.foreach { _.getLogger.log("Creating configuration\n")}
+    logger.debug("Creating configuration")
     new Configuration()
   }
 
   lazy val paMatchDayClient = {
-    globalContext.foreach { _.getLogger.log("Creating pa match day client\n")}
+    logger.debug("Creating pa match day client")
     PaMatchDayClient(new PaFootballClient(configuration.paApiKey, configuration.paHost))
   }
 
   lazy val dynamoDBClient: AmazonDynamoDBAsyncClient = {
-    globalContext.foreach { _.getLogger.log("Creating dynamo db client\n")}
+    logger.debug("Creating dynamo db client")
     new AmazonDynamoDBAsyncClient(configuration.credentials).withRegion(EU_WEST_1)
   }
 
   lazy val footballActor = {
-    globalContext.foreach { _.getLogger.log("Creating actor\n")}
+    logger.debug("Creating actor")
     system.actorOf(
       Props(classOf[PaFootballActor], paMatchDayClient, dynamoDBClient, tableName),
       "goal-notifications-actor-solution"
@@ -61,11 +55,9 @@ object Lambda extends App {
   }
 
   def handler(lambdaInput: LambdaInput, context: Context): String = {
-    globalContext = Some(context)
-    implicit val timeout = Timeout(60.seconds)
-    val done = footballActor ? TriggerPoll(context.getLogger)
-    Await.ready(done, 60.seconds)
-    globalContext = None
+    implicit val timeout = Timeout(30.seconds)
+    val done = footballActor ? TriggerPoll
+    Await.ready(done, 35.seconds)
     "done"
   }
 }
