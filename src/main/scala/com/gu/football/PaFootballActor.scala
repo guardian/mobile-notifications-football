@@ -27,13 +27,13 @@ object PaFootballActor {
 
 object Logger {
   def info(s: => String)(implicit logger: LambdaLogger): Unit =
-    logger.log(s)
+    logger.log(s"$s\n")
 
   def warn(s: => String)(implicit logger: LambdaLogger): Unit =
-    logger.log(s)
+    logger.log(s"$s\n")
 
   def error(s: => String)(implicit logger: LambdaLogger): Unit =
-    logger.log(s)
+    logger.log(s"$s\n")
 
   def debug(s: => String)(implicit logger: LambdaLogger): Unit = {}
 }
