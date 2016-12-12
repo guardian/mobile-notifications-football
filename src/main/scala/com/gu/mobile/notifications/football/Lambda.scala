@@ -25,25 +25,47 @@ class LambdaInput() {
 
 object Lambda extends App {
 
-  implicit val system = ActorSystem("goal-notifications-system")
+  var globalContext: Option[Context] = None
 
-  val paMatchDayClient = PaMatchDayClient(PaFootballClient)
-  private val provider = new AWSCredentialsProviderChain(
-    new ProfileCredentialsProvider("mobile"),
-    InstanceProfileCredentialsProvider.getInstance
-  )
-  val dynamoDBClient: AmazonDynamoDBAsyncClient = new AmazonDynamoDBAsyncClient(provider).withRegion(EU_WEST_1)
-  val tableName = "mobile-notifications-football-CODE"
+  lazy val tableName = {
+    println("Initialising table name")
+    "mobile-notifications-football-CODE"
+  }
 
-  val footballActor = system.actorOf(
-    Props(classOf[PaFootballActor], paMatchDayClient, dynamoDBClient, tableName),
-    "goal-notifications-actor-solution"
-  )
+  implicit lazy val system = {
+    globalContext.foreach { _.getLogger.log("Creating actor system\n")}
+    ActorSystem("goal-notifications-system")
+  }
+
+  lazy val configuration = {
+    globalContext.foreach { _.getLogger.log("Creating configuration\n")}
+    new Configuration()
+  }
+
+  lazy val paMatchDayClient = {
+    globalContext.foreach { _.getLogger.log("Creating pa match day client\n")}
+    PaMatchDayClient(new PaFootballClient(configuration.paApiKey, configuration.paHost))
+  }
+
+  lazy val dynamoDBClient: AmazonDynamoDBAsyncClient = {
+    globalContext.foreach { _.getLogger.log("Creating dynamo db client\n")}
+    new AmazonDynamoDBAsyncClient(configuration.credentials).withRegion(EU_WEST_1)
+  }
+
+  lazy val footballActor = {
+    globalContext.foreach { _.getLogger.log("Creating actor\n")}
+    system.actorOf(
+      Props(classOf[PaFootballActor], paMatchDayClient, dynamoDBClient, tableName),
+      "goal-notifications-actor-solution"
+    )
+  }
 
   def handler(lambdaInput: LambdaInput, context: Context): String = {
+    globalContext = Some(context)
     implicit val timeout = Timeout(60.seconds)
     val done = footballActor ? TriggerPoll(context.getLogger)
     Await.ready(done, 60.seconds)
+    globalContext = None
     "done"
   }
 }

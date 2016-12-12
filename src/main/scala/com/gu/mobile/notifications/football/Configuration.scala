@@ -4,14 +4,15 @@ import java.io.{BufferedReader, InputStreamReader}
 import java.util.stream.Collectors
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
-import com.amazonaws.auth.{AWSCredentialsProviderChain, InstanceProfileCredentialsProvider}
+import com.amazonaws.auth.{AWSCredentialsProviderChain, EnvironmentVariableCredentialsProvider, InstanceProfileCredentialsProvider}
 import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.s3.AmazonS3Client
 import com.typesafe.config.{Config, ConfigFactory}
 
-object Configuration {
+class Configuration {
 
-  private val credentials = new AWSCredentialsProviderChain(
+  val credentials = new AWSCredentialsProviderChain(
+    new EnvironmentVariableCredentialsProvider(),
     new ProfileCredentialsProvider("mobile"),
     InstanceProfileCredentialsProvider.getInstance()
   )
