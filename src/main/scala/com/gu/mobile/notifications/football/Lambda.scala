@@ -54,10 +54,20 @@ object Lambda extends App with Logging {
     )
   }
 
+  var cachedLambda: Boolean = null
+
   def handler(lambdaInput: LambdaInput, context: Context): String = {
+    if (cachedLambda) {
+      logger.info("Re-using existing container")
+    } else {
+      cachedLambda = true
+      logger.info("Starting new container")
+    }
+    
     implicit val timeout = Timeout(30.seconds)
     val done = footballActor ? TriggerPoll
     Await.ready(done, 35.seconds)
     "done"
   }
+
 }
