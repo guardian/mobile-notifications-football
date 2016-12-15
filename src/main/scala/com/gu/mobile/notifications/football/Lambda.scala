@@ -6,9 +6,10 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.football.PaFootballActor
 import com.gu.football.PaFootballActor.TriggerPoll
-import com.gu.mobile.notifications.football.lib.{PaFootballClient, PaMatchDayClient}
+import com.gu.mobile.notifications.football.lib.{NotificationHttpProvider, PaFootballClient, PaMatchDayClient}
 import akka.pattern.ask
 import akka.util.Timeout
+import com.gu.mobile.notifications.client.ApiClient
 import grizzled.slf4j.Logging
 
 import scala.beans.BeanProperty
@@ -23,6 +24,8 @@ class LambdaInput() {
 }
 
 object Lambda extends App with Logging {
+
+  var cachedLambda = null.asInstanceOf[Boolean]
 
   def tableName = s"mobile-notifications-football-${configuration.stage}"
 
@@ -54,7 +57,18 @@ object Lambda extends App with Logging {
     )
   }
 
-  var cachedLambda: Boolean = null
+  lazy val notificationHttpProvider = {
+    implicit val ec = system.dispatcher
+    new NotificationHttpProvider()
+  }
+
+  lazy val notificationClient = ApiClient(
+    host = configuration.notificationsHost,
+    apiKey = configuration.notificationsApiKey,
+    httpProvider = notificationHttpProvider,
+    legacyHost = configuration.notificationsLegacyHost,
+    legacyApiKey = configuration.notificationsLegacyApiKey
+  )
 
   def handler(lambdaInput: LambdaInput, context: Context): String = {
     if (cachedLambda) {
@@ -63,7 +77,7 @@ object Lambda extends App with Logging {
       cachedLambda = true
       logger.info("Starting new container")
     }
-    
+
     implicit val timeout = Timeout(30.seconds)
     val done = footballActor ? TriggerPoll
     Await.ready(done, 35.seconds)

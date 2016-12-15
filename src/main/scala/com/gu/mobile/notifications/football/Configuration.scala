@@ -33,10 +33,11 @@ class Configuration {
     ConfigFactory.parseString(data)
   }
 
-
-  val paApiKey = conf.getString("pa.api_key")
+  val paApiKey = conf.getString("pa.api-key")
   val paHost = conf.getString("pa.host")
-  val guardianNotificationsHost = conf.getString("notifications.client.host")
-  val guardianNotificationsApiKey = conf.getString("notifications.client.api.key")
-  val goalAlertsApiKey = conf.getString("goal.alerts.api.key")
+  val notificationsHost = conf.getString("notifications-client.host")
+  val notificationsApiKey = conf.getString("notifications-client.api.key")
+  val notificationsLegacyHost = conf.getString("notifications-client.legacy.host")
+  val notificationsLegacyApiKey = conf.getString("notifications-lient.legacy.api-key")
+  val mapiHost = conf.getString("mapi.host")
 }

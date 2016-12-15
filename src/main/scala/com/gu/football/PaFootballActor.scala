@@ -2,7 +2,9 @@ package com.gu.football
 
 import akka.actor.{Actor, ActorRef}
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
-import com.gu.mobile.notifications.football.lib.PaMatchDayClient
+import com.gu.football.models.{Goal, GoalContext, Score}
+import com.gu.mobile.notifications.client._
+import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaMatchDayClient}
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{ScanamoAsync, Table}
 import grizzled.slf4j.Logging
@@ -24,7 +26,13 @@ object PaFootballActor {
   case object Unknown extends DistinctStatus
 }
 
-class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDBAsync, tableName: String) extends Actor with Logging {
+class PaFootballActor(
+  paMatchDayClient: PaMatchDayClient,
+  client: AmazonDynamoDBAsync,
+  tableName: String,
+  goalNotificationBuilder: GoalNotificationBuilder,
+  notificationClient: ApiClient
+) extends Actor with Logging {
 
   implicit val ec = context.dispatcher
 
@@ -90,9 +98,29 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
   private def isLive(m: MatchDay): Boolean =
     m.date.isBefore(DateTime.now) && !m.result
 
-  private def runOncePerEvent(event: MatchEventWithId): Future[Unit] = {
+  private def sendGoalAlert(matchDay: MatchDay, previousEvents: List[MatchEventWithId])(goal: Goal): Future[Unit] = {
+    logger.info(s"Sending goal alert $goal")
+    import matchDay._
+    val goalsToDate = goal :: previousEvents.flatMap(Goal.fromEvent(homeTeam, awayTeam)(_))
+    val score = Score.fromGoals(homeTeam, awayTeam, goalsToDate)
+    val goalContext = GoalContext(homeTeam, awayTeam, matchDay.id, score)
+    val payload = goalNotificationBuilder.build(goal, goalContext)
+    val result = notificationClient.send(payload)
+    result.onComplete {
+      case Success(Left(error)) => logger.error(s"Error sending $goal - ${error.description}")
+      case Success(Right(())) => logger.info(s"Goal alert $goal successfully sent")
+      case Failure(f) => logger.error(s"Error sending $goal ${f.getMessage}")
+    }
+    result
+      .map(_ => ())
+      .recover({case _ => ()})
+  }
+
+  private def runOncePerEvent(matchDay: MatchDay, previousEvents: List[MatchEventWithId], event: MatchEventWithId): Future[Unit] = {
     logger.info(s"Found unique event $event")
-    Future.successful(())
+    val goal = Goal.fromEvent(matchDay.homeTeam, matchDay.awayTeam)(event)
+    val sentGoalAlert = goal.map(sendGoalAlert(matchDay, previousEvents))
+    sentGoalAlert.getOrElse(Future.successful(()))
   }
 
   private def todaysMatches: Future[List[MatchDay]] = {
@@ -119,7 +147,7 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
     }
   }
   private def processMatch(matchDay: MatchDay): Future[List[String]] =
-    eventsForMatch(matchDay.id).flatMap(processMatchEvents)
+    eventsForMatch(matchDay.id).flatMap(processMatchEvents(matchDay))
 
   private def eventsForMatch(id: String): Future[List[MatchEventWithId]] =
     paMatchDayClient.matchEvents(id).map { matchEvents =>
@@ -130,14 +158,15 @@ class PaFootballActor(paMatchDayClient: PaMatchDayClient, client: AmazonDynamoDB
         List.empty
     }
 
-  private def processMatchEvents(events: List[MatchEventWithId]): Future[List[String]] =
-    Future.traverse(events)(processMatchEvent).map(_.flatten)
+  private def processMatchEvents(matchDay: MatchDay)(events: List[MatchEventWithId]): Future[List[String]] =
+    Future.traverse(events)(processMatchEvent(matchDay, events)).map(_.flatten)
 
-  private def processMatchEvent(event: MatchEventWithId): Future[Option[String]] = {
+  private def processMatchEvent(matchDay: MatchDay, events: List[MatchEventWithId])(event: MatchEventWithId): Future[Option[String]] = {
     if (!processedEvents.contains(event.id)) {
       dynamoDistinctCheck(event).flatMap {
         case Distinct =>
-          runOncePerEvent(event).map(_ => Some(event.id))
+          val previousEvents = events.takeWhile(_ != event)
+          runOncePerEvent(matchDay, previousEvents, event).map(_ => Some(event.id))
         case Duplicate =>
           Future.successful(Some(event.id))
         case Unknown =>
