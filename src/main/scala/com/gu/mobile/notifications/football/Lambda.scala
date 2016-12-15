@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.football.PaFootballActor
 import com.gu.football.PaFootballActor.TriggerPoll
-import com.gu.mobile.notifications.football.lib.{NotificationHttpProvider, PaFootballClient, PaMatchDayClient}
+import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, NotificationHttpProvider, PaFootballClient, PaMatchDayClient}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.gu.mobile.notifications.client.ApiClient
@@ -49,13 +49,7 @@ object Lambda extends App with Logging {
     new AmazonDynamoDBAsyncClient(configuration.credentials).withRegion(EU_WEST_1)
   }
 
-  lazy val footballActor = {
-    logger.debug("Creating actor")
-    system.actorOf(
-      Props(classOf[PaFootballActor], paMatchDayClient, dynamoDBClient, tableName),
-      "goal-notifications-actor-solution"
-    )
-  }
+  lazy val goalNotificationBuilder = new GoalNotificationBuilder(configuration.mapiHost)
 
   lazy val notificationHttpProvider = {
     implicit val ec = system.dispatcher
@@ -69,6 +63,14 @@ object Lambda extends App with Logging {
     legacyHost = configuration.notificationsLegacyHost,
     legacyApiKey = configuration.notificationsLegacyApiKey
   )
+
+  lazy val footballActor = {
+    logger.debug("Creating actor")
+    system.actorOf(
+      Props(classOf[PaFootballActor], paMatchDayClient, dynamoDBClient, tableName, goalNotificationBuilder, notificationClient),
+      "goal-notifications-actor-solution"
+    )
+  }
 
   def handler(lambdaInput: LambdaInput, context: Context): String = {
     if (cachedLambda) {
