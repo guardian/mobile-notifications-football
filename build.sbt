@@ -18,8 +18,7 @@ libraryDependencies ++= {
     "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.60",
     "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
     "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
-    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
+    "org.specs2" %% "specs2-core" % "3.8.5" % "test",
     "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
     "org.typelevel" %% "cats" % "0.8.1"
   )
