@@ -27,8 +27,7 @@ class GoalNotificationBuilder(mapiHost: String) {
     }
 
     s"""$homeTeam ${score.home}-${score.away} $awayTeam
-       |${goal.scorerName} ${goal.minute}min$extraInfo
-     """.stripMargin
+       |${goal.scorerName} ${goal.minute}min$extraInfo""".stripMargin
   }
 
   def build(goal: Goal, goalContext: GoalContext): GoalAlertPayload = {

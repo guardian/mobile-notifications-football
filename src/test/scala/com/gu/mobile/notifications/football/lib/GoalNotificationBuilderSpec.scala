@@ -49,45 +49,39 @@ class GoalNotificationBuilderSpec extends Specification {
     "build a notification for a regular goal" in new GoalContext {
       val notification = builder.build(baseGoal.copy(goalType = DefaultGoalType), goalContext)
       notification.message mustEqual s"""Liverpool 2-0 Plymouth
-                                        |Steve 5min
-     """.stripMargin
+                                        |Steve 5min""".stripMargin
     }
 
     "build a notification for an own goal" in new GoalContext {
       val notification = builder.build(baseGoal.copy(goalType = OwnGoalType), goalContext)
       notification.message mustEqual s"""Liverpool 2-0 Plymouth
-                                        |Steve 5min (o.g.)
-     """.stripMargin
+                                        |Steve 5min (o.g.)""".stripMargin
     }
 
     "build a notification for a penalty goal"  in new GoalContext {
       val notification = builder.build(baseGoal.copy(goalType = PenaltyGoalType), goalContext)
       notification.message mustEqual s"""Liverpool 2-0 Plymouth
-                                        |Steve 5min (pen)
-     """.stripMargin
+                                        |Steve 5min (pen)""".stripMargin
 
     }
 
     "build a notification for a regular goal in extra time" in new GoalContext {
       val notification = builder.build(baseGoal.copy(goalType = DefaultGoalType, addedTime = Some("4:32")), goalContext)
       notification.message mustEqual s"""Liverpool 2-0 Plymouth
-                                        |Steve 5min (+4:32)
-     """.stripMargin
+                                        |Steve 5min (+4:32)""".stripMargin
 
     }
 
     "build a notification for an own goal in extra time" in new GoalContext {
       val notification = builder.build(baseGoal.copy(goalType = OwnGoalType, addedTime = Some("4:32")), goalContext)
       notification.message mustEqual s"""Liverpool 2-0 Plymouth
-                                        |Steve 5min (o.g. +4:32)
-     """.stripMargin
+                                        |Steve 5min (o.g. +4:32)""".stripMargin
     }
 
     "build a notification for a penalty goal in extra time" in new GoalContext {
       val notification = builder.build(baseGoal.copy(goalType = PenaltyGoalType, addedTime = Some("4:32")), goalContext)
       notification.message mustEqual s"""Liverpool 2-0 Plymouth
-                                        |Steve 5min (pen +4:32)
-     """.stripMargin
+                                        |Steve 5min (pen +4:32)""".stripMargin
     }
   }
 
