@@ -11,7 +11,7 @@ import PartialFunction.condOpt
 
 class GoalNotificationBuilder(mapiHost: String) {
 
-  def alertMessage(goal: Goal, score: Score, homeTeam: String, awayTeam: String) = {
+  private def alertMessage(goal: Goal, score: Score, homeTeam: String, awayTeam: String) = {
     val extraInfo = {
       val goalTypeInfo = condOpt(goal.goalType) {
         case OwnGoalType => "o.g."
@@ -27,10 +27,9 @@ class GoalNotificationBuilder(mapiHost: String) {
     }
 
     s"""$homeTeam ${score.home}-${score.away} $awayTeam
-       |$goal.scorerName ${goal.minute}min$extraInfo
+       |${goal.scorerName} ${goal.minute}min$extraInfo
      """.stripMargin
   }
-
 
   def build(goal: Goal, goalContext: GoalContext): GoalAlertPayload = {
     val message = alertMessage(goal, goalContext.score, goalContext.home.name, goalContext.away.name)
