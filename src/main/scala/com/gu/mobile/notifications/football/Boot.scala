@@ -5,6 +5,8 @@ import akka.io.IO
 import spray.can.Http
 import akka.pattern.ask
 import akka.util.Timeout
+import com.gu.mobile.notifications.football.conf.GoalNotificationsConfig
+
 import scala.concurrent.duration._
 
 object SystemSetup {
@@ -15,7 +17,9 @@ object SystemSetup {
 object Boot extends App {
   import SystemSetup._
 
-  GoalNotificationsPipeline.start()
+  if (GoalNotificationsConfig.pollingEnabled) {
+    GoalNotificationsPipeline.start()
+  }
 
   // create and start our service actor
   val service = system.actorOf(
