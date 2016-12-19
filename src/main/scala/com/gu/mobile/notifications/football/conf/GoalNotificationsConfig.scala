@@ -37,6 +37,7 @@ object GoalNotificationsConfig {
   lazy val goalAlertsApiKey = configuration.getStringProperty("goal.alerts.api.key")
   lazy val testEndPointEnabled = configuration.getBooleanProperty("test_endpoint_enabled", false)
 
+  lazy val pollingEnabled = configuration.getBooleanProperty("polling_enabled", true)
   lazy val snsQueuePublishCredentials = for {
     accessKey <- snsAccessKey
     secretKey <- snsSecretKey
