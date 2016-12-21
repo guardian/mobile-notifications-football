@@ -78,7 +78,7 @@ Resources:
           Stage: !Ref Stage
           Stack: !Ref Stack
           App: !Ref App
-      Description: Your description here
+      Description: Send Goal Alert notifications
       Handler: com.gu.mobile.notifications.football.Lambda::handler
       MemorySize: 384
       Role: !GetAtt ExecutionRole.Arn
