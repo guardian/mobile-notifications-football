@@ -102,22 +102,22 @@ Resources:
       Principal: events.amazonaws.com
       SourceArn: !GetAtt MinuteEvent.Arn
 
-  GoalEvent:
-    Type: AWS::Logs::MetricFilter
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/${Lambda}"
-      FilterPattern: "successfully sent"
-      MetricTransformations:
-        - MetricNamespace: !Sub "${Stage}/football-notifications"
-          MetricName: "goal-success"
-          MetricValue: 1
-
-  ErrorEvent:
-    Type: AWS::Logs::MetricFilter
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/${Lambda}"
-      FilterPattern: "Error"
-      MetricTransformations:
-        - MetricNamespace: !Sub "${Stage}/football-notifications"
-          MetricName: "error"
-          MetricValue: 1
+#  GoalEvent:
+#    Type: AWS::Logs::MetricFilter
+#    Properties:
+#      LogGroupName: !Sub "/aws/lambda/${Lambda}"
+#      FilterPattern: "successfully sent"
+#      MetricTransformations:
+#        - MetricNamespace: !Sub "${Stage}/football-notifications"
+#          MetricName: "goal-success"
+#          MetricValue: 1
+#
+#  ErrorEvent:
+#    Type: AWS::Logs::MetricFilter
+#    Properties:
+#      LogGroupName: !Sub "/aws/lambda/${Lambda}"
+#      FilterPattern: "Error"
+#      MetricTransformations:
+#        - MetricNamespace: !Sub "${Stage}/football-notifications"
+#          MetricName: "error"
+#          MetricValue: 1
