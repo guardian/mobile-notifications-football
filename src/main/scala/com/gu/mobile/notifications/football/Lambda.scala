@@ -4,12 +4,12 @@ import akka.actor.{ActorSystem, Props}
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.football.PaFootballActor
-import com.gu.football.PaFootballActor.TriggerPoll
-import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, NotificationHttpProvider, PaFootballClient, PaMatchDayClient}
+import PaFootballActor.TriggerPoll
+import com.gu.mobile.notifications.football.lib.{_}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.gu.mobile.notifications.client.ApiClient
+import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
 import grizzled.slf4j.Logging
 
 import scala.beans.BeanProperty
@@ -39,15 +39,17 @@ object Lambda extends App with Logging {
     new Configuration()
   }
 
-  lazy val paMatchDayClient = {
-    logger.debug("Creating pa match day client")
-    PaMatchDayClient(new PaFootballClient(configuration.paApiKey, configuration.paHost))
+  lazy val paFootballClient = {
+    logger.debug("Creating pa football client")
+    new PaFootballClient(configuration.paApiKey, configuration.paHost)
   }
 
   lazy val dynamoDBClient: AmazonDynamoDBAsyncClient = {
     logger.debug("Creating dynamo db client")
     new AmazonDynamoDBAsyncClient(configuration.credentials).withRegion(EU_WEST_1)
   }
+
+  lazy val syntheticMatchEventGenerator = new SyntheticMatchEventGenerator()
 
   lazy val goalNotificationBuilder = new GoalNotificationBuilder(configuration.mapiHost)
 
@@ -64,10 +66,16 @@ object Lambda extends App with Logging {
     legacyApiKey = configuration.notificationsLegacyApiKey
   )
 
+  lazy val matchStatusNotificationBuilder = new MatchStatusNotificationBuilder(configuration.mapiHost)
+
+  lazy val eventConsumer = new EventConsumerImpl(goalNotificationBuilder, matchStatusNotificationBuilder, notificationClient)
+
+  lazy val distinctCheck = new DynamoDistinctCheck(dynamoDBClient, tableName)
+
   lazy val footballActor = {
     logger.debug("Creating actor")
     system.actorOf(
-      Props(classOf[PaFootballActor], paMatchDayClient, dynamoDBClient, tableName, goalNotificationBuilder, notificationClient),
+      Props(classOf[PaFootballActor], paFootballClient, distinctCheck, syntheticMatchEventGenerator, eventConsumer),
       "goal-notifications-actor-solution"
     )
   }

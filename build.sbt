@@ -11,7 +11,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-actor" % akkaV,
     "com.typesafe.akka" %% "akka-slf4j" % akkaV,
     "org.clapper" % "grizzled-slf4j_2.10" % "1.3.0",
-    "com.gu" %% "mobile-notifications-client" % "0.5.29",
+    "com.gu" %% "mobile-notifications-client" % "0.5.30",
     "com.gu" %% "pa-client" % "6.0.2",
     "com.gu" %% "scanamo" % "0.8.1",
     "ch.qos.logback" % "logback-classic" % "1.0.13",
@@ -19,6 +19,7 @@ libraryDependencies ++= {
     "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
     "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
     "org.specs2" %% "specs2-core" % "3.8.5" % "test",
+    "org.specs2" %% "specs2-mock" % "3.8.5" % "test",
     "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
     "org.typelevel" %% "cats" % "0.8.1"
   )
