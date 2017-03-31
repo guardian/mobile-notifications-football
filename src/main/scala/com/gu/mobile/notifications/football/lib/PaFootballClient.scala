@@ -27,7 +27,7 @@ class PaFootballClient(override val apiKey: String, apiBase: String) extends PaC
 
     val days = List(yesterday, today, tomorrow)
 
-    Future.reduce(days.map(matchDay))(_ ++ _)
+    Future.reduce(days.map { day => matchDay(day).recover { case _ => List.empty } })(_ ++ _)
   }
 
   def eventsForMatch(id: String, syntheticMatchEventGenerator: SyntheticMatchEventGenerator)(implicit ec: ExecutionContext): Future[List[MatchEvent]] =
