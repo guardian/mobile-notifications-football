@@ -11,7 +11,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-actor" % akkaV,
     "com.typesafe.akka" %% "akka-slf4j" % akkaV,
     "org.clapper" % "grizzled-slf4j_2.10" % "1.3.0",
-    "com.gu" %% "mobile-notifications-client" % "0.5.30",
+    "com.gu" %% "mobile-notifications-client" % "0.5.31",
     "com.gu" %% "pa-client" % "6.0.2",
     "com.gu" %% "scanamo" % "0.8.1",
     "ch.qos.logback" % "logback-classic" % "1.0.13",
