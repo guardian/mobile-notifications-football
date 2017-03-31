@@ -24,7 +24,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
         awayTeamName = "Plymouth",
         awayTeamId = "2",
         awayTeamScore = 0,
-        awayTeamMessage = "",
+        awayTeamMessage = " ",
         homeTeamName = "Liverpool",
         homeTeamId = "1",
         homeTeamScore = 1,
