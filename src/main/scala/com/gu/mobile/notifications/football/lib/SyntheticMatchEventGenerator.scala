@@ -10,7 +10,9 @@ class SyntheticMatchEventGenerator {
     events.map(enhanceTimelineEvents(id)) ++ generators.flatMap(_.apply(matchDay, events)) // order is important here
   }
 
-  private val fullTime = { (matchDay: MatchDay, matchEvents: List[pa.MatchEvent]) =>
+  private type MatchEventGenerator = (MatchDay, List[pa.MatchEvent]) => Option[MatchEvent]
+
+  private val fullTime: MatchEventGenerator = { (matchDay: MatchDay, matchEvents: List[pa.MatchEvent]) =>
     if (matchDay.result) Some(emptyMatchEvent.copy(
       id = Some(UUID.nameUUIDFromBytes(s"football-match/${matchDay.id}/full-time".getBytes).toString),
       eventType = "full-time"
@@ -18,7 +20,7 @@ class SyntheticMatchEventGenerator {
     else None
   }
 
-  private val halfTime = { (matchDay: MatchDay, matchEvents: List[pa.MatchEvent]) =>
+  private val halfTime: MatchEventGenerator = { (matchDay: MatchDay, matchEvents: List[pa.MatchEvent]) =>
     if (matchDay.matchStatus == "HT") Some(emptyMatchEvent.copy(
       id = Some(UUID.nameUUIDFromBytes(s"football-match/${matchDay.id}/half-time".getBytes).toString),
       eventType = "half-time"
@@ -26,7 +28,7 @@ class SyntheticMatchEventGenerator {
     else None
   }
 
-  private val secondHalf = { (matchDay: MatchDay, matchEvents: List[pa.MatchEvent]) =>
+  private val secondHalf: MatchEventGenerator = { (matchDay: MatchDay, matchEvents: List[pa.MatchEvent]) =>
     if (matchDay.matchStatus == "SHS") Some(emptyMatchEvent.copy(
       id = Some(UUID.nameUUIDFromBytes(s"football-match/${matchDay.id}/second-half".getBytes).toString),
       eventType = "second-half"
@@ -34,7 +36,7 @@ class SyntheticMatchEventGenerator {
     else None
   }
 
-  private val generators = List(fullTime, halfTime, secondHalf)
+  private val generators: List[MatchEventGenerator] = List(fullTime, halfTime, secondHalf)
 
   private def emptyMatchEvent = MatchEvent(
     id = None,

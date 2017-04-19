@@ -81,7 +81,7 @@ class PaFootballActor(
     }
   }
 
-  private def inProgress(m: MatchDay) =
+  private def inProgress(m: MatchDay): Boolean =
     m.date.isBefore(DateTime.now) && !endedMatches.exists(_.matchId == m.id)
 
   private def processMatch(matchDay: MatchDay): Future[List[String]] = for {
