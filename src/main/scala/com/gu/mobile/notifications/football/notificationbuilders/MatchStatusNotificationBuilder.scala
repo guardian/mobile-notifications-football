@@ -5,7 +5,7 @@ import java.util.UUID
 
 import com.gu.mobile.notifications.client.models.Importance.Major
 import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal, Score}
+import com.gu.mobile.notifications.football.models._
 import pa.{MatchDay, MatchDayTeam}
 
 import scala.PartialFunction.condOpt
@@ -24,7 +24,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     val score = Score.fromGoals(matchInfo.homeTeam, matchInfo.awayTeam, goals)
 
     FootballMatchStatusPayload(
-      title = "The Guardian",
+      title = eventTitle(triggeringEvent),
       message = mainMessage(matchInfo.homeTeam, matchInfo.awayTeam, score, matchInfo.matchStatus),
       sender = "mobile-notifications-football-lambda",
       awayTeamName = matchInfo.awayTeam.name,
@@ -75,5 +75,14 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
 
   private def mainMessage(homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, score: Score, matchStatus: String) = {
     s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
+  }
+
+  private def eventTitle(fme: FootballMatchEvent): String = fme match {
+    case _: Goal => "Goal!"
+    case HalfTime => "Half-time"
+    case KickOff => "Kick-off!"
+    case SecondHalf => "Kick-off!"
+    case FullTime => "Full-Time"
+    case _ => "The Guardian"
   }
 }
