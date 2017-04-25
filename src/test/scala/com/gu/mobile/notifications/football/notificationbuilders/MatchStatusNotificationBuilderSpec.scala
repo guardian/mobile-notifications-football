@@ -18,7 +18,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
     "Build a notification" in new MatchEventsContext {
       builder.build(baseGoal, matchInfo, List.empty) shouldEqual FootballMatchStatusPayload(
         title = "Goal!",
-        message = "Liverpool 1-0 Plymouth (HT)",
+        message = "Liverpool 1-0 Plymouth",
         thumbnailUrl = None,
         sender = "mobile-notifications-football-lambda",
         awayTeamName = "Plymouth",
@@ -34,7 +34,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
         importance = Major,
         topic = Set(Topic(TopicTypes.FootballTeam, "1"), Topic(TopicTypes.FootballTeam, "2"), Topic(TopicTypes.FootballMatch, "some-match-id")),
         eventId = UUID.nameUUIDFromBytes((baseGoal :: List.empty).toString.getBytes).toString,
-        phase = "HT",
+        phase = "1st",
         debug = false,
         competitionName = Some("FA Cup"),
         venue = Some("Wembley")
