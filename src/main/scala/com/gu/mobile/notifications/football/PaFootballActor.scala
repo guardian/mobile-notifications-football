@@ -33,7 +33,6 @@ class PaFootballActor(
   private var ready: Boolean = true
   private var processedEvents = Set.empty[String]
   private var endedMatches: Set[EndedMatch] = Set.empty
-  private val cachedMatches = new CachedValue[List[MatchDay]](30.minutes)
 
   def receive = {
     case TriggerPoll if !ready =>
@@ -72,13 +71,9 @@ class PaFootballActor(
       endedMatches = endedMatches.filter(_.startTime.isAfter(DateTime.now.minusDays(2))) + endedMatch
   }
 
-  private def todaysMatches: Future[List[MatchDay]] = cachedMatches() {
+  private def todaysMatches: Future[List[MatchDay]] = {
     logger.info("Retrieving today's matches from PA")
-    paClient.aroundToday recover {
-      case e =>
-        logger.error("Error retrieving today's matches from PA", e)
-        cachedMatches.value.getOrElse(List.empty)
-    }
+    paClient.aroundToday
   }
 
   private def inProgress(m: MatchDay): Boolean =
