@@ -41,7 +41,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       mapiUrl = new URI(s"$mapiHost/sport/football/matches/${matchInfo.id}"),
       importance = Major,
       topic = topics,
-      phase = eventPhase(allEvents),
+      phase = matchInfo.matchStatus,
       eventId = UUID.nameUUIDFromBytes(allEvents.toString.getBytes).toString,
       debug = false
     )
@@ -84,15 +84,5 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     case SecondHalf => "Kick-off!"
     case FullTime => "Full-Time"
     case _ => "The Guardian"
-  }
-
-  private def eventPhase(allEvents: List[FootballMatchEvent]): String = {
-    allEvents.foldLeft("1st"){
-      case (_, KickOff) => "1st"
-      case (_, HalfTime) => "HT"
-      case (_, SecondHalf) => "2nd"
-      case (_, FullTime) => "HT"
-      case (phase, _) => phase
-    }
   }
 }
