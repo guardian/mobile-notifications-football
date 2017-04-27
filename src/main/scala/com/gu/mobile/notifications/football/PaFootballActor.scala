@@ -77,7 +77,7 @@ class PaFootballActor(
   }
 
   private def inProgress(m: MatchDay): Boolean =
-    m.date.isBefore(DateTime.now) && !endedMatches.exists(_.matchId == m.id)
+    m.date.minusMinutes(5).isBefore(DateTime.now) && !endedMatches.exists(_.matchId == m.id)
 
   private def processMatch(matchDay: MatchDay): Future[List[String]] = for {
     events <- paClient.eventsForMatch(matchDay.id, syntheticEvents)
