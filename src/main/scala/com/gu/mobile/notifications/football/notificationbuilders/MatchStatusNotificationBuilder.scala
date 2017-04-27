@@ -41,7 +41,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       mapiUrl = new URI(s"$mapiHost/sport/football/matches/${matchInfo.id}"),
       importance = Major,
       topic = topics,
-      phase = matchInfo.matchStatus,
+      phase = statuses.getOrElse(matchInfo.matchStatus, matchInfo.matchStatus),
       eventId = UUID.nameUUIDFromBytes(allEvents.toString.getBytes).toString,
       debug = false
     )
@@ -85,4 +85,37 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     case FullTime => "Full-Time"
     case _ => "The Guardian"
   }
+
+  private val statuses = Map(
+    ("KO", "1st"), // The Match has started (Kicked Off).
+
+    ("HT", "HT"), // The Referee has blown the whistle for Half Time.
+
+    ("SHS", "2nd"), // The Second Half of the Match has Started.
+
+    ("FT", "FT"), // The Referee has blown the whistle for Full Time.
+    ("PTFT", "FT"), // Penalty ShooT Full Time.
+    ("Result", "FT"), // The Result is official.
+    ("ETFT", "FT"), // Extra Time, Full Time has been blown.
+    ("MC", "FT"), // Match has been Completed.
+
+    ("FTET", "ET"), // Full Time, Extra Time it to be played.
+    ("ETS", "ET"), // Extra Time has Started.
+    ("ETHT", "ET"), // Extra Time Half Time has been called.
+    ("ETSHS", "ET"), // Extra Time, Second Half has Started.
+
+    ("FTPT", "PT"), // Full Time, Penalties are To be played.
+    ("PT", "PT"), // Penalty ShooT Out has started.
+    ("ETFTPT", "PT"), // Extra Time, Full Time, Penalties are To be played.
+
+    ("Suspended", "S"), // Match has been Suspended.
+
+    // don't really expect to see these (the way we handle data)
+    ("Resumed", "R"), // Match has been Resumed.
+    ("Abandoned", "A"), // Match has been Abandoned.
+    ("Fixture", "F"), // Created Fixture is available and had been Created by us.
+    ("-", "F"), // this sneaky one is not in the docs
+    ("New", "N"), // Match A New Match has been added to our data.
+    ("Cancelled", "C") // A Match has been Cancelled.
+  )
 }
