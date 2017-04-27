@@ -43,7 +43,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       mapiUrl = new URI(s"$mapiHost/sport/football/matches/${matchInfo.id}"),
       importance = Major,
       topic = topics,
-      phase = status,
+      matchStatus = status,
       eventId = UUID.nameUUIDFromBytes(allEvents.toString.getBytes).toString,
       debug = false
     )

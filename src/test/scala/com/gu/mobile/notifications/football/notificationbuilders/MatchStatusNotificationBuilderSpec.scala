@@ -34,7 +34,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
         importance = Major,
         topic = Set(Topic(TopicTypes.FootballTeam, "1"), Topic(TopicTypes.FootballTeam, "2"), Topic(TopicTypes.FootballMatch, "some-match-id")),
         eventId = UUID.nameUUIDFromBytes((baseGoal :: List.empty).toString.getBytes).toString,
-        phase = "1st",
+        matchStatus = "1st",
         debug = false,
         competitionName = Some("FA Cup"),
         venue = Some("Wembley")
@@ -62,7 +62,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
       previewAvailable = false,
       reportAvailable = false,
       lineupsAvailable = false,
-      matchStatus = "HT",
+      matchStatus = "1st",
       attendance = None,
       homeTeam = home,
       awayTeam = away,
