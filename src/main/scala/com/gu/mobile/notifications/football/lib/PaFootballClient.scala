@@ -1,5 +1,6 @@
 package com.gu.mobile.notifications.football.lib
 
+import com.gu.mobile.notifications.football.models.MatchId
 import pa._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,15 +31,11 @@ class PaFootballClient(override val apiKey: String, apiBase: String) extends PaC
     Future.reduce(days.map { day => matchDay(day).recover { case _ => List.empty } })(_ ++ _)
   }
 
-  def eventsForMatch(id: String, syntheticMatchEventGenerator: SyntheticMatchEventGenerator)(implicit ec: ExecutionContext): Future[List[MatchEvent]] =
-    (for {
-      info <- matchInfo(id)
-      events <- matchEvents(id).map(_.toList.flatMap(_.events))
+  def eventsForMatch(matchId: MatchId, syntheticMatchEventGenerator: SyntheticMatchEventGenerator)(implicit ec: ExecutionContext): Future[(MatchDay, List[MatchEvent])] =
+    for {
+      matchDay <- matchInfo(matchId.id)
+      events <- matchEvents(matchId.id).map(_.toList.flatMap(_.events))
     } yield {
-      syntheticMatchEventGenerator.generate(events, id, info)
-    }) recover {
-      case e =>
-        logger.error(s"Failed to fetch events for match $id: ${e.getMessage}")
-        List.empty
+      (matchDay, syntheticMatchEventGenerator.generate(events, matchId.id, matchDay))
     }
 }

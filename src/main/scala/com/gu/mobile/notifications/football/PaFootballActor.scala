@@ -3,13 +3,12 @@ package com.gu.mobile.notifications.football
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
-
 import akka.actor.{Actor, ActorRef}
 import grizzled.slf4j.Logging
 import org.joda.time.DateTime
-
 import com.gu.mobile.notifications.football.lib.{CachedValue, DynamoDistinctCheck, PaFootballClient, SyntheticMatchEventGenerator}
 import DynamoDistinctCheck.{Distinct, Duplicate, Unknown}
+import com.gu.mobile.notifications.football.models.MatchId
 import pa.{MatchDay, MatchEvent}
 
 object PaFootballActor {
@@ -45,8 +44,7 @@ class PaFootballActor(
       logger.info("Starting poll for new match events")
 
       val matchEventIds = for {
-        matches <- todaysMatches
-        liveMatches = matches.filter(inProgress)
+        liveMatches <- matchIdsInProgress
         ids <- Future.traverse(liveMatches)(processMatch)
       } yield ids.flatten.toSet
 
@@ -72,22 +70,30 @@ class PaFootballActor(
       endedMatches = endedMatches.filter(_.startTime.isAfter(DateTime.now.minusDays(2))) + endedMatch
   }
 
-  private def todaysMatches: Future[List[MatchDay]] = cachedMatches() {
-    logger.info("Retrieving today's matches from PA")
-    paClient.aroundToday recover {
-      case e =>
-        logger.error("Error retrieving today's matches from PA", e)
-        cachedMatches.value.getOrElse(List.empty)
+  private def matchIdsInProgress: Future[List[MatchId]] = {
+    def inProgress(m: MatchDay): Boolean =
+      m.date.minusMinutes(5).isBefore(DateTime.now) && !endedMatches.exists(_.matchId == m.id)
+    val matches = cachedMatches() {
+      logger.info("Retrieving today's matches from PA")
+      paClient.aroundToday recover {
+        case e =>
+          logger.error("Error retrieving today's matches from PA", e)
+          cachedMatches.value.getOrElse(List.empty)
+      }
     }
+    matches.map(_.filter(inProgress).map(_.id).map(MatchId))
   }
 
-  private def inProgress(m: MatchDay): Boolean =
-    m.date.minusMinutes(5).isBefore(DateTime.now) && !endedMatches.exists(_.matchId == m.id)
-
-  private def processMatch(matchDay: MatchDay): Future[List[String]] = for {
-    events <- paClient.eventsForMatch(matchDay.id, syntheticEvents)
-    processed <- Future.traverse(events)(processMatchEvent(matchDay, events))
-  } yield processed.flatten
+  private def processMatch(matchId: MatchId): Future[List[String]] = {
+    val eventIds = for {
+      (matchDay, events) <- paClient.eventsForMatch(matchId, syntheticEvents)
+      processed <- Future.traverse(events)(processMatchEvent(matchDay, events))
+    } yield processed.flatten
+    eventIds.recover { case e =>
+        logger.error(s"Failed to process match ${matchId.id}: ${e.getMessage}", e)
+        List.empty[String]
+    }
+  }
 
   private def processMatchEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): Future[Option[String]] = {
     handleMatchEnd(matchDay, event)
