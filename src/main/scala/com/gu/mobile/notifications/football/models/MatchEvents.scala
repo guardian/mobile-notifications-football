@@ -1,26 +1,18 @@
-package com.gu.football.models
+package com.gu.mobile.notifications.football.models
 
-import com.gu.football.MatchEventWithId
 import com.gu.mobile.notifications.client.models.{DefaultGoalType, GoalType, OwnGoalType, PenaltyGoalType}
-import pa.MatchDayTeam
 
 import scala.PartialFunction._
 import scala.util.Try
 
-sealed trait MatchEvent
-object MatchEvent {
-  def fromEvent(homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, event: MatchEventWithId): Option[MatchEvent] =
-    KickOff.fromEvent(event) orElse Goal.fromEvent(homeTeam, awayTeam)(event)
-}
-
-case object KickOff extends MatchEvent {
-  def fromEvent(event: MatchEventWithId): Option[MatchEvent] = {
-    Option(event.eventType).filter(_ == "timeline" && event.matchTime.contains("0:00")).map(_ => KickOff)
-  }
+sealed trait FootballMatchEvent
+object FootballMatchEvent {
+  def fromPaMatchEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent): Option[FootballMatchEvent] =
+    MatchPhaseEvent.fromEvent(event) orElse Goal.fromEvent(homeTeam, awayTeam)(event)
 }
 
 object Score {
-  def fromGoals(homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, goals: List[Goal]) = {
+  def fromGoals(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam, goals: List[Goal]) = {
     val home = goals.count(_.scoringTeam == homeTeam)
     val away = goals.count(_.scoringTeam == awayTeam)
 
@@ -33,15 +25,15 @@ case class Score(home: Int, away: Int)
 case class Goal(
   goalType: GoalType,
   scorerName: String,
-  scoringTeam: MatchDayTeam,
-  otherTeam: MatchDayTeam,
+  scoringTeam: pa.MatchDayTeam,
+  otherTeam: pa.MatchDayTeam,
   minute: Int,
   addedTime: Option[String]
-) extends MatchEvent
+) extends FootballMatchEvent
 
 object Goal {
 
-  def fromEvent(homeTeam: MatchDayTeam, awayTeam: MatchDayTeam)(event: MatchEventWithId): Option[Goal] = for {
+  def fromEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent): Option[Goal] = for {
     goalType <- goalTypeFromString(event.eventType)
     scorer <- event.players.headOption
     eventTime <- event.eventTime
@@ -66,9 +58,27 @@ object Goal {
   }
 }
 
+
+trait MatchPhaseEvent extends FootballMatchEvent
+
+object MatchPhaseEvent {
+  def fromEvent(event: pa.MatchEvent): Option[MatchPhaseEvent] =
+    condOpt(event.eventType) {
+      case "timeline" if event.matchTime.contains("0:00") => KickOff
+      case "full-time" => FullTime
+      case "half-time" => HalfTime
+      case "second-half" => SecondHalf
+  }
+}
+
+case object KickOff extends MatchPhaseEvent
+case object FullTime extends MatchPhaseEvent
+case object HalfTime extends MatchPhaseEvent
+case object SecondHalf extends MatchPhaseEvent
+
 case class GoalContext(
-  home: MatchDayTeam,
-  away: MatchDayTeam,
+  home: pa.MatchDayTeam,
+  away: pa.MatchDayTeam,
   matchId: String,
   score: Score
 )

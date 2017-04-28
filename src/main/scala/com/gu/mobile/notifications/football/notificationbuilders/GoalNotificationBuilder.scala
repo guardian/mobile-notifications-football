@@ -1,11 +1,11 @@
-package com.gu.mobile.notifications.football.lib
+package com.gu.mobile.notifications.football.notificationbuilders
 
 import java.net.URI
 
-import com.gu.mobile.notifications.client.models.GoalAlertPayload
-import com.gu.mobile.notifications.client.models.Importance.Major
 import com.gu.mobile.notifications.client.models._
-import com.gu.football.models._
+import com.gu.mobile.notifications.client.models.Importance.{Major, _}
+import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal, GoalContext, Score}
+import pa.{MatchDay, MatchDayTeam}
 
 import PartialFunction.condOpt
 
@@ -30,7 +30,11 @@ class GoalNotificationBuilder(mapiHost: String) {
        |${goal.scorerName} ${goal.minute}min$extraInfo""".stripMargin
   }
 
-  def build(goal: Goal, goalContext: GoalContext): GoalAlertPayload = {
+  def build(goal: Goal, matchDay: MatchDay, previousEvents: List[FootballMatchEvent]): GoalAlertPayload = {
+    val goalsToDate = goal :: previousEvents.collect({ case g: Goal => g })
+    val score = Score.fromGoals(matchDay.homeTeam, matchDay.awayTeam, goalsToDate)
+    val goalContext = GoalContext(matchDay.homeTeam, matchDay.awayTeam, matchDay.id, score)
+
     val message = alertMessage(goal, goalContext.score, goalContext.home.name, goalContext.away.name)
 
     val topics = Set(
