@@ -81,7 +81,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     case _: Goal => "Goal!"
     case HalfTime => "Half-time"
     case KickOff => "Kick-off!"
-    case SecondHalf => "Kick-off!"
+    case SecondHalf => "Second-half start"
     case FullTime => "Full-Time"
     case _ => "The Guardian"
   }
