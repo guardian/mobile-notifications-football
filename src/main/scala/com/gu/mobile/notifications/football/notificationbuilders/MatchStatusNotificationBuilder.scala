@@ -3,7 +3,7 @@ package com.gu.mobile.notifications.football.notificationbuilders
 import java.net.URI
 import java.util.UUID
 
-import com.gu.mobile.notifications.client.models.Importance.Major
+import com.gu.mobile.notifications.client.models.Importance.{Importance, Major, Minor}
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.football.models._
 import pa.{MatchDay, MatchDayTeam}
@@ -41,7 +41,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       competitionName = matchInfo.competition.map(_.name),
       venue = matchInfo.venue.map(_.name),
       mapiUrl = new URI(s"$mapiHost/sport/football/matches/${matchInfo.id}"),
-      importance = Major,
+      importance = importance(triggeringEvent),
       topic = topics,
       matchStatus = status,
       eventId = UUID.nameUUIDFromBytes(allEvents.toString.getBytes).toString,
@@ -86,6 +86,11 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     case SecondHalf => "Second-half start"
     case FullTime => "Full-Time"
     case _ => "The Guardian"
+  }
+
+  private def importance(fme: FootballMatchEvent): Importance = fme match {
+    case _: Goal => Major
+    case _ => Minor
   }
 
   private val statuses = Map(

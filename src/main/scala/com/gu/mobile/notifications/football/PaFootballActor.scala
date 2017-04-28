@@ -73,7 +73,7 @@ class PaFootballActor(
   private def matchIdsInProgress: Future[List[MatchId]] = {
     def inProgress(m: MatchDay): Boolean =
       m.date.minusMinutes(5).isBeforeNow &&
-        (!endedMatches.exists(_.matchId == m.id) || m.date.plusHours(4).isBeforeNow)
+        (!endedMatches.exists(_.matchId == m.id) || m.date.plusHours(4).isAfterNow)
     val matches = cachedMatches() {
       logger.info("Retrieving today's matches from PA")
       paClient.aroundToday recover {
