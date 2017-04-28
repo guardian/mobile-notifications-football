@@ -38,7 +38,7 @@ class SyntheticMatchEventGeneratorSpec extends Specification {
       id = None,
       teamID = None,
       eventType = "timeline",
-      matchTime = Some("00:00"),
+      matchTime = Some("0:00"),
       eventTime = None,
       addedTime = None,
       players = List.empty,
