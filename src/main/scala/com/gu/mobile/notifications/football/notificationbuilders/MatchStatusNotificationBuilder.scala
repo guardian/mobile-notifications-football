@@ -23,9 +23,11 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     val goals = allEvents.collect { case g: Goal => g }
     val score = Score.fromGoals(matchInfo.homeTeam, matchInfo.awayTeam, goals)
 
+    val status = statuses.getOrElse(matchInfo.matchStatus, matchInfo.matchStatus)
+
     FootballMatchStatusPayload(
       title = eventTitle(triggeringEvent),
-      message = mainMessage(matchInfo.homeTeam, matchInfo.awayTeam, score, matchInfo.matchStatus),
+      message = mainMessage(matchInfo.homeTeam, matchInfo.awayTeam, score, status),
       sender = "mobile-notifications-football-lambda",
       awayTeamName = matchInfo.awayTeam.name,
       awayTeamScore = score.away,
@@ -41,7 +43,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       mapiUrl = new URI(s"$mapiHost/sport/football/matches/${matchInfo.id}"),
       importance = Major,
       topic = topics,
-      matchStatus = statuses.getOrElse(matchInfo.matchStatus, matchInfo.matchStatus),
+      matchStatus = status,
       eventId = UUID.nameUUIDFromBytes(allEvents.toString.getBytes).toString,
       debug = false
     )
@@ -74,7 +76,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
   }
 
   private def mainMessage(homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, score: Score, matchStatus: String) = {
-    s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name}"""
+    s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
   }
 
   private def eventTitle(fme: FootballMatchEvent): String = fme match {
