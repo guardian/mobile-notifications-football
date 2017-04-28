@@ -55,7 +55,7 @@ class SyntheticMatchEventGenerator {
   )
 
   private def enhanceTimelineEvents(matchId: String)(event: MatchEvent): MatchEvent = {
-    if (event.eventType == "timeline" && event.matchTime.contains("00:00")) {
+    if (event.eventType == "timeline" && event.matchTime.contains("0:00")) {
       event.copy(id = Some(UUID.nameUUIDFromBytes(s"football-match/$matchId/timeline/00:00".getBytes).toString))
     } else {
       event
