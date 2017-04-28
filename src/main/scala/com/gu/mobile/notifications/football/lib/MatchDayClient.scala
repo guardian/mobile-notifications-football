@@ -1,8 +1,10 @@
 package com.gu.mobile.notifications.football.lib
 
-import pa.{MatchEvents, PaClient, MatchDay}
+import pa.{MatchDay, MatchEvents, PaClient}
+
 import scala.concurrent.Future
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, LocalDate}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait MatchDayClient {
@@ -13,6 +15,15 @@ trait MatchDayClient {
 }
 
 case class PaMatchDayClient(api: PaClient) extends MatchDayClient {
+  def aroundToday: Future[List[MatchDay]] = {
+    val today = DateTime.now.toLocalDate
+    val yesterday = today.minusDays(1)
+    val tomorrow = today.plusDays(1)
+
+    val days = List(yesterday, today, tomorrow)
+
+    Future.reduce(days.map(api.matchDay))(_ ++ _)
+  }
   def today = api.matchDay(DateTime.now.toLocalDate)
 
   /** It's a bit weird that our PA client returns None for broken match event feeds (see the client for more details)
