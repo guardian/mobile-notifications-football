@@ -32,6 +32,8 @@ case class PaMatchDayClient(api: PaClient) extends MatchDayClient with Logging {
 
     val days = List(yesterday, today, tomorrow)
 
+    logger.info(s"Fetching matches for $days")
+
     Future.reduce(days.map(safeMatchDay))(_ ++ _)
   }
   def today = api.matchDay(DateTime.now.toLocalDate)
