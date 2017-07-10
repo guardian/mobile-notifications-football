@@ -1,5 +1,7 @@
 package com.gu.mobile.notifications.football
 
+import java.net.URL
+
 import akka.actor.{ActorSystem, Props}
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
@@ -11,10 +13,13 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.gu.mobile.notifications.client.ApiClient
 import grizzled.slf4j.Logging
+import org.joda.time.{DateTime, DateTimeUtils}
+import play.api.libs.json.Json
 
 import scala.beans.BeanProperty
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.io.Source
 
 /**
   * This is compatible with aws' lambda JSON to POJO conversion
@@ -72,7 +77,19 @@ object Lambda extends App with Logging {
     )
   }
 
+  def debugSetTime(): Unit = {
+    // this is only used to debug and should never reach master nor prod
+    if (configuration.stage == "CODE") {
+      val is = new URL("https://hdjq4n85yi.execute-api.eu-west-1.amazonaws.com/Prod/getTime").openStream()
+      val json = Json.parse(Source.fromInputStream(is).mkString)
+      val date = DateTime.parse((json \ "currentDate").as[String])
+      logger.info(s"Force the date to $date")
+      DateTimeUtils.setCurrentMillisFixed(date.getMillis)
+    }
+  }
+
   def handler(lambdaInput: LambdaInput, context: Context): String = {
+    debugSetTime()
     if (cachedLambda) {
       logger.info("Re-using existing container")
     } else {

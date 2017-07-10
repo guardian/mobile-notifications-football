@@ -56,6 +56,7 @@ class PaFootballActor(
       val matchEventIds = for {
         matches <- todaysMatches
         liveMatches = matches.filter(isLive)
+        _ = logger.info(s"Processing ${liveMatches.map(_.id)}")
         ids <- Future.traverse(liveMatches)(processMatch)
       } yield ids.flatten.toSet
 

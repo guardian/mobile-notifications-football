@@ -14,7 +14,7 @@ trait DispatchHttp extends pa.Http with Logging {
 
   def GET(urlString: String): Future[Response] = {
     logger.info("Http GET " + urlString.replaceAll(apiKey, "<api-key>"))
-    dispatch.Http(url(urlString) OK as.Response(r => Response(r.getStatusCode, r.getResponseBody, r.getStatusText)))
+    dispatch.Http(url(urlString) OK as.Response{r => logger.info(r.getResponseBody) ; Response(r.getStatusCode, r.getResponseBody, r.getStatusText)})
   }
 }
 
