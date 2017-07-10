@@ -82,7 +82,7 @@ object Lambda extends App with Logging {
     if (configuration.stage == "CODE") {
       val is = new URL("https://hdjq4n85yi.execute-api.eu-west-1.amazonaws.com/Prod/getTime").openStream()
       val json = Json.parse(Source.fromInputStream(is).mkString)
-      val date = (json \ "currentDate").as[DateTime]
+      val date = DateTime.parse((json \ "currentDate").as[String])
       logger.info(s"Force the date to $date")
       DateTimeUtils.setCurrentMillisFixed(date.getMillis)
     }
