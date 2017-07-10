@@ -1,8 +1,9 @@
 package com.gu.mobile.notifications.football.lib
 
+import grizzled.slf4j.Logging
 import pa.{MatchDay, MatchEvents, PaClient}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import org.joda.time.{DateTime, LocalDate}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,7 +15,16 @@ trait MatchDayClient {
   def matchEvents(id: String): Future[MatchEvents]
 }
 
-case class PaMatchDayClient(api: PaClient) extends MatchDayClient {
+case class PaMatchDayClient(api: PaClient) extends MatchDayClient with Logging {
+
+  def safeMatchDay(date: LocalDate)(implicit ec: ExecutionContext): Future[List[MatchDay]] = {
+    api.matchDay(date).recover {
+      case e: Exception =>
+        logger.error(s"Unable to get MatchDays for date $date. Falling back with no match", e)
+        Nil
+    }
+  }
+
   def aroundToday: Future[List[MatchDay]] = {
     val today = DateTime.now.toLocalDate
     val yesterday = today.minusDays(1)
@@ -22,7 +32,7 @@ case class PaMatchDayClient(api: PaClient) extends MatchDayClient {
 
     val days = List(yesterday, today, tomorrow)
 
-    Future.reduce(days.map(api.matchDay))(_ ++ _)
+    Future.reduce(days.map(safeMatchDay))(_ ++ _)
   }
   def today = api.matchDay(DateTime.now.toLocalDate)
 
