@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.football.lib
 
-import grizzled.slf4j.Logging
+import com.gu.Logging
 import pa.{MatchDay, MatchEvents, PaClient}
 
 import scala.concurrent.{ExecutionContext, Future}

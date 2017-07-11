@@ -2,17 +2,13 @@ package com.gu.mobile.notifications.football
 
 import java.net.URL
 
-import akka.actor.{ActorSystem, Props}
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.football.PaFootballActor
-import com.gu.football.PaFootballActor.TriggerPoll
 import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, NotificationHttpProvider, PaFootballClient, PaMatchDayClient}
-import akka.pattern.ask
-import akka.util.Timeout
 import com.gu.mobile.notifications.client.ApiClient
-import grizzled.slf4j.Logging
+import com.gu.Logging
 import org.joda.time.{DateTime, DateTimeUtils}
 import play.api.libs.json.Json
 
@@ -20,6 +16,7 @@ import scala.beans.BeanProperty
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.Source
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * This is compatible with aws' lambda JSON to POJO conversion
@@ -33,11 +30,6 @@ object Lambda extends App with Logging {
   var cachedLambda = null.asInstanceOf[Boolean]
 
   def tableName = s"mobile-notifications-football-${configuration.stage}"
-
-  implicit lazy val system = {
-    logger.debug("Creating actor system")
-    ActorSystem("mobile-notification-football")
-  }
 
   lazy val configuration = {
     logger.debug("Creating configuration")
@@ -57,7 +49,6 @@ object Lambda extends App with Logging {
   lazy val goalNotificationBuilder = new GoalNotificationBuilder(configuration.mapiHost)
 
   lazy val notificationHttpProvider = {
-    implicit val ec = system.dispatcher
     new NotificationHttpProvider()
   }
 
@@ -69,13 +60,7 @@ object Lambda extends App with Logging {
     legacyApiKey = configuration.notificationsLegacyApiKey
   )
 
-  lazy val footballActor = {
-    logger.debug("Creating actor")
-    system.actorOf(
-      Props(classOf[PaFootballActor], paMatchDayClient, dynamoDBClient, tableName, goalNotificationBuilder, notificationClient),
-      "goal-notifications-actor-solution"
-    )
-  }
+  lazy val footballActor = new PaFootballActor(paMatchDayClient, dynamoDBClient, tableName, goalNotificationBuilder, notificationClient)
 
   def debugSetTime(): Unit = {
     // this is only used to debug and should never reach master nor prod
@@ -96,11 +81,12 @@ object Lambda extends App with Logging {
       cachedLambda = true
       logger.info("Starting new container")
     }
-
-    implicit val timeout = Timeout(30.seconds)
-    val done = footballActor ? TriggerPoll
-    Await.ready(done, 35.seconds)
+    Await.ready(footballActor.start, 35.seconds)
     "done"
+  }
+
+  override def main(args: Array[String]): Unit = {
+    handler(null, null)
   }
 
 }

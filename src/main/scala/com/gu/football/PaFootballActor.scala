@@ -1,24 +1,20 @@
 package com.gu.football
 
-import akka.actor.{Actor, ActorRef}
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
+import com.gu.Logging
 import com.gu.football.models.{Goal, GoalContext, Score}
 import com.gu.mobile.notifications.client._
 import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, PaMatchDayClient}
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{ScanamoAsync, Table}
-import grizzled.slf4j.Logging
 import org.joda.time.DateTime
 import pa.MatchDay
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 object PaFootballActor {
   case class CachedValue[T](value: T, expiry: DateTime)
-  case object TriggerPoll
-  case class PollFinished(senderRef: ActorRef)
-  case class ProcessedEvents(events: Set[String], senderRef: ActorRef)
 
   sealed trait DistinctStatus
   case object Distinct extends DistinctStatus
@@ -32,51 +28,31 @@ class PaFootballActor(
   tableName: String,
   goalNotificationBuilder: GoalNotificationBuilder,
   notificationClient: ApiClient
-) extends Actor with Logging {
-
-  implicit val ec = context.dispatcher
+) extends Logging {
 
   import PaFootballActor._
 
   val eventsTable = Table[MatchEventWithId](tableName)
   var processedEvents = Set.empty[String]
-  var ready: Boolean = true
   var cachedMatches: Option[CachedValue[List[MatchDay]]] = None
 
-  def receive = {
-    case TriggerPoll if !ready =>
-      logger.warn("Poll triggered while existing poll still in progress, ignoring")
+  def start: Future[Set[String]] = {
+    logger.info("Starting poll for new match events")
 
-    case TriggerPoll if ready =>
-      implicit val lg = logger
-      val senderRef = sender()
-      ready = false
-      logger.info("Starting poll for new match events")
+    val matchEventIds = for {
+      matches <- todaysMatches
+      liveMatches = matches.filter(isLive)
+      _ = logger.info(s"Processing ${liveMatches.map(_.id)}")
+      ids <- Future.traverse(liveMatches)(processMatch)
+    } yield ids.flatten.toSet
 
-      val matchEventIds = for {
-        matches <- todaysMatches
-        liveMatches = matches.filter(isLive)
-        _ = logger.info(s"Processing ${liveMatches.map(_.id)}")
-        ids <- Future.traverse(liveMatches)(processMatch)
-      } yield ids.flatten.toSet
-
-      matchEventIds andThen {
-        case Success(ids) =>
-          logger.info("Finished polling with success")
-          self ! ProcessedEvents(ids, senderRef)
-        case Failure(e) =>
-          logger.error(s"Finished polling with error ${e.getMessage}")
-          self ! PollFinished(senderRef)
-      }
-
-    case ProcessedEvents(events, senderRef) =>
-      processedEvents = events
-      self ! PollFinished(senderRef)
-
-    case PollFinished(senderRef) =>
-      ready = true
-      logger.info("Stopping lambda")
-      senderRef ! "done"
+    matchEventIds andThen {
+      case Success(events) =>
+        logger.info("Finished polling with success")
+        processedEvents = events
+      case Failure(e) =>
+        logger.error(s"Finished polling with error ${e.getMessage}")
+    }
   }
 
 
@@ -96,8 +72,11 @@ class PaFootballActor(
     }
   }
 
-  private def isLive(m: MatchDay): Boolean =
-    m.date.isBefore(DateTime.now) && !m.result
+  private def isLive(m: MatchDay): Boolean = {
+    println(s"${m.id}: ${m.date}, result: ${m.result}, beforeNow: ${m.date.isBeforeNow}")
+    println(s"Now: ${DateTime.now()}")
+    m.date.isBefore(DateTime.now()) && !m.result
+  }
 
   private def sendGoalAlert(matchDay: MatchDay, previousEvents: List[MatchEventWithId])(goal: Goal): Future[Unit] = {
     logger.info(s"Sending goal alert $goal")
