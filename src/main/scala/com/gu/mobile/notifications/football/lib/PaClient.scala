@@ -3,7 +3,7 @@ package com.gu.mobile.notifications.football.lib
 import pa._
 
 import scala.concurrent.{ExecutionContext, Future}
-import grizzled.slf4j.Logging
+import com.gu.Logging
 import okhttp3.{OkHttpClient, Request}
 
 trait OkHttp extends pa.Http with Logging {
