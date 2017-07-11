@@ -4,20 +4,29 @@ import com.gu.mobile.notifications.football.models.MatchId
 import pa._
 
 import scala.concurrent.{ExecutionContext, Future}
-import dispatch._
 import grizzled.slf4j.Logging
+import okhttp3.{OkHttpClient, Request}
 import org.joda.time.DateTime
 
-class PaFootballClient(override val apiKey: String, apiBase: String) extends PaClient with pa.Http with Logging {
+trait OkHttp extends pa.Http with Logging {
+
+  val httpClient = new OkHttpClient
+
+  def apiKey: String
+
+  def GET(urlString: String): Future[Response] = {
+    logger.info("Http GET " + urlString.replaceAll(apiKey, "<api-key>"))
+    val httpRequest = new Request.Builder().url(urlString).build()
+    val httpResponse = httpClient.newCall(httpRequest).execute()
+    Future.successful(Response(httpResponse.code(), httpResponse.body().string, httpResponse.message()))
+  }
+}
+
+class PaFootballClient(override val apiKey: String, apiBase: String) extends PaClient with OkHttp {
 
   import ExecutionContext.Implicits.global
 
   override lazy val base = apiBase
-
-  def GET(urlString: String): Future[Response] = {
-    logger.info("Http GET " + urlString.replaceAll(apiKey, "<api-key>"))
-    dispatch.Http(url(urlString) OK as.Response(r => Response(r.getStatusCode, r.getResponseBody, r.getStatusText)))
-  }
 
   override protected def get(suffix: String)(implicit context: ExecutionContext): Future[String] = super.get(suffix)(context)
 
