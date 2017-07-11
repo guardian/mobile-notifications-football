@@ -17,7 +17,8 @@ libraryDependencies ++= {
     "ch.qos.logback" % "logback-classic" % "1.0.13",
     "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.60",
     "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
-    "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
+    "com.squareup.okhttp3" % "okhttp" % "3.8.1",
+    "com.google.code.findbugs" % "jsr305" % "3.0.2",
     "org.specs2" %% "specs2-core" % "3.8.5" % "test",
     "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
     "org.typelevel" %% "cats" % "0.8.1"

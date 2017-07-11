@@ -1,24 +1,26 @@
 package com.gu.mobile.notifications.football.lib
 
 import pa._
+
 import scala.concurrent.{ExecutionContext, Future}
-import dispatch._
-import com.gu.mobile.notifications.football.Configuration
 import grizzled.slf4j.Logging
+import okhttp3.{OkHttpClient, Request}
 
-trait DispatchHttp extends pa.Http with Logging {
+trait OkHttp extends pa.Http with Logging {
 
-  import ExecutionContext.Implicits.global
+  val httpClient = new OkHttpClient
 
   def apiKey: String
 
   def GET(urlString: String): Future[Response] = {
     logger.info("Http GET " + urlString.replaceAll(apiKey, "<api-key>"))
-    dispatch.Http(url(urlString) OK as.Response{r => logger.info(r.getResponseBody) ; Response(r.getStatusCode, r.getResponseBody, r.getStatusText)})
+    val httpRequest = new Request.Builder().url(urlString).build()
+    val httpResponse = httpClient.newCall(httpRequest).execute()
+    Future.successful(Response(httpResponse.code(), httpResponse.body().string, httpResponse.message()))
   }
 }
 
-class PaFootballClient(override val apiKey: String, apiBase: String) extends PaClient with DispatchHttp {
+class PaFootballClient(override val apiKey: String, apiBase: String) extends PaClient with OkHttp {
   override lazy val base = apiBase
 
   override protected def get(suffix: String)(implicit context: ExecutionContext): Future[String] = super.get(suffix)(context)
