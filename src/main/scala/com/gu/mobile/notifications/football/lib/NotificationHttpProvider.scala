@@ -2,26 +2,30 @@ package com.gu.mobile.notifications.football.lib
 
 import scala.concurrent.{ExecutionContext, Future}
 import com.gu.mobile.notifications.client._
-import com.ning.http.client.Response
-import dispatch.{Http, as, url}
+import okhttp3.{MediaType, OkHttpClient, Request, RequestBody, Response}
 
 class NotificationHttpProvider(implicit ec: ExecutionContext) extends HttpProvider {
 
-  override def post(uri: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] =
-    Http(
-      url(uri)
-        .POST
-        .setContentType(contentType.mediaType, contentType.charset)
-        .setBody(body) > as.Response(extract)
-    )
+  val httpClient = new OkHttpClient
 
-  override def get(uri: String): Future[HttpResponse] =
-    Http(url(uri) OK as.Response(extract))
+  override def post(uri: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = {
+    val mediaType = MediaType.parse(s"${contentType.mediaType}; charset=${contentType.charset}")
+    val requestBody = RequestBody.create(mediaType, body)
+    val httpRequest = new Request.Builder().url(uri).post(requestBody).build()
+    val httpResponse = httpClient.newCall(httpRequest).execute()
+    Future.successful(extract(httpResponse))
+  }
+
+  override def get(uri: String): Future[HttpResponse] = {
+    val httpRequest = new Request.Builder().url(uri).build
+    val httpResponse = httpClient.newCall(httpRequest).execute
+    Future.successful(extract(httpResponse))
+  }
 
   private def extract(response: Response) = {
-    if (response.getStatusCode >= 200 && response.getStatusCode < 300)
-      HttpOk(response.getStatusCode, response.getResponseBody)
+    if (response.code >= 200 && response.code < 300)
+      HttpOk(response.code, response.body.string)
     else
-      HttpError(response.getStatusCode, response.getResponseBody)
+      HttpError(response.code, response.body.string)
   }
 }
