@@ -5,7 +5,7 @@ import java.net.URL
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.football.PaFootballPoller$
+import com.gu.football.{PaFootballPoller, PaFootballPoller$}
 import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, NotificationHttpProvider, PaFootballClient, PaMatchDayClient}
 import com.gu.mobile.notifications.client.ApiClient
 import com.gu.Logging
