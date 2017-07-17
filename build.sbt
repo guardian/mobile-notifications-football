@@ -30,3 +30,5 @@ riffRaffManifestProjectName := s"mobile-notifications:${name.value}"
 riffRaffUploadArtifactBucket := Option("riffraff-artifact")
 riffRaffUploadManifestBucket := Option("riffraff-builds")
 riffRaffArtifactResources += (file("cfn.yaml"), s"${name.value}-cfn/cfn.yaml")
+
+testResultLogger in (Test, test) := TestResultLogger.Default
