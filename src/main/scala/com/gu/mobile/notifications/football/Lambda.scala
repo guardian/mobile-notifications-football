@@ -5,7 +5,7 @@ import java.net.URL
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.football.PaFootballActor
+import com.gu.football.PaFootballPoller$
 import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, NotificationHttpProvider, PaFootballClient, PaMatchDayClient}
 import com.gu.mobile.notifications.client.ApiClient
 import com.gu.Logging
@@ -60,7 +60,7 @@ object Lambda extends App with Logging {
     legacyApiKey = configuration.notificationsLegacyApiKey
   )
 
-  lazy val footballActor = new PaFootballActor(paMatchDayClient, dynamoDBClient, tableName, goalNotificationBuilder, notificationClient)
+  lazy val footballActor = new PaFootballPoller(paMatchDayClient, dynamoDBClient, tableName, goalNotificationBuilder, notificationClient)
 
   def debugSetTime(): Unit = {
     // this is only used to debug and should never reach master nor prod

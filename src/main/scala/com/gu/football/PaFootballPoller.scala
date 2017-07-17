@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-object PaFootballActor {
+object PaFootballPoller {
   case class CachedValue[T](value: T, expiry: DateTime)
 
   sealed trait DistinctStatus
@@ -22,7 +22,7 @@ object PaFootballActor {
   case object Unknown extends DistinctStatus
 }
 
-class PaFootballActor(
+class PaFootballPoller(
   paMatchDayClient: PaMatchDayClient,
   client: AmazonDynamoDBAsync,
   tableName: String,
@@ -30,7 +30,7 @@ class PaFootballActor(
   notificationClient: ApiClient
 ) extends Logging {
 
-  import PaFootballActor._
+  import PaFootballPoller._
 
   val eventsTable = Table[MatchEventWithId](tableName)
   var processedEvents = Set.empty[String]

@@ -83,6 +83,10 @@ class GoalNotificationBuilderSpec extends Specification {
       notification.message mustEqual s"""Liverpool 2-0 Plymouth
                                         |Steve 5min (pen +4:32)""".stripMargin
     }
+
+    "fail" in {
+      1 mustEqual 2
+    }
   }
 
   trait GoalContext extends Scope {
