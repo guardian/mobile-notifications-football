@@ -1,38 +1,24 @@
 package com.gu.mobile.notifications.football
 
-import akka.actor.{ActorSystem, Props}
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
-import PaFootballActor.TriggerPoll
 import com.gu.mobile.notifications.football.lib._
-import akka.pattern.ask
-import akka.util.Timeout
 import com.gu.Logging
 import com.gu.mobile.notifications.client.ApiClient
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
 
-import scala.beans.BeanProperty
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationLong
 
-/**
-  * This is compatible with aws' lambda JSON to POJO conversion
-  */
-class LambdaInput() {
-  @BeanProperty var name: String = _
-}
+class LambdaInput()
 
 object Lambda extends App with Logging {
 
   var cachedLambda = null.asInstanceOf[Boolean]
 
   def tableName = s"mobile-notifications-football-${configuration.stage}"
-
-  implicit lazy val system = {
-    logger.debug("Creating actor system")
-    ActorSystem("mobile-notification-football")
-  }
 
   lazy val configuration = {
     logger.debug("Creating configuration")
@@ -53,10 +39,7 @@ object Lambda extends App with Logging {
 
   lazy val goalNotificationBuilder = new GoalNotificationBuilder(configuration.mapiHost)
 
-  lazy val notificationHttpProvider = {
-    implicit val ec = system.dispatcher
-    new NotificationHttpProvider()
-  }
+  lazy val notificationHttpProvider = new NotificationHttpProvider()
 
   lazy val notificationClient = ApiClient(
     host = configuration.notificationsHost,
@@ -74,10 +57,7 @@ object Lambda extends App with Logging {
 
   lazy val footballActor = {
     logger.debug("Creating actor")
-    system.actorOf(
-      Props(classOf[PaFootballActor], paFootballClient, distinctCheck, syntheticMatchEventGenerator, eventConsumer),
-      "goal-notifications-actor-solution"
-    )
+    new PaFootballActor(paFootballClient, distinctCheck, syntheticMatchEventGenerator, eventConsumer)
   }
 
   def handler(lambdaInput: LambdaInput, context: Context): String = {
@@ -88,9 +68,7 @@ object Lambda extends App with Logging {
       logger.info("Starting new container")
     }
 
-    implicit val timeout = Timeout(30.seconds)
-    val done = footballActor ? TriggerPoll
-    Await.ready(done, 35.seconds)
+    Await.ready(footballActor.start, 35.seconds)
     "done"
   }
 

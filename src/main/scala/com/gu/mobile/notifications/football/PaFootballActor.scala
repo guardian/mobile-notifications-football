@@ -3,71 +3,42 @@ package com.gu.mobile.notifications.football
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
-import akka.actor.{Actor, ActorRef}
 import org.joda.time.DateTime
 import com.gu.mobile.notifications.football.lib.{CachedValue, DynamoDistinctCheck, PaFootballClient, SyntheticMatchEventGenerator}
 import DynamoDistinctCheck.{Distinct, Duplicate, Unknown}
 import com.gu.Logging
 import com.gu.mobile.notifications.football.models.MatchId
 import pa.{MatchDay, MatchEvent}
+import scala.concurrent.ExecutionContext.Implicits.global
 
-object PaFootballActor {
-  case class EndedMatch(matchId: String, startTime: DateTime)
-  case object TriggerPoll
-  case class PollFinished(senderRef: ActorRef)
-  case class ProcessedEvents(events: Set[String], senderRef: ActorRef)
-}
+case class EndedMatch(matchId: String, startTime: DateTime)
 
 class PaFootballActor(
   paClient: PaFootballClient,
   distinctCheck: DynamoDistinctCheck,
   syntheticEvents: SyntheticMatchEventGenerator,
   eventConsumer: EventConsumer
-) extends Actor with Logging {
+) extends Logging {
 
-  implicit val ec = context.dispatcher
-
-  import PaFootballActor._
-
-  private var ready: Boolean = true
   private var processedEvents = Set.empty[String]
   private var endedMatches: Set[EndedMatch] = Set.empty
   private val cachedMatches = new CachedValue[List[MatchDay]](30.minutes)
 
-  def receive = {
-    case TriggerPoll if !ready =>
-      logger.warn("Poll triggered while existing poll still in progress, ignoring")
+  def start: Future[Set[String]] = {
+    logger.info("Starting poll for new match events")
 
-    case TriggerPoll if ready =>
-      val senderRef = sender()
-      ready = false
-      logger.info("Starting poll for new match events")
+    val matchEventIds = for {
+      liveMatches <- matchIdsInProgress
+      ids <- Future.traverse(liveMatches)(processMatch)
+    } yield ids.flatten.toSet
 
-      val matchEventIds = for {
-        liveMatches <- matchIdsInProgress
-        ids <- Future.traverse(liveMatches)(processMatch)
-      } yield ids.flatten.toSet
-
-      matchEventIds andThen {
-        case Success(ids) =>
-          logger.info("Finished polling with success")
-          self ! ProcessedEvents(ids, senderRef)
-        case Failure(e) =>
-          logger.error(s"Finished polling with error ${e.getMessage}")
-          self ! PollFinished(senderRef)
-      }
-
-    case ProcessedEvents(events, senderRef) =>
-      processedEvents = events
-      self ! PollFinished(senderRef)
-
-    case PollFinished(senderRef) =>
-      ready = true
-      logger.info("Stopping lambda")
-      senderRef ! "done"
-
-    case endedMatch: EndedMatch =>
-      endedMatches = endedMatches.filter(_.startTime.isAfter(DateTime.now.minusDays(2))) + endedMatch
+    matchEventIds andThen {
+      case Success(ids) =>
+        processedEvents = ids
+        logger.info("Finished polling with success")
+      case Failure(e) =>
+        logger.error(s"Finished polling with error ${e.getMessage}")
+    }
   }
 
   private def matchIdsInProgress: Future[List[MatchId]] = {
@@ -119,7 +90,7 @@ class PaFootballActor(
 
   private def handleMatchEnd(matchDay: MatchDay, event: MatchEvent) = {
     if (event.eventType == "full-time") {
-      self ! EndedMatch(matchDay.id, matchDay.date)
+      endedMatches = endedMatches.filter(_.startTime.isAfter(DateTime.now.minusDays(2))) + EndedMatch(matchDay.id, matchDay.date)
     }
   }
 }
