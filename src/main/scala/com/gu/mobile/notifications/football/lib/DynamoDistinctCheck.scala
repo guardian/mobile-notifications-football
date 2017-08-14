@@ -7,7 +7,21 @@ import com.gu.scanamo.{ScanamoAsync, Table}
 import com.gu.scanamo.syntax._
 import pa.MatchEvent
 
-case class DynamoMatchEvent(id: String, matchEvent: MatchEvent)
+case class DynamoMatchEvent(
+  eventId: String,
+  matchId: String,
+  matchEvent: MatchEvent,
+  ttl: Long
+)
+
+object DynamoMatchEvent {
+  def apply(matchId: String, eventId: String, event: MatchEvent): DynamoMatchEvent = DynamoMatchEvent(
+    eventId = eventId,
+    matchId = matchId,
+    matchEvent = event,
+    ttl = (System.currentTimeMillis() / 1000) + (14 * 24 * 3600)
+  )
+}
 
 object DynamoDistinctCheck {
   sealed trait DistinctStatus
@@ -21,13 +35,13 @@ class DynamoDistinctCheck(client: AmazonDynamoDBAsync, tableName: String) extend
 
   val eventsTable = Table[DynamoMatchEvent](tableName)
 
-  def insertEvent(id: String, event: MatchEvent)(implicit ec: ExecutionContext): Future[DistinctStatus] = {
-    val putResult = ScanamoAsync.exec(client)(eventsTable.given(not(attributeExists('id))).put(DynamoMatchEvent(id, event)))
+  def insertEvent(matchId: String, eventId: String, event: MatchEvent)(implicit ec: ExecutionContext): Future[DistinctStatus] = {
+    val putResult = ScanamoAsync.exec(client)(eventsTable.given(not(attributeExists('id))).put(DynamoMatchEvent(matchId, eventId, event)))
     putResult map {
-      case Right(s) =>
+      case Right(_) =>
         logger.debug(s"Distinct event ${event.id} written to dynamodb")
         Distinct
-      case Left(s) =>
+      case Left(_) =>
         logger.debug(s"Event ${event.id} already exists in dynamodb - discarding")
         Duplicate
     } recover {

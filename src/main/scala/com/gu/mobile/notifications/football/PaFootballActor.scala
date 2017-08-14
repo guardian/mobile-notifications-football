@@ -70,8 +70,8 @@ class PaFootballActor(
   private def processMatchEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): Future[Option[String]] = {
     handleMatchEnd(matchDay, event)
 
-    event.id.filterNot(processedEvents.contains).map { id =>
-      distinctCheck.insertEvent(id, event).flatMap {
+    event.id.filterNot(processedEvents.contains).map { eventId =>
+      distinctCheck.insertEvent(matchDay.id, eventId, event).flatMap {
         case Distinct => uniqueEvent(matchDay, events)(event)
         case Duplicate => Future.successful(event.id)
         case Unknown => Future.successful(None)
