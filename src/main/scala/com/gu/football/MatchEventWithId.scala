@@ -16,7 +16,8 @@ case class MatchEventWithId(
   whereFrom: Option[String],
   whereTo: Option[String],
   distance: Option[String],
-  outcome: Option[String]
+  outcome: Option[String],
+  expiry: Long
 )
 
 object MatchEventWithId {
@@ -35,7 +36,8 @@ object MatchEventWithId {
       event.whereFrom,
       event.whereTo,
       event.distance,
-      event.outcome
+      event.outcome,
+      (System.currentTimeMillis() / 1000) + (14 * 24 * 3600)
     )
   }
 }
