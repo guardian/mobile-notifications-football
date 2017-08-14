@@ -148,6 +148,7 @@ class PaFootballActor(
           val previousEvents = events.takeWhile(_ != event)
           runOncePerEvent(matchDay, previousEvents, event).map(_ => Some(event.id))
         case Duplicate =>
+          logger.warn(s"duplicate event ${event.id}")
           Future.successful(Some(event.id))
         case Unknown =>
           Future.successful(None)
