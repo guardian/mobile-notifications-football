@@ -5,12 +5,12 @@ import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.amazonaws.services.lambda.runtime.Context
 import PaFootballActor.TriggerPoll
-import com.gu.mobile.notifications.football.lib.{_}
+import com.gu.mobile.notifications.football.lib._
 import akka.pattern.ask
 import akka.util.Timeout
+import com.gu.Logging
 import com.gu.mobile.notifications.client.ApiClient
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
-import grizzled.slf4j.Logging
 
 import scala.beans.BeanProperty
 import scala.concurrent.Await

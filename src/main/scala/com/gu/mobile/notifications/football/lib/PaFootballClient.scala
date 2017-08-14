@@ -1,10 +1,10 @@
 package com.gu.mobile.notifications.football.lib
 
+import com.gu.Logging
 import com.gu.mobile.notifications.football.models.MatchId
 import pa._
 
 import scala.concurrent.{ExecutionContext, Future}
-import grizzled.slf4j.Logging
 import okhttp3.{OkHttpClient, Request}
 import org.joda.time.DateTime
 

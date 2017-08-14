@@ -1,9 +1,9 @@
 package com.gu.mobile.notifications.football
 
+import com.gu.Logging
 import com.gu.mobile.notifications.client.ApiClient
-import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal, GoalContext, Score}
+import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal}
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
-import grizzled.slf4j.Logging
 import pa.MatchDay
 
 import scala.PartialFunction._

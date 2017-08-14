@@ -4,10 +4,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import akka.actor.{Actor, ActorRef}
-import grizzled.slf4j.Logging
 import org.joda.time.DateTime
 import com.gu.mobile.notifications.football.lib.{CachedValue, DynamoDistinctCheck, PaFootballClient, SyntheticMatchEventGenerator}
 import DynamoDistinctCheck.{Distinct, Duplicate, Unknown}
+import com.gu.Logging
 import com.gu.mobile.notifications.football.models.MatchId
 import pa.{MatchDay, MatchEvent}
 

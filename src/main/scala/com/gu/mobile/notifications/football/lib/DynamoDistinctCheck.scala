@@ -1,9 +1,8 @@
 package com.gu.mobile.notifications.football.lib
 
 import scala.concurrent.{ExecutionContext, Future}
-import grizzled.slf4j.Logging
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
+import com.gu.Logging
 import com.gu.scanamo.{ScanamoAsync, Table}
 import com.gu.scanamo.syntax._
 import pa.MatchEvent
