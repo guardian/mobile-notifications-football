@@ -20,6 +20,9 @@ Parameters:
     Description: Bucket where RiffRaff uploads artifacts on deploy
     Type: String
     Default: mobile-dist
+  DynamoNotificationTopic:
+    Description: SNS topic to notify when there's a dynamo throttling event
+    Type: String
 Resources:
   ExecutionRole:
     Type: AWS::IAM::Role
@@ -64,7 +67,7 @@ Resources:
                 - dynamodb:PutItem
                 - dynamodb:UpdateItem
                 - dynamodb:Query
-              Resource: !Sub arn:aws:dynamodb:eu-west-1:201359054765:table/mobile-notifications-football-${Stage}
+              Resource: !Sub arn:aws:dynamodb:eu-west-1:201359054765:table/${Stack}-${App}-events-${Stage}
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -121,3 +124,52 @@ Resources:
         - MetricNamespace: !Sub "${Stage}/football-notifications"
           MetricName: "error"
           MetricValue: 1
+
+  dynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${Stack}-${App}-events-${Stage}
+      AttributeDefinitions:
+        - AttributeName: eventId
+          AttributeType: S
+      KeySchema:
+      - AttributeName: eventId
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 20
+        WriteCapacityUnits: 10
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  mobileNotificationsFootballConsumedReadThrottleEvents:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/DynamoDB
+      MetricName: ReadThrottleEvents
+      Unit: Count
+      Statistic: Sum
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+      - Name: TableName
+        Value: !Ref dynamoTable
+      Threshold: 20
+      Period: 300
+      EvaluationPeriods: 1
+      AlarmActions: [ !Ref DynamoNotificationTopic ]
+
+  mobileNotificationsFootballConsumedWriteThrottleEvents:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/DynamoDB
+      MetricName: WriteThrottleEvents
+      Unit: Count
+      Statistic: Sum
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+      - Name: TableName
+        Value: !Ref dynamoTable
+      Threshold: 10
+      Period: 300
+      EvaluationPeriods: 1
+      AlarmActions: [ !Ref DynamoNotificationTopic ]
