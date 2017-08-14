@@ -4,6 +4,7 @@ import pa.{MatchEvent, Player}
 
 case class MatchEventWithId(
   id: String,
+  matchId: String,
   teamID: Option[String],
   eventType: String,
   matchTime: Option[String],
@@ -19,9 +20,10 @@ case class MatchEventWithId(
 )
 
 object MatchEventWithId {
-  def fromMatchEvent(event: MatchEvent): Option[MatchEventWithId] = event.id map { id =>
+  def fromMatchEvent(matchId: String)(event: MatchEvent): Option[MatchEventWithId] = event.id map { id =>
     MatchEventWithId(
       id,
+      matchId,
       event.teamID,
       event.eventType,
       event.matchTime,

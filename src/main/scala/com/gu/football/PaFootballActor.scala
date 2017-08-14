@@ -129,12 +129,12 @@ class PaFootballActor(
   private def processMatch(matchDay: MatchDay): Future[List[String]] =
     eventsForMatch(matchDay.id).flatMap(processMatchEvents(matchDay))
 
-  private def eventsForMatch(id: String): Future[List[MatchEventWithId]] =
-    paMatchDayClient.matchEvents(id).map { matchEvents =>
-      matchEvents.events.flatMap(MatchEventWithId.fromMatchEvent)
+  private def eventsForMatch(matchid: String): Future[List[MatchEventWithId]] =
+    paMatchDayClient.matchEvents(matchid).map { matchEvents =>
+      matchEvents.events.flatMap(MatchEventWithId.fromMatchEvent(matchid))
     } recover {
       case e =>
-        logger.error(s"Failed to fetch events for match $id: ${e.getMessage}")
+        logger.error(s"Failed to fetch events for match $matchid: ${e.getMessage}")
         List.empty
     }
 
