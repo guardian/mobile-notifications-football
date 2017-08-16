@@ -5,10 +5,12 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import org.joda.time.DateTime
 import com.gu.mobile.notifications.football.lib.{CachedValue, DynamoDistinctCheck, PaFootballClient, SyntheticMatchEventGenerator}
-import DynamoDistinctCheck.{Distinct, Duplicate, Unknown}
+import DynamoDistinctCheck.Distinct
 import com.gu.Logging
+import com.gu.mobile.notifications.client.models.NotificationPayload
 import com.gu.mobile.notifications.football.models.MatchId
 import pa.{MatchDay, MatchEvent}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class EndedMatch(matchId: String, startTime: DateTime)
@@ -20,22 +22,23 @@ class PaFootballActor(
   eventConsumer: EventConsumer
 ) extends Logging {
 
-  private var processedEvents = Set.empty[String]
+  //private var processedEvents = Set.empty[String]
+  // TODO re-instate a local cache, outside of this object as it's a side effect
   private var endedMatches: Set[EndedMatch] = Set.empty
   private val cachedMatches = new CachedValue[List[MatchDay]](30.minutes)
 
-  def start: Future[Set[String]] = {
+  def prepareNotifications: Future[List[NotificationPayload]] = {
     logger.info("Starting poll for new match events")
 
-    val matchEventIds = for {
+    val matchNotifications = for {
       liveMatches <- matchIdsInProgress
-      ids <- Future.traverse(liveMatches)(processMatch)
-    } yield ids.flatten.toSet
+      notifications <- Future.traverse(liveMatches)(processMatch)
+    } yield notifications.flatten
 
-    matchEventIds andThen {
-      case Success(ids) =>
-        processedEvents = ids
-        logger.info("Finished polling with success")
+    matchNotifications andThen {
+      case Success(notifications) =>
+        //processedEvents = ids
+        logger.info(s"Finished polling with success, created ${notifications.size} notifications")
       case Failure(e) =>
         logger.error(s"Finished polling with error ${e.getMessage}")
     }
@@ -56,36 +59,38 @@ class PaFootballActor(
     matches.map(_.filter(inProgress).map(_.id).map(MatchId))
   }
 
-  private def processMatch(matchId: MatchId): Future[List[String]] = {
-    val eventIds = for {
+  private def processMatch(matchId: MatchId): Future[List[NotificationPayload]] = {
+    val notifications = for {
       (matchDay, events) <- paClient.eventsForMatch(matchId, syntheticEvents)
       processed <- Future.traverse(events)(processMatchEvent(matchDay, events))
     } yield processed.flatten
-    eventIds.recover { case e =>
+
+    notifications.recover {
+      case e =>
         logger.error(s"Failed to process match ${matchId.id}: ${e.getMessage}", e)
-        List.empty[String]
+        Nil
     }
   }
 
-  private def processMatchEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): Future[Option[String]] = {
+  private def processMatchEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): Future[List[NotificationPayload]] = {
     handleMatchEnd(matchDay, event)
 
-    event.id.filterNot(processedEvents.contains).map { eventId =>
-      distinctCheck.insertEvent(matchDay.id, eventId, event).flatMap {
+    // TODO cache
+    event.id/*.filterNot(processedEvents.contains)*/.map { eventId =>
+      distinctCheck.insertEvent(matchDay.id, eventId, event).map {
         case Distinct => uniqueEvent(matchDay, events)(event)
-        case Duplicate => Future.successful(event.id)
-        case Unknown => Future.successful(None)
+        case _ => Nil
       }
     } getOrElse {
       logger.debug(s"Event ${event.id} already exists in local cache or does not have an id - discarding")
-      Future.successful(event.id)
+      Future.successful(Nil)
     }
   }
 
-  private def uniqueEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): Future[Option[String]] = {
+  private def uniqueEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): List[NotificationPayload] = {
     logger.info(s"Found unique event $event")
     val previousEvents = events.takeWhile(_ != event)
-    eventConsumer.receiveEvent(matchDay, previousEvents, event).recover({case _ => ()}).map(_ => event.id)
+    eventConsumer.receiveEvent(matchDay, previousEvents, event)
   }
 
   private def handleMatchEnd(matchDay: MatchDay, event: MatchEvent) = {

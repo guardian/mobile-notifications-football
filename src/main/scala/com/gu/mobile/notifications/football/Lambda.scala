@@ -8,14 +8,16 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.gu.mobile.notifications.football.lib._
 import com.gu.Logging
 import com.gu.mobile.notifications.client.ApiClient
+import com.gu.mobile.notifications.client.models.NotificationPayload
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
 import org.joda.time.{DateTime, DateTimeUtils}
 import play.api.libs.json.Json
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
 import scala.io.Source
+import scala.util.control.NonFatal
 
 class LambdaInput()
 
@@ -56,7 +58,7 @@ object Lambda extends App with Logging {
 
   lazy val matchStatusNotificationBuilder = new MatchStatusNotificationBuilder(configuration.mapiHost)
 
-  lazy val eventConsumer = new EventConsumerImpl(goalNotificationBuilder, matchStatusNotificationBuilder, notificationClient)
+  lazy val eventConsumer = new EventConsumer(goalNotificationBuilder, matchStatusNotificationBuilder)
 
   lazy val distinctCheck = new DynamoDistinctCheck(dynamoDBClient, tableName)
 
@@ -76,16 +78,33 @@ object Lambda extends App with Logging {
     }
   }
 
-  def handler(lambdaInput: LambdaInput, context: Context): String = {
-    debugSetTime()
+  private def logContainer() = {
     if (cachedLambda) {
       logger.info("Re-using existing container")
     } else {
       cachedLambda = true
       logger.info("Starting new container")
     }
+  }
 
-    Await.ready(footballActor.start, 35.seconds)
+  def handler(lambdaInput: LambdaInput, context: Context): String = {
+    debugSetTime()
+    logContainer()
+
+    def sendNotification(notification: NotificationPayload): Future[Unit] = {
+      notificationClient.send(notification).map {
+        case Right(_) => logger.info(s"Match status for $notification successfully sent")
+        case Left(error) => logger.error(s"Error sending match status for $notification - ${error.description}")
+      }.recover {
+        case NonFatal(exception) => logger.error(s"Error sending match status for $notification ${exception.getMessage}", exception)
+      }
+    }
+
+    val result = footballActor.prepareNotifications.flatMap { notifications =>
+      Future.traverse(notifications)(sendNotification)
+    }
+
+    Await.ready(result, 35.seconds)
     "done"
   }
 

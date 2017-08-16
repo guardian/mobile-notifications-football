@@ -1,69 +1,36 @@
 package com.gu.mobile.notifications.football
 
 import com.gu.Logging
-import com.gu.mobile.notifications.client.ApiClient
+import com.gu.mobile.notifications.client.models.NotificationPayload
 import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal}
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
 import pa.MatchDay
 
 import scala.PartialFunction._
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext
 
-trait EventConsumer {
-  def receiveEvent(matchDay: MatchDay, previousEvents: List[pa.MatchEvent], event: pa.MatchEvent)(implicit ec: ExecutionContext): Future[Unit]
-}
-
-class EventConsumerImpl(
+class EventConsumer(
   goalNotificationBuilder: GoalNotificationBuilder,
-  matchStatusNotificationBuilder: MatchStatusNotificationBuilder,
-  notificationClient: ApiClient
-) extends EventConsumer with Logging {
+  matchStatusNotificationBuilder: MatchStatusNotificationBuilder
+) extends Logging {
 
-  override def receiveEvent(matchDay: MatchDay, previousEvents: List[pa.MatchEvent], event: pa.MatchEvent)(implicit ec: ExecutionContext): Future[Unit] = {
+  def receiveEvent(matchDay: MatchDay, previousEvents: List[pa.MatchEvent], event: pa.MatchEvent)(implicit ec: ExecutionContext): List[NotificationPayload] = {
     FootballMatchEvent.fromPaMatchEvent(matchDay.homeTeam, matchDay.awayTeam)(event) map { ev =>
-      sendAlerts(
+      prepareNotifications(
         matchDay = matchDay,
         previousEvents = previousEvents.flatMap(FootballMatchEvent.fromPaMatchEvent(matchDay.homeTeam, matchDay.awayTeam)(_)),
         event = ev
       )
-    } getOrElse Future.successful(())
+    } getOrElse Nil
   }
 
-  private def sendAlerts(matchDay: MatchDay, previousEvents: List[FootballMatchEvent], event: FootballMatchEvent)(implicit ec: ExecutionContext): Future[Unit] = {
-    val sentGoalAlert = condOpt(event) { case g: Goal => sendGoalAlert(matchDay, previousEvents)(g) }
-    val sentMatchStatus = Some(sendMatchStatus(matchDay, previousEvents)(event))
+  private def prepareNotifications(matchDay: MatchDay, previousEvents: List[FootballMatchEvent], event: FootballMatchEvent)(implicit ec: ExecutionContext): List[NotificationPayload] = {
+    val sentGoalAlert = condOpt(event) { case goal: Goal => goalNotificationBuilder.build(goal, matchDay, previousEvents) }
+    val sentMatchStatus = Some(matchStatusNotificationBuilder.build(event, matchDay, previousEvents))
 
-    Future.sequence(List(sentGoalAlert, sentMatchStatus).flatten).map(_ => ())
-  }
+    val notifications = List(sentGoalAlert, sentMatchStatus).flatten
+    logger.info(s"prepared the following notifications for match ${matchDay.id}, event $event: $notifications")
 
-  private def sendGoalAlert(matchDay: MatchDay, previousEvents: List[FootballMatchEvent])(goal: Goal)(implicit ec: ExecutionContext): Future[Unit] = {
-    logger.info(s"Sending goal alert $goal")
-
-    val payload = goalNotificationBuilder.build(goal, matchDay, previousEvents)
-    val result = notificationClient.send(payload)
-    result.onComplete {
-      case Success(Left(error)) => logger.error(s"Error sending $goal - ${error.description}")
-      case Success(Right(())) => logger.info(s"Goal alert $goal successfully sent")
-      case Failure(f) => logger.error(s"Error sending $goal ${f.getMessage}")
-    }
-    result
-      .map(_ => ())
-      .recover({ case _ => () })
-  }
-
-  private def sendMatchStatus(matchDay: MatchDay, previousEvents: List[FootballMatchEvent])(event: FootballMatchEvent)(implicit ec: ExecutionContext): Future[Unit] = {
-    logger.info(s"Sending match status for even $event")
-
-    val payload = matchStatusNotificationBuilder.build(event, matchDay, previousEvents)
-    val result = notificationClient.send(payload)
-    result.onComplete {
-      case Success(Left(error)) => logger.error(s"Error sending match status for $event - ${error.description}")
-      case Success(Right(())) => logger.info(s"Match status for $event successfully sent")
-      case Failure(f) => logger.error(s"Error sending match status for $event ${f.getMessage}")
-    }
-    result
-      .map(_ => ())
-      .recover({ case _ => () })
+    notifications
   }
 }
