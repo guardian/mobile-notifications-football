@@ -1,7 +1,6 @@
 package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
-import com.gu.mobile.notifications.football.lib.DynamoDistinctCheck.Distinct
 import com.gu.mobile.notifications.football.models.{MatchData, MatchId}
 import org.joda.time.DateTime
 import pa.{MatchDay, MatchEvent}
@@ -16,13 +15,11 @@ case class EndedMatch(matchId: String, startTime: DateTime)
 
 class FootballData(
   paClient: PaFootballClient,
-  distinctCheck: DynamoDistinctCheck,
+  eventFilter: EventFilter,
   syntheticEvents: SyntheticMatchEventGenerator,
   eventConsumer: EventConsumer
 ) extends Logging {
 
-  //private var processedEvents = Set.empty[String]
-  // TODO re-instate a local cache, outside of this object as it's a side effect
   private var endedMatches: Set[EndedMatch] = Set.empty
   private val cachedMatches = new CachedValue[List[MatchDay]](30.minutes)
 
@@ -36,7 +33,6 @@ class FootballData(
 
     matchesData andThen {
       case Success(data) =>
-        //processedEvents = ids
         logger.info(s"Finished polling with success, fetched ${data.size} matches' data")
       case Failure(e) =>
         logger.error(s"Finished polling with error ${e.getMessage}")
@@ -61,26 +57,12 @@ class FootballData(
   private def processMatch(matchId: MatchId): Future[Option[MatchData]] = {
     val matchData = for {
       (matchDay, events) <- paClient.eventsForMatch(matchId, syntheticEvents)
-      eventsToProcess <- Future.traverse(events)(processMatchEvent(matchDay, events))
-    } yield Some(MatchData(matchDay, events, eventsToProcess.flatten))
+      eventsToProcess <- eventFilter.filterProcessedEvents(matchDay.id)(events)
+    } yield Some(MatchData(matchDay, events, eventsToProcess))
 
     matchData.recover { case NonFatal(exception) =>
       logger.error(s"Failed to process match ${matchId.id}: ${exception.getMessage}", exception)
       None
-    }
-  }
-
-  private def processMatchEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): Future[Option[MatchEvent]] = {
-    handleMatchEnd(matchDay, event)
-
-    event.id.map { eventId =>
-      distinctCheck.insertEvent(matchDay.id, eventId, event).map {
-        case Distinct => Some(event)
-        case _ => None
-      }
-    } getOrElse {
-      logger.debug(s"Event ${event.id} already exists in local cache or does not have an id - discarding")
-      Future.successful(None)
     }
   }
 

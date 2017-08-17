@@ -39,7 +39,7 @@ class DynamoDistinctCheck(client: AmazonDynamoDBAsync, tableName: String) extend
     val putResult = ScanamoAsync.exec(client)(eventsTable.given(not(attributeExists('id))).put(DynamoMatchEvent(matchId, eventId, event)))
     putResult map {
       case Right(_) =>
-        logger.debug(s"Distinct event ${event.id} written to dynamodb")
+        logger.info(s"Distinct event ${event.id} written to dynamodb")
         Distinct
       case Left(_) =>
         logger.debug(s"Event ${event.id} already exists in dynamodb - discarding")

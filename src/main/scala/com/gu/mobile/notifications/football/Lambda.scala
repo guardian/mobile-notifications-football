@@ -62,7 +62,9 @@ object Lambda extends App with Logging {
 
   lazy val distinctCheck = new DynamoDistinctCheck(dynamoDBClient, tableName)
 
-  lazy val footballData = new FootballData(paFootballClient, distinctCheck, syntheticMatchEventGenerator, eventConsumer)
+  lazy val eventFilter = new CachedEventFilter(distinctCheck)
+
+  lazy val footballData = new FootballData(paFootballClient, eventFilter, syntheticMatchEventGenerator, eventConsumer)
 
   def debugSetTime(): Unit = {
     // this is only used to debug
