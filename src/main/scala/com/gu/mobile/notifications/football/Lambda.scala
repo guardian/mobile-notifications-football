@@ -62,10 +62,7 @@ object Lambda extends App with Logging {
 
   lazy val distinctCheck = new DynamoDistinctCheck(dynamoDBClient, tableName)
 
-  lazy val footballActor = {
-    logger.debug("Creating actor")
-    new PaFootballActor(paFootballClient, distinctCheck, syntheticMatchEventGenerator, eventConsumer)
-  }
+  lazy val footballData = new FootballData(paFootballClient, distinctCheck, syntheticMatchEventGenerator, eventConsumer)
 
   def debugSetTime(): Unit = {
     // this is only used to debug
@@ -100,9 +97,11 @@ object Lambda extends App with Logging {
       }
     }
 
-    val result = footballActor.prepareNotifications.flatMap { notifications =>
-      Future.traverse(notifications)(sendNotification)
-    }
+    val result = footballData.pollFootballData
+      .map(_.flatMap(eventConsumer.receiveEvents))
+      .flatMap { notifications =>
+        Future.traverse(notifications)(sendNotification)
+      }
 
     Await.ready(result, 35.seconds)
     "done"

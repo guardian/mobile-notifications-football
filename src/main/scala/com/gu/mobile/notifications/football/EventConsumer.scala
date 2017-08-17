@@ -2,19 +2,26 @@ package com.gu.mobile.notifications.football
 
 import com.gu.Logging
 import com.gu.mobile.notifications.client.models.NotificationPayload
-import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal}
+import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal, MatchData}
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
-import pa.MatchDay
+import pa.{MatchDay, MatchEvent}
 
 import scala.PartialFunction._
-import scala.concurrent.ExecutionContext
 
 class EventConsumer(
   goalNotificationBuilder: GoalNotificationBuilder,
   matchStatusNotificationBuilder: MatchStatusNotificationBuilder
 ) extends Logging {
 
-  def receiveEvent(matchDay: MatchDay, previousEvents: List[pa.MatchEvent], event: pa.MatchEvent)(implicit ec: ExecutionContext): List[NotificationPayload] = {
+  def receiveEvents(matchData: MatchData): List[NotificationPayload] = {
+    matchData.eventsToProcess.flatMap { event =>
+      receiveEvent(matchData.matchDay, matchData.allEvents, event)
+    }
+  }
+
+  def receiveEvent(matchDay: MatchDay, events: List[MatchEvent], event: MatchEvent): List[NotificationPayload] = {
+    logger.info(s"Processing event $event for match ${matchDay.id}")
+    val previousEvents = events.takeWhile(_ != event)
     FootballMatchEvent.fromPaMatchEvent(matchDay.homeTeam, matchDay.awayTeam)(event) map { ev =>
       prepareNotifications(
         matchDay = matchDay,
@@ -24,7 +31,7 @@ class EventConsumer(
     } getOrElse Nil
   }
 
-  private def prepareNotifications(matchDay: MatchDay, previousEvents: List[FootballMatchEvent], event: FootballMatchEvent)(implicit ec: ExecutionContext): List[NotificationPayload] = {
+  private def prepareNotifications(matchDay: MatchDay, previousEvents: List[FootballMatchEvent], event: FootballMatchEvent): List[NotificationPayload] = {
     val sentGoalAlert = condOpt(event) { case goal: Goal => goalNotificationBuilder.build(goal, matchDay, previousEvents) }
     val sentMatchStatus = Some(matchStatusNotificationBuilder.build(event, matchDay, previousEvents))
 

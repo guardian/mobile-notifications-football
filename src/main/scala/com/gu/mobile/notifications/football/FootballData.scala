@@ -7,15 +7,15 @@ import org.joda.time.DateTime
 import com.gu.mobile.notifications.football.lib.{CachedValue, DynamoDistinctCheck, PaFootballClient, SyntheticMatchEventGenerator}
 import DynamoDistinctCheck.Distinct
 import com.gu.Logging
-import com.gu.mobile.notifications.client.models.NotificationPayload
-import com.gu.mobile.notifications.football.models.MatchId
+import com.gu.mobile.notifications.football.models.{MatchData, MatchId}
 import pa.{MatchDay, MatchEvent}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.control.NonFatal
 
 case class EndedMatch(matchId: String, startTime: DateTime)
 
-class PaFootballActor(
+class FootballData(
   paClient: PaFootballClient,
   distinctCheck: DynamoDistinctCheck,
   syntheticEvents: SyntheticMatchEventGenerator,
@@ -27,15 +27,15 @@ class PaFootballActor(
   private var endedMatches: Set[EndedMatch] = Set.empty
   private val cachedMatches = new CachedValue[List[MatchDay]](30.minutes)
 
-  def prepareNotifications: Future[List[NotificationPayload]] = {
+  def pollFootballData: Future[List[MatchData]] = {
     logger.info("Starting poll for new match events")
 
-    val matchNotifications = for {
+    val matchesData = for {
       liveMatches <- matchIdsInProgress
       notifications <- Future.traverse(liveMatches)(processMatch)
     } yield notifications.flatten
 
-    matchNotifications andThen {
+    matchesData andThen {
       case Success(notifications) =>
         //processedEvents = ids
         logger.info(s"Finished polling with success, created ${notifications.size} notifications")
@@ -59,38 +59,30 @@ class PaFootballActor(
     matches.map(_.filter(inProgress).map(_.id).map(MatchId))
   }
 
-  private def processMatch(matchId: MatchId): Future[List[NotificationPayload]] = {
-    val notifications = for {
+  private def processMatch(matchId: MatchId): Future[Option[MatchData]] = {
+    val matchData = for {
       (matchDay, events) <- paClient.eventsForMatch(matchId, syntheticEvents)
-      processed <- Future.traverse(events)(processMatchEvent(matchDay, events))
-    } yield processed.flatten
+      eventsToProcess <- Future.traverse(events)(processMatchEvent(matchDay, events))
+    } yield Some(MatchData(matchDay, events, eventsToProcess.flatten))
 
-    notifications.recover {
-      case e =>
-        logger.error(s"Failed to process match ${matchId.id}: ${e.getMessage}", e)
-        Nil
+    matchData.recover { case NonFatal(exception) =>
+      logger.error(s"Failed to process match ${matchId.id}: ${exception.getMessage}", exception)
+      None
     }
   }
 
-  private def processMatchEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): Future[List[NotificationPayload]] = {
+  private def processMatchEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): Future[Option[MatchEvent]] = {
     handleMatchEnd(matchDay, event)
 
-    // TODO cache
-    event.id/*.filterNot(processedEvents.contains)*/.map { eventId =>
+    event.id.map { eventId =>
       distinctCheck.insertEvent(matchDay.id, eventId, event).map {
-        case Distinct => uniqueEvent(matchDay, events)(event)
-        case _ => Nil
+        case Distinct => Some(event)
+        case _ => None
       }
     } getOrElse {
       logger.debug(s"Event ${event.id} already exists in local cache or does not have an id - discarding")
-      Future.successful(Nil)
+      Future.successful(None)
     }
-  }
-
-  private def uniqueEvent(matchDay: MatchDay, events: List[MatchEvent])(event: MatchEvent): List[NotificationPayload] = {
-    logger.info(s"Found unique event $event")
-    val previousEvents = events.takeWhile(_ != event)
-    eventConsumer.receiveEvent(matchDay, previousEvents, event)
   }
 
   private def handleMatchEnd(matchDay: MatchDay, event: MatchEvent) = {
