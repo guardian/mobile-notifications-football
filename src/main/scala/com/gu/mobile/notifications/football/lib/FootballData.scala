@@ -3,11 +3,10 @@ package com.gu.mobile.notifications.football.lib
 import com.gu.Logging
 import com.gu.mobile.notifications.football.models.{MatchData, MatchId}
 import org.joda.time.DateTime
-import pa.{MatchDay, MatchEvent}
+import pa.MatchDay
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration._
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
@@ -19,9 +18,6 @@ class FootballData(
   syntheticEvents: SyntheticMatchEventGenerator,
   eventConsumer: EventConsumer
 ) extends Logging {
-
-  private var endedMatches: Set[EndedMatch] = Set.empty
-  private val cachedMatches = new CachedValue[List[MatchDay]](30.minutes)
 
   def pollFootballData: Future[List[MatchData]] = {
     logger.info("Starting poll for new match events")
@@ -41,16 +37,9 @@ class FootballData(
 
   private def matchIdsInProgress: Future[List[MatchId]] = {
     def inProgress(m: MatchDay): Boolean =
-      m.date.minusMinutes(5).isBeforeNow &&
-        (!endedMatches.exists(_.matchId == m.id) || m.date.plusHours(4).isAfterNow)
-    val matches = cachedMatches() {
-      logger.info("Retrieving today's matches from PA")
-      paClient.aroundToday recover {
-        case e =>
-          logger.error("Error retrieving today's matches from PA", e)
-          cachedMatches.value.getOrElse(List.empty)
-      }
-    }
+      m.date.minusMinutes(5).isBeforeNow || m.date.plusHours(4).isAfterNow
+    logger.info("Retrieving today's matches from PA")
+    val matches = paClient.aroundToday
     matches.map(_.filter(inProgress).map(_.id).map(MatchId))
   }
 
@@ -66,9 +55,4 @@ class FootballData(
     }
   }
 
-  private def handleMatchEnd(matchDay: MatchDay, event: MatchEvent) = {
-    if (event.eventType == "full-time") {
-      endedMatches = endedMatches.filter(_.startTime.isAfter(DateTime.now.minusDays(2))) + EndedMatch(matchDay.id, matchDay.date)
-    }
-  }
 }
