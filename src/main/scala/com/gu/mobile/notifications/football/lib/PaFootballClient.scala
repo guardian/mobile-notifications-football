@@ -1,7 +1,6 @@
 package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
-import com.gu.mobile.notifications.football.models.MatchId
 import pa._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,11 +39,10 @@ class PaFootballClient(override val apiKey: String, apiBase: String) extends PaC
     Future.reduce(days.map { day => matchDay(day).recover { case _ => List.empty } })(_ ++ _)
   }
 
-  def eventsForMatch(matchId: MatchId, syntheticMatchEventGenerator: SyntheticMatchEventGenerator)(implicit ec: ExecutionContext): Future[(MatchDay, List[MatchEvent])] =
+  def eventsForMatch(matchDay: MatchDay, syntheticMatchEventGenerator: SyntheticMatchEventGenerator)(implicit ec: ExecutionContext): Future[(MatchDay, List[MatchEvent])] =
     for {
-      matchDay <- matchInfo(matchId.id)
-      events <- matchEvents(matchId.id).map(_.toList.flatMap(_.events))
+      events <- matchEvents(matchDay.id).map(_.toList.flatMap(_.events))
     } yield {
-      (matchDay, syntheticMatchEventGenerator.generate(events, matchId.id, matchDay))
+      (matchDay, syntheticMatchEventGenerator.generate(events, matchDay.id, matchDay))
     }
 }

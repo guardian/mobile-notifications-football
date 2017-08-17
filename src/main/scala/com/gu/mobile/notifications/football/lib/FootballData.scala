@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
-import com.gu.mobile.notifications.football.models.{MatchData, MatchId}
+import com.gu.mobile.notifications.football.models.MatchData
 import org.joda.time.DateTime
 import pa.MatchDay
 
@@ -35,22 +35,22 @@ class FootballData(
     }
   }
 
-  private def matchIdsInProgress: Future[List[MatchId]] = {
+  private def matchIdsInProgress: Future[List[MatchDay]] = {
     def inProgress(m: MatchDay): Boolean =
       m.date.minusMinutes(5).isBeforeNow || m.date.plusHours(4).isAfterNow
     logger.info("Retrieving today's matches from PA")
     val matches = paClient.aroundToday
-    matches.map(_.filter(inProgress).map(_.id).map(MatchId))
+    matches.map(_.filter(inProgress))
   }
 
-  private def processMatch(matchId: MatchId): Future[Option[MatchData]] = {
+  private def processMatch(matchDay: MatchDay): Future[Option[MatchData]] = {
     val matchData = for {
-      (matchDay, events) <- paClient.eventsForMatch(matchId, syntheticEvents)
+      (matchDay, events) <- paClient.eventsForMatch(matchDay, syntheticEvents)
       eventsToProcess <- eventFilter.filterProcessedEvents(matchDay.id)(events)
     } yield Some(MatchData(matchDay, events, eventsToProcess))
 
     matchData.recover { case NonFatal(exception) =>
-      logger.error(s"Failed to process match ${matchId.id}: ${exception.getMessage}", exception)
+      logger.error(s"Failed to process match ${matchDay.id}: ${exception.getMessage}", exception)
       None
     }
   }
