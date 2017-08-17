@@ -31,13 +31,13 @@ class FootballData(
 
     val matchesData = for {
       liveMatches <- matchIdsInProgress
-      notifications <- Future.traverse(liveMatches)(processMatch)
-    } yield notifications.flatten
+      md <- Future.traverse(liveMatches)(processMatch)
+    } yield md.flatten
 
     matchesData andThen {
-      case Success(notifications) =>
+      case Success(data) =>
         //processedEvents = ids
-        logger.info(s"Finished polling with success, created ${notifications.size} notifications")
+        logger.info(s"Finished polling with success, fetched ${data.size} matches' data")
       case Failure(e) =>
         logger.error(s"Finished polling with error ${e.getMessage}")
     }
