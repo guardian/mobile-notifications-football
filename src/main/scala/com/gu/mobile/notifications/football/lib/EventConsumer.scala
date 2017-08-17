@@ -1,4 +1,4 @@
-package com.gu.mobile.notifications.football
+package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
 import com.gu.mobile.notifications.client.models.NotificationPayload

@@ -1,17 +1,16 @@
-package com.gu.mobile.notifications.football
+package com.gu.mobile.notifications.football.lib
 
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Failure, Success}
-import org.joda.time.DateTime
-import com.gu.mobile.notifications.football.lib.{CachedValue, DynamoDistinctCheck, PaFootballClient, SyntheticMatchEventGenerator}
-import DynamoDistinctCheck.Distinct
 import com.gu.Logging
+import com.gu.mobile.notifications.football.lib.DynamoDistinctCheck.Distinct
 import com.gu.mobile.notifications.football.models.{MatchData, MatchId}
+import org.joda.time.DateTime
 import pa.{MatchDay, MatchEvent}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 case class EndedMatch(matchId: String, startTime: DateTime)
 
