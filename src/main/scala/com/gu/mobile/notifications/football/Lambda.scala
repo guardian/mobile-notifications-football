@@ -8,16 +8,14 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.gu.mobile.notifications.football.lib._
 import com.gu.Logging
 import com.gu.mobile.notifications.client.ApiClient
-import com.gu.mobile.notifications.client.models.NotificationPayload
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
 import org.joda.time.{DateTime, DateTimeUtils}
 import play.api.libs.json.Json
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
 import scala.io.Source
-import scala.util.control.NonFatal
 
 class LambdaInput()
 
@@ -56,6 +54,8 @@ object Lambda extends App with Logging {
     legacyApiKey = configuration.notificationsLegacyApiKey
   )
 
+  lazy val notificationSender = new NotificationSender(notificationClient)
+
   lazy val matchStatusNotificationBuilder = new MatchStatusNotificationBuilder(configuration.mapiHost)
 
   lazy val eventConsumer = new EventConsumer(goalNotificationBuilder, matchStatusNotificationBuilder)
@@ -88,20 +88,9 @@ object Lambda extends App with Logging {
     debugSetTime()
     logContainer()
 
-    def sendNotification(notification: NotificationPayload): Future[Unit] = {
-      notificationClient.send(notification).map {
-        case Right(_) => logger.info(s"Match status for $notification successfully sent")
-        case Left(error) => logger.error(s"Error sending match status for $notification - ${error.description}")
-      }.recover {
-        case NonFatal(exception) => logger.error(s"Error sending match status for $notification ${exception.getMessage}", exception)
-      }
-    }
-
     val result = footballData.pollFootballData
       .map(_.flatMap(eventConsumer.receiveEvents))
-      .flatMap { notifications =>
-        Future.traverse(notifications)(sendNotification)
-      }
+      .flatMap(notificationSender.sendNotifications)
 
     Await.ready(result, 35.seconds)
     "done"
