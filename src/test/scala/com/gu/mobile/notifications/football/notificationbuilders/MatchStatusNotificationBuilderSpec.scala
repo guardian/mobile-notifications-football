@@ -33,7 +33,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
         mapiUrl = new URI("http://localhost/sport/football/matches/some-match-id"),
         importance = Major,
         topic = Set(Topic(TopicTypes.FootballTeam, "1"), Topic(TopicTypes.FootballTeam, "2"), Topic(TopicTypes.FootballMatch, "some-match-id")),
-        eventId = UUID.nameUUIDFromBytes((baseGoal :: List.empty).toString.getBytes).toString,
+        eventId = UUID.nameUUIDFromBytes("".getBytes).toString,
         matchStatus = "1st",
         debug = false,
         competitionName = Some("FA Cup"),
@@ -48,7 +48,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
     val builder = new MatchStatusNotificationBuilder("http://localhost")
     val home = MatchDayTeam("1", "Liverpool", None, None, None, None)
     val away = MatchDayTeam("2", "Plymouth", None, None, None, None)
-    val baseGoal = Goal(DefaultGoalType, "Steve", home, away, 5, None)
+    val baseGoal = Goal(DefaultGoalType, "Steve", home, away, 5, None, "")
     val goalContext = GoalContext(home, away, "match-1", Score(2, 0))
     val matchInfo = MatchDay(
       id = "some-match-id",

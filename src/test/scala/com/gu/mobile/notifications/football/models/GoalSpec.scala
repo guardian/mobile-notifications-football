@@ -8,19 +8,19 @@ import org.specs2.specification.Scope
 class GoalSpec extends Specification {
   "A Goal" should {
     "Create a normal goal (home)" in new GoalScope {
-      Goal.fromEvent(home, away)(homeGoal) should beSome(Goal(DefaultGoalType, homePlayer.name, home, away, 5, None))
+      Goal.fromEvent(home, away)(homeGoal) should beSome(Goal(DefaultGoalType, homePlayer.name, home, away, 5, None, "1234"))
     }
     "Create a normal goal (away)" in new GoalScope {
-      Goal.fromEvent(home, away)(awayGoal) should beSome(Goal(DefaultGoalType, awayPlayer.name, away, home, 5, None))
+      Goal.fromEvent(home, away)(awayGoal) should beSome(Goal(DefaultGoalType, awayPlayer.name, away, home, 5, None, "1234"))
     }
     "Create a normal goal in extra time" in new GoalScope {
-      Goal.fromEvent(home, away)(homeGoal.copy(addedTime = Some("5:00"))) should beSome(Goal(DefaultGoalType, homePlayer.name, home, away, 5, Some("5:00")))
+      Goal.fromEvent(home, away)(homeGoal.copy(addedTime = Some("5:00"))) should beSome(Goal(DefaultGoalType, homePlayer.name, home, away, 5, Some("5:00"), "1234"))
     }
     "Create an own goal" in new GoalScope {
-      Goal.fromEvent(home, away)(homeOwnGoal) should beSome(Goal(OwnGoalType, homePlayer.name, away, home, 5, None))
+      Goal.fromEvent(home, away)(homeOwnGoal) should beSome(Goal(OwnGoalType, homePlayer.name, away, home, 5, None, "1234"))
     }
     "Create a penalty" in new GoalScope {
-      Goal.fromEvent(home, away)(homePenalty) should beSome(Goal(PenaltyGoalType, homePlayer.name, home, away, 5, None))
+      Goal.fromEvent(home, away)(homePenalty) should beSome(Goal(PenaltyGoalType, homePlayer.name, home, away, 5, None, "1234"))
     }
   }
 
@@ -44,7 +44,7 @@ class GoalSpec extends Specification {
     val homePlayer = pa.Player(id = "123", teamID = home.id, "A player")
     val awayPlayer = pa.Player(id = "456", teamID = away.id, "B player")
     val baseGoal = pa.MatchEvent(
-      id = None,
+      id = Some("1234"),
       teamID = None,
       eventType = "goal",
       matchTime = None,

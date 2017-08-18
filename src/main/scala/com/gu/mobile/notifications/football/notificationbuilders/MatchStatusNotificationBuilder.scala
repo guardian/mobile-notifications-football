@@ -44,7 +44,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       importance = importance(triggeringEvent),
       topic = topics,
       matchStatus = status,
-      eventId = UUID.nameUUIDFromBytes(allEvents.toString.getBytes).toString,
+      eventId = UUID.nameUUIDFromBytes(triggeringEvent.eventId.getBytes).toString,
       debug = false
     )
   }
@@ -81,10 +81,10 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
 
   private def eventTitle(fme: FootballMatchEvent): String = fme match {
     case _: Goal => "Goal!"
-    case HalfTime => "Half-time"
-    case KickOff => "Kick-off!"
-    case SecondHalf => "Second-half start"
-    case FullTime => "Full-Time"
+    case HalfTime(_) => "Half-time"
+    case KickOff(_) => "Kick-off!"
+    case SecondHalf(_) => "Second-half start"
+    case FullTime(_) => "Full-Time"
     case _ => "The Guardian"
   }
 

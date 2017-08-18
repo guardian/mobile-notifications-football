@@ -2,8 +2,6 @@ package com.gu.mobile.notifications.football.models
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import com.gu.mobile.notifications.football.models.{KickOff, FullTime, HalfTime, SecondHalf}
-
 
 class MatchPhaseEventSpec extends Specification with Mockito {
   "MatchPhaseEvent" should {

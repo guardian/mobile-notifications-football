@@ -4,7 +4,6 @@ import java.net.URL
 
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
-import com.amazonaws.services.lambda.runtime.Context
 import com.gu.mobile.notifications.football.lib._
 import com.gu.Logging
 import com.gu.mobile.notifications.client.ApiClient
@@ -17,9 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
 import scala.io.Source
 
-class LambdaInput()
-
-object Lambda extends App with Logging {
+object Lambda extends Logging {
 
   var cachedLambda = null.asInstanceOf[Boolean]
 
@@ -86,7 +83,7 @@ object Lambda extends App with Logging {
     }
   }
 
-  def handler(lambdaInput: LambdaInput, context: Context): String = {
+  def handler(): String = {
     debugSetTime()
     logContainer()
 
@@ -96,6 +93,10 @@ object Lambda extends App with Logging {
 
     Await.ready(result, 35.seconds)
     "done"
+  }
+
+  def main(args: Array[String]): Unit = {
+    handler()
   }
 
 }

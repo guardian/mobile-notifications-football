@@ -6,7 +6,7 @@ import pa.{MatchDay, MatchEvent}
 
 class SyntheticMatchEventGenerator {
 
-  def generate(events: List[MatchEvent], id: String, matchDay: MatchDay) = {
+  def generate(events: List[MatchEvent], id: String, matchDay: MatchDay): List[MatchEvent] = {
     events.map(enhanceTimelineEvents(id)) ++ generators.flatMap(_.apply(matchDay, events)) // order is important here
   }
 

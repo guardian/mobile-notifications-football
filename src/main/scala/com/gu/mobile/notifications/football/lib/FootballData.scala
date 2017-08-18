@@ -37,7 +37,7 @@ class FootballData(
 
   private def matchIdsInProgress: Future[List[MatchDay]] = {
     def inProgress(m: MatchDay): Boolean =
-      m.date.minusMinutes(5).isBeforeNow || m.date.plusHours(4).isAfterNow
+      m.date.minusMinutes(5).isBeforeNow && m.date.plusHours(4).isAfterNow
     logger.info("Retrieving today's matches from PA")
     val matches = paClient.aroundToday
     matches.map(_.filter(inProgress))

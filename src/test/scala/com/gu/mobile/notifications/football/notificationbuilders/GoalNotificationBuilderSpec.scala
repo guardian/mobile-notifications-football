@@ -92,7 +92,7 @@ class GoalNotificationBuilderSpec extends Specification {
     val builder = new GoalNotificationBuilder("http://localhost")
     val home = MatchDayTeam("1", "Liverpool", None, None, None, None)
     val away = MatchDayTeam("2", "Plymouth", None, None, None, None)
-    val baseGoal = Goal(DefaultGoalType, "Steve", home, away, 5, None)
+    val baseGoal = Goal(DefaultGoalType, "Steve", home, away, 5, None, "")
     val matchInfo = MatchDay(
       id = "some-match-id",
       date = DateTime.parse("2000-01-01T00:00:00Z"),

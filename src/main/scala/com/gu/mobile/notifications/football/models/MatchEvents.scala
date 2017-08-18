@@ -5,7 +5,10 @@ import com.gu.mobile.notifications.client.models.{DefaultGoalType, GoalType, Own
 import scala.PartialFunction._
 import scala.util.Try
 
-sealed trait FootballMatchEvent
+sealed trait FootballMatchEvent {
+  def eventId: String
+}
+
 object FootballMatchEvent {
   def fromPaMatchEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent): Option[FootballMatchEvent] =
     MatchPhaseEvent.fromEvent(event) orElse Goal.fromEvent(homeTeam, awayTeam)(event)
@@ -28,7 +31,8 @@ case class Goal(
   scoringTeam: pa.MatchDayTeam,
   otherTeam: pa.MatchDayTeam,
   minute: Int,
-  addedTime: Option[String]
+  addedTime: Option[String],
+  eventId: String
 ) extends FootballMatchEvent
 
 object Goal {
@@ -48,7 +52,8 @@ object Goal {
       scoringTeam,
       otherTeam,
       eventMinute,
-      event.addedTime.filterNot(_ == "0:00")
+      event.addedTime.filterNot(_ == "0:00"),
+      event.id.getOrElse("")
   )
 
   private def goalTypeFromString(s: String) = condOpt(s) {
@@ -62,19 +67,21 @@ object Goal {
 trait MatchPhaseEvent extends FootballMatchEvent
 
 object MatchPhaseEvent {
-  def fromEvent(event: pa.MatchEvent): Option[MatchPhaseEvent] =
+  def fromEvent(event: pa.MatchEvent): Option[MatchPhaseEvent] = {
+    val eventId = event.id.getOrElse("")
     condOpt(event.eventType) {
-      case "timeline" if event.matchTime.contains("0:00") => KickOff
-      case "full-time" => FullTime
-      case "half-time" => HalfTime
-      case "second-half" => SecondHalf
+      case "timeline" if event.matchTime.contains("0:00") => KickOff(eventId)
+      case "full-time" => FullTime(eventId)
+      case "half-time" => HalfTime(eventId)
+      case "second-half" => SecondHalf(eventId)
+    }
   }
 }
 
-case object KickOff extends MatchPhaseEvent
-case object FullTime extends MatchPhaseEvent
-case object HalfTime extends MatchPhaseEvent
-case object SecondHalf extends MatchPhaseEvent
+case class KickOff(eventId: String) extends MatchPhaseEvent
+case class FullTime(eventId: String) extends MatchPhaseEvent
+case class HalfTime(eventId: String) extends MatchPhaseEvent
+case class SecondHalf(eventId: String) extends MatchPhaseEvent
 
 case class GoalContext(
   home: pa.MatchDayTeam,

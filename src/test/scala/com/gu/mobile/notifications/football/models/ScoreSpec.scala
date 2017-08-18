@@ -53,7 +53,8 @@ class ScoreSpec extends Specification {
       scoringTeam = home,
       otherTeam = away,
       minute = 5,
-      addedTime = None
+      addedTime = None,
+      ""
     )
     val awayGoal = Goal(
       goalType = DefaultGoalType,
@@ -61,7 +62,8 @@ class ScoreSpec extends Specification {
       scoringTeam = away,
       otherTeam = home,
       minute = 5,
-      addedTime = None
+      addedTime = None,
+      ""
     )
     val homePenalty = Goal(
       goalType = PenaltyGoalType,
@@ -69,7 +71,8 @@ class ScoreSpec extends Specification {
       scoringTeam = home,
       otherTeam = away,
       minute = 5,
-      addedTime = None
+      addedTime = None,
+      ""
     )
     val awayPenalty = Goal(
       goalType = PenaltyGoalType,
@@ -77,7 +80,8 @@ class ScoreSpec extends Specification {
       scoringTeam = away,
       otherTeam = home,
       minute = 5,
-      addedTime = None
+      addedTime = None,
+      ""
     )
     val homeOwnGoal = Goal(
       goalType = OwnGoalType,
@@ -85,7 +89,8 @@ class ScoreSpec extends Specification {
       scoringTeam = home,
       otherTeam = away,
       minute = 5,
-      addedTime = None
+      addedTime = None,
+      ""
     )
     val awayOwnGoal = Goal(
       goalType = OwnGoalType,
@@ -93,7 +98,8 @@ class ScoreSpec extends Specification {
       scoringTeam = away,
       otherTeam = home,
       minute = 5,
-      addedTime = None
+      addedTime = None,
+      ""
     )
   }
 }
