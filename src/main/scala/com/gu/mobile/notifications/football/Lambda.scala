@@ -14,7 +14,7 @@ import play.api.libs.json.Json
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
-import scala.io.Source
+import scala.io.{Source, StdIn}
 
 object Lambda extends Logging {
 
@@ -97,6 +97,11 @@ object Lambda extends Logging {
 
   def main(args: Array[String]): Unit = {
     handler()
+    println("\n\n*************\nPress enter to run again")
+    while(StdIn.readLine() == "") {
+      handler()
+      println("\n\n*************\nPress enter to run again")
+    }
   }
 
 }
