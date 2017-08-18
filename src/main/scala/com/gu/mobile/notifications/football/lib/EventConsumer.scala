@@ -20,7 +20,7 @@ class EventConsumer(
   }
 
   def receiveEvent(matchDay: MatchDay, events: List[MatchEvent], event: MatchEvent): List[NotificationPayload] = {
-    logger.info(s"Processing event $event for match ${matchDay.id}")
+    logger.debug(s"Processing event $event for match ${matchDay.id}")
     val previousEvents = events.takeWhile(_ != event)
     FootballMatchEvent.fromPaMatchEvent(matchDay.homeTeam, matchDay.awayTeam)(event) map { ev =>
       prepareNotifications(
@@ -36,7 +36,7 @@ class EventConsumer(
     val sentMatchStatus = Some(matchStatusNotificationBuilder.build(event, matchDay, previousEvents))
 
     val notifications = List(sentGoalAlert, sentMatchStatus).flatten
-    logger.info(s"prepared the following notifications for match ${matchDay.id}, event $event: $notifications")
+    logger.info(s"Prepared the following notifications for match ${matchDay.id}, event $event: $notifications")
 
     notifications
   }
