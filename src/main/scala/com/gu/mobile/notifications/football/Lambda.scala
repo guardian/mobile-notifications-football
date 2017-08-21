@@ -96,11 +96,9 @@ object Lambda extends Logging {
   }
 
   def main(args: Array[String]): Unit = {
-    handler()
-    println("\n\n*************\nPress enter to run again")
-    while(StdIn.readLine() == "") {
+    while (true) {
       handler()
-      println("\n\n*************\nPress enter to run again")
+      Thread.sleep(10000)
     }
   }
 
