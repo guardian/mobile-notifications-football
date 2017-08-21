@@ -117,11 +117,12 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
 
     ("Suspended", "S"), // Match has been Suspended.
 
+    ("Fixture", "1st"), // fixture maps to 1st just in case the matchInfo and event feed are out of sync
+    ("-", "1st"), // same as above
+
     // don't really expect to see these (the way we handle data)
     ("Resumed", "R"), // Match has been Resumed.
     ("Abandoned", "A"), // Match has been Abandoned.
-    ("Fixture", "F"), // Created Fixture is available and had been Created by us.
-    ("-", "F"), // this sneaky one is not in the docs
     ("New", "N"), // Match A New Match has been added to our data.
     ("Cancelled", "C") // A Match has been Cancelled.
   )
