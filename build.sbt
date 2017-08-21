@@ -6,7 +6,7 @@ scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-simple" % "1.7.25",
-  "com.gu" %% "mobile-notifications-client" % "0.5.32",
+  "com.gu" %% "mobile-notifications-client" % "0.5.35",
   "com.gu" %% "pa-client" % "6.0.2",
   "com.gu" %% "scanamo" % "0.8.1",
   "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.60",
