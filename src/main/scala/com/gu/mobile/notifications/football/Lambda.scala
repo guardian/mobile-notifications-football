@@ -46,9 +46,7 @@ object Lambda extends Logging {
   lazy val notificationClient = ApiClient(
     host = configuration.notificationsHost,
     apiKey = configuration.notificationsApiKey,
-    httpProvider = notificationHttpProvider,
-    legacyHost = configuration.notificationsLegacyHost,
-    legacyApiKey = configuration.notificationsLegacyApiKey
+    httpProvider = notificationHttpProvider
   )
 
   lazy val notificationSender = new NotificationSender(notificationClient)
