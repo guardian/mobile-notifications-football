@@ -4,25 +4,19 @@ version := "1.0"
 
 scalaVersion := "2.11.8"
 
-libraryDependencies ++= {
-  val akkaV = "2.4.14"
-  val sprayV = "1.3.2"
-  Seq(
-    "com.typesafe.akka" %% "akka-actor" % akkaV,
-    "com.typesafe.akka" %% "akka-slf4j" % akkaV,
-    "org.clapper" % "grizzled-slf4j_2.10" % "1.3.0",
-    "com.gu" %% "mobile-notifications-client" % "0.5.29",
-    "com.gu" %% "pa-client" % "6.0.2",
-    "com.gu" %% "scanamo" % "0.8.1",
-    "ch.qos.logback" % "logback-classic" % "1.0.13",
-    "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.60",
-    "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
-    "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
-    "org.specs2" %% "specs2-core" % "3.8.5" % "test",
-    "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
-    "org.typelevel" %% "cats" % "0.8.1"
-  )
-}
+libraryDependencies ++= Seq(
+  "org.slf4j" % "slf4j-simple" % "1.7.25",
+  "com.gu" %% "mobile-notifications-client" % "0.5.35",
+  "com.gu" %% "pa-client" % "6.0.2",
+  "com.gu" %% "scanamo" % "0.8.1",
+  "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.60",
+  "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
+  "com.squareup.okhttp3" % "okhttp" % "3.8.1",
+  "com.google.code.findbugs" % "jsr305" % "3.0.2",
+  "org.specs2" %% "specs2-core" % "3.8.5" % "test",
+  "org.specs2" %% "specs2-mock" % "3.8.5" % "test",
+  "org.typelevel" %% "cats" % "0.8.1"
+)
 
 enablePlugins(RiffRaffArtifact)
 

@@ -1,47 +1,35 @@
 package com.gu.mobile.notifications.football
 
-import akka.actor.{ActorSystem, Props}
+import java.net.URL
+
 import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
-import com.amazonaws.services.lambda.runtime.Context
-import com.gu.football.PaFootballActor
-import com.gu.football.PaFootballActor.TriggerPoll
-import com.gu.mobile.notifications.football.lib.{GoalNotificationBuilder, NotificationHttpProvider, PaFootballClient, PaMatchDayClient}
-import akka.pattern.ask
-import akka.util.Timeout
+import com.gu.mobile.notifications.football.lib._
+import com.gu.Logging
 import com.gu.mobile.notifications.client.ApiClient
-import grizzled.slf4j.Logging
+import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
+import org.joda.time.{DateTime, DateTimeUtils}
+import play.api.libs.json.Json
 
-import scala.beans.BeanProperty
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationLong
+import scala.io.{Source, StdIn}
 
-/**
-  * This is compatible with aws' lambda JSON to POJO conversion
-  */
-class LambdaInput() {
-  @BeanProperty var name: String = _
-}
-
-object Lambda extends App with Logging {
+object Lambda extends Logging {
 
   var cachedLambda = null.asInstanceOf[Boolean]
 
-  def tableName = s"mobile-notifications-football-${configuration.stage}"
-
-  implicit lazy val system = {
-    logger.debug("Creating actor system")
-    ActorSystem("mobile-notification-football")
-  }
+  def tableName = s"mobile-notifications-football-events-${configuration.stage}"
 
   lazy val configuration = {
     logger.debug("Creating configuration")
     new Configuration()
   }
 
-  lazy val paMatchDayClient = {
-    logger.debug("Creating pa match day client")
-    PaMatchDayClient(new PaFootballClient(configuration.paApiKey, configuration.paHost))
+  lazy val paFootballClient = {
+    logger.debug("Creating pa football client")
+    new PaFootballClient(configuration.paApiKey, configuration.paHost)
   }
 
   lazy val dynamoDBClient: AmazonDynamoDBAsyncClient = {
@@ -49,41 +37,67 @@ object Lambda extends App with Logging {
     new AmazonDynamoDBAsyncClient(configuration.credentials).withRegion(EU_WEST_1)
   }
 
+  lazy val syntheticMatchEventGenerator = new SyntheticMatchEventGenerator()
+
   lazy val goalNotificationBuilder = new GoalNotificationBuilder(configuration.mapiHost)
 
-  lazy val notificationHttpProvider = {
-    implicit val ec = system.dispatcher
-    new NotificationHttpProvider()
-  }
+  lazy val notificationHttpProvider = new NotificationHttpProvider()
 
   lazy val notificationClient = ApiClient(
     host = configuration.notificationsHost,
     apiKey = configuration.notificationsApiKey,
-    httpProvider = notificationHttpProvider,
-    legacyHost = configuration.notificationsLegacyHost,
-    legacyApiKey = configuration.notificationsLegacyApiKey
+    httpProvider = notificationHttpProvider
   )
 
-  lazy val footballActor = {
-    logger.debug("Creating actor")
-    system.actorOf(
-      Props(classOf[PaFootballActor], paMatchDayClient, dynamoDBClient, tableName, goalNotificationBuilder, notificationClient),
-      "goal-notifications-actor-solution"
-    )
+  lazy val notificationSender = new NotificationSender(notificationClient)
+
+  lazy val matchStatusNotificationBuilder = new MatchStatusNotificationBuilder(configuration.mapiHost)
+
+  lazy val eventConsumer = new EventConsumer(goalNotificationBuilder, matchStatusNotificationBuilder)
+
+  lazy val distinctCheck = new DynamoDistinctCheck(dynamoDBClient, tableName)
+
+  lazy val eventFilter = new CachedEventFilter(distinctCheck)
+
+  lazy val footballData = new FootballData(paFootballClient, eventFilter, syntheticMatchEventGenerator, eventConsumer)
+
+  def debugSetTime(): Unit = {
+    // this is only used to debug
+    if (configuration.stage == "CODE") {
+      val is = new URL("https://hdjq4n85yi.execute-api.eu-west-1.amazonaws.com/Prod/getTime").openStream()
+      val json = Json.parse(Source.fromInputStream(is).mkString)
+      val date = DateTime.parse((json \ "currentDate").as[String])
+      logger.info(s"Force the date to $date")
+      DateTimeUtils.setCurrentMillisFixed(date.getMillis)
+    }
   }
 
-  def handler(lambdaInput: LambdaInput, context: Context): String = {
+  private def logContainer() = {
     if (cachedLambda) {
       logger.info("Re-using existing container")
     } else {
       cachedLambda = true
       logger.info("Starting new container")
     }
+  }
 
-    implicit val timeout = Timeout(30.seconds)
-    val done = footballActor ? TriggerPoll
-    Await.ready(done, 35.seconds)
+  def handler(): String = {
+    debugSetTime()
+    logContainer()
+
+    val result = footballData.pollFootballData
+      .map(_.flatMap(eventConsumer.receiveEvents))
+      .flatMap(notificationSender.sendNotifications)
+
+    Await.ready(result, 35.seconds)
     "done"
+  }
+
+  def main(args: Array[String]): Unit = {
+    while (true) {
+      handler()
+      Thread.sleep(10000)
+    }
   }
 
 }
