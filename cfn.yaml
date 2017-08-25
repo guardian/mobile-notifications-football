@@ -137,7 +137,7 @@ Resources:
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 20
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 20
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
@@ -169,7 +169,7 @@ Resources:
       Dimensions:
       - Name: TableName
         Value: !Ref dynamoTable
-      Threshold: 10
+      Threshold: 20
       Period: 300
       EvaluationPeriods: 1
       AlarmActions: [ !Ref DynamoNotificationTopic ]
