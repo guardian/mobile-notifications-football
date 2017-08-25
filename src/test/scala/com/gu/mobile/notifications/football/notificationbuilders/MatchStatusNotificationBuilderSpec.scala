@@ -16,7 +16,8 @@ class MatchStatusNotificationBuilderSpec extends Specification {
   "A MatchStatusNotificationBuilder" should {
 
     "Build a notification" in new MatchEventsContext {
-      builder.build(baseGoal, matchInfo, List.empty) shouldEqual FootballMatchStatusPayload(
+      val notification = builder.build(baseGoal, matchInfo, List.empty, Some("football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live"))
+      notification shouldEqual FootballMatchStatusPayload(
         title = "Goal!",
         message = "Liverpool 1-0 Plymouth (1st)",
         thumbnailUrl = None,
@@ -30,7 +31,8 @@ class MatchStatusNotificationBuilderSpec extends Specification {
         homeTeamScore = 1,
         homeTeamMessage = "Steve 5'",
         matchId = "some-match-id",
-        mapiUrl = new URI("http://localhost/sport/football/matches/some-match-id"),
+        matchInfoUri = new URI("http://localhost/sport/football/matches/some-match-id"),
+        articleUri = Some(new URI("http://localhost/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Major,
         topic = Set(Topic(TopicTypes.FootballTeam, "1"), Topic(TopicTypes.FootballTeam, "2"), Topic(TopicTypes.FootballMatch, "some-match-id")),
         eventId = UUID.nameUUIDFromBytes("".getBytes).toString,

@@ -12,7 +12,12 @@ import scala.PartialFunction.condOpt
 
 class MatchStatusNotificationBuilder(mapiHost: String) {
 
-  def build(triggeringEvent: FootballMatchEvent, matchInfo: MatchDay, previousEvents: List[FootballMatchEvent]): FootballMatchStatusPayload = {
+  def build(
+    triggeringEvent: FootballMatchEvent,
+    matchInfo: MatchDay,
+    previousEvents: List[FootballMatchEvent],
+    articleId: Option[String]
+  ): FootballMatchStatusPayload = {
     val topics = Set(
       Topic(TopicTypes.FootballTeam, matchInfo.homeTeam.id),
       Topic(TopicTypes.FootballTeam, matchInfo.awayTeam.id),
@@ -40,7 +45,8 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       matchId = matchInfo.id,
       competitionName = matchInfo.competition.map(_.name),
       venue = matchInfo.venue.map(_.name),
-      mapiUrl = new URI(s"$mapiHost/sport/football/matches/${matchInfo.id}"),
+      matchInfoUri = new URI(s"$mapiHost/sport/football/matches/${matchInfo.id}"),
+      articleUri = articleId.map(id => new URI(s"$mapiHost/items/$id")),
       importance = importance(triggeringEvent),
       topic = topics,
       matchStatus = status,
