@@ -248,6 +248,6 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
     def matchDay: MatchDay = Parser.parseMatchDay(loadFile("20170811.xml")).head
 
     def events: List[MatchEvent] = new SyntheticMatchEventGenerator().generate(rawEvents, "4011135", matchDay)
-    def matchData = MatchData(matchDay, events, events)
+    def matchData = FilteredMatchData(matchDay, events, events)
   }
 }

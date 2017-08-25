@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
-import com.gu.mobile.notifications.football.models.MatchData
+import com.gu.mobile.notifications.football.models.RawMatchData
 import org.joda.time.DateTime
 import pa.MatchDay
 
@@ -14,12 +14,10 @@ case class EndedMatch(matchId: String, startTime: DateTime)
 
 class FootballData(
   paClient: PaFootballClient,
-  eventFilter: EventFilter,
-  syntheticEvents: SyntheticMatchEventGenerator,
-  eventConsumer: EventConsumer
+  syntheticEvents: SyntheticMatchEventGenerator
 ) extends Logging {
 
-  def pollFootballData: Future[List[MatchData]] = {
+  def pollFootballData: Future[List[RawMatchData]] = {
     logger.info("Starting poll for new match events")
 
     val matchesData = for {
@@ -43,11 +41,10 @@ class FootballData(
     matches.map(_.filter(inProgress))
   }
 
-  private def processMatch(matchDay: MatchDay): Future[Option[MatchData]] = {
+  private def processMatch(matchDay: MatchDay): Future[Option[RawMatchData]] = {
     val matchData = for {
       (matchDay, events) <- paClient.eventsForMatch(matchDay, syntheticEvents)
-      eventsToProcess <- eventFilter.filterProcessedEvents(matchDay.id)(events)
-    } yield Some(MatchData(matchDay, events, eventsToProcess))
+    } yield Some(RawMatchData(matchDay, events))
 
     matchData.recover { case NonFatal(exception) =>
       logger.error(s"Failed to process match ${matchDay.id}: ${exception.getMessage}", exception)

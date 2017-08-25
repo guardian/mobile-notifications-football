@@ -18,16 +18,16 @@ import scala.io.{Source, StdIn}
 
 object Lambda extends Logging {
 
-  var cachedLambda = null.asInstanceOf[Boolean]
+  var cachedLambda: Boolean = _
 
   def tableName = s"mobile-notifications-football-events-${configuration.stage}"
 
-  lazy val configuration = {
+  lazy val configuration: Configuration = {
     logger.debug("Creating configuration")
     new Configuration()
   }
 
-  lazy val paFootballClient = {
+  lazy val paFootballClient: PaFootballClient = {
     logger.debug("Creating pa football client")
     new PaFootballClient(configuration.paApiKey, configuration.paHost)
   }
@@ -57,9 +57,9 @@ object Lambda extends Logging {
 
   lazy val distinctCheck = new DynamoDistinctCheck(dynamoDBClient, tableName)
 
-  lazy val eventFilter = new CachedEventFilter(distinctCheck)
+  lazy val eventFilter = new EventFilter(distinctCheck)
 
-  lazy val footballData = new FootballData(paFootballClient, eventFilter, syntheticMatchEventGenerator, eventConsumer)
+  lazy val footballData = new FootballData(paFootballClient, syntheticMatchEventGenerator)
 
   def debugSetTime(): Unit = {
     // this is only used to debug
@@ -86,6 +86,7 @@ object Lambda extends Logging {
     logContainer()
 
     val result = footballData.pollFootballData
+      .flatMap(eventFilter.filterRawMatchDataList)
       .map(_.flatMap(eventConsumer.receiveEvents))
       .flatMap(notificationSender.sendNotifications)
 

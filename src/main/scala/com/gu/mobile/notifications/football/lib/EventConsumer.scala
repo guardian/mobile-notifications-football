@@ -2,7 +2,7 @@ package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
 import com.gu.mobile.notifications.client.models.NotificationPayload
-import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal, MatchData}
+import com.gu.mobile.notifications.football.models.{FilteredMatchData, FootballMatchEvent, Goal}
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
 import pa.{MatchDay, MatchEvent}
 
@@ -13,8 +13,8 @@ class EventConsumer(
   matchStatusNotificationBuilder: MatchStatusNotificationBuilder
 ) extends Logging {
 
-  def receiveEvents(matchData: MatchData): List[NotificationPayload] = {
-    matchData.eventsToProcess.flatMap { event =>
+  def receiveEvents(matchData: FilteredMatchData): List[NotificationPayload] = {
+    matchData.filteredEvents.flatMap { event =>
       receiveEvent(matchData.matchDay, matchData.allEvents, event)
     }
   }
