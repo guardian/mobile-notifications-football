@@ -34,5 +34,6 @@ class EventFilter(distinctCheck: DynamoDistinctCheck) extends Logging {
 
   def filterRawMatchDataList(matches: List[RawMatchData])(implicit ec: ExecutionContext): Future[List[FilteredMatchData]] = {
     Future.traverse(matches)(filterRawMatchData)
+      .map(_.filter(_.filteredEvents.nonEmpty))
   }
 }
