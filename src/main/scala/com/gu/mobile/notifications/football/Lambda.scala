@@ -89,7 +89,7 @@ object Lambda extends Logging {
       .map(_.flatMap(eventConsumer.receiveEvents))
       .flatMap(notificationSender.sendNotifications)
 
-    Await.ready(result, 35.seconds)
+    Await.ready(result, 50.seconds)
     "done"
   }
 
