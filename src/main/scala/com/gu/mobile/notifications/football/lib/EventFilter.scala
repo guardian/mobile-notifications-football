@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
-import com.gu.mobile.notifications.football.lib.DynamoDistinctCheck.Distinct
+import com.gu.mobile.notifications.football.lib.DynamoDistinctCheck._
 import pa.MatchEvent
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,6 +19,9 @@ class CachedEventFilter(distinctCheck: DynamoDistinctCheck) extends EventFilter 
         case Distinct =>
           processedEvents = processedEvents + eventId
           Some(event)
+        case Duplicate =>
+          processedEvents = processedEvents + eventId
+          None
         case _ => None
       }
     } getOrElse {
