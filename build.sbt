@@ -27,3 +27,10 @@ riffRaffManifestProjectName := s"mobile-notifications:${name.value}"
 riffRaffUploadArtifactBucket := Option("riffraff-artifact")
 riffRaffUploadManifestBucket := Option("riffraff-builds")
 riffRaffArtifactResources += (file("cfn.yaml"), s"${name.value}-cfn/cfn.yaml")
+
+assemblyMergeStrategy in assembly := {
+  case PathList(ps @ _*) if ps.last endsWith ".thrift" => MergeStrategy.discard
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}
