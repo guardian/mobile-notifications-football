@@ -2,15 +2,12 @@ package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
 import com.gu.mobile.notifications.football.lib.DynamoDistinctCheck._
+import com.gu.mobile.notifications.football.models.{FilteredMatchData, RawMatchData}
 import pa.MatchEvent
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait EventFilter {
-  def filterProcessedEvents(matchId: String)(events: List[MatchEvent])(implicit ec: ExecutionContext): Future[List[MatchEvent]]
-}
-
-class CachedEventFilter(distinctCheck: DynamoDistinctCheck) extends EventFilter with Logging {
+class EventFilter(distinctCheck: DynamoDistinctCheck) extends Logging {
   private var processedEvents = Set.empty[String]
 
   private def filterOneEvent(matchId: String)(event: MatchEvent)(implicit ec: ExecutionContext): Future[Option[MatchEvent]] = {
@@ -30,7 +27,13 @@ class CachedEventFilter(distinctCheck: DynamoDistinctCheck) extends EventFilter 
     }
   }
 
-  override def filterProcessedEvents(matchId: String)(events: List[MatchEvent])(implicit ec: ExecutionContext): Future[List[MatchEvent]] = {
-    Future.traverse(events)(filterOneEvent(matchId)).map(_.flatten)
+  def filterRawMatchData(matchData: RawMatchData)(implicit ec: ExecutionContext): Future[FilteredMatchData] = {
+    val filteredEvents = Future.traverse(matchData.allEvents)(filterOneEvent(matchData.matchDay.id)).map(_.flatten)
+    filteredEvents.map(matchData.withFilteredEvents)
+  }
+
+  def filterRawMatchDataList(matches: List[RawMatchData])(implicit ec: ExecutionContext): Future[List[FilteredMatchData]] = {
+    Future.traverse(matches)(filterRawMatchData)
+      .map(_.filter(_.filteredEvents.nonEmpty))
   }
 }

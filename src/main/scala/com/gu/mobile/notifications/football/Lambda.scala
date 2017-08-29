@@ -6,6 +6,7 @@ import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.gu.mobile.notifications.football.lib._
 import com.gu.Logging
+import com.gu.contentapi.client.GuardianContentClient
 import com.gu.mobile.notifications.client.ApiClient
 import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
 import org.joda.time.{DateTime, DateTimeUtils}
@@ -14,20 +15,20 @@ import play.api.libs.json.Json
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
-import scala.io.{Source, StdIn}
+import scala.io.Source
 
 object Lambda extends Logging {
 
-  var cachedLambda = null.asInstanceOf[Boolean]
+  var cachedLambda: Boolean = false
 
   def tableName = s"mobile-notifications-football-events-${configuration.stage}"
 
-  lazy val configuration = {
+  lazy val configuration: Configuration = {
     logger.debug("Creating configuration")
     new Configuration()
   }
 
-  lazy val paFootballClient = {
+  lazy val paFootballClient: PaFootballClient = {
     logger.debug("Creating pa football client")
     new PaFootballClient(configuration.paApiKey, configuration.paHost)
   }
@@ -36,6 +37,8 @@ object Lambda extends Logging {
     logger.debug("Creating dynamo db client")
     new AmazonDynamoDBAsyncClient(configuration.credentials).withRegion(EU_WEST_1)
   }
+
+  lazy val capiClient: GuardianContentClient = new GuardianContentClient(configuration.capiApiKey)
 
   lazy val syntheticMatchEventGenerator = new SyntheticMatchEventGenerator()
 
@@ -57,9 +60,11 @@ object Lambda extends Logging {
 
   lazy val distinctCheck = new DynamoDistinctCheck(dynamoDBClient, tableName)
 
-  lazy val eventFilter = new CachedEventFilter(distinctCheck)
+  lazy val eventFilter = new EventFilter(distinctCheck)
 
-  lazy val footballData = new FootballData(paFootballClient, eventFilter, syntheticMatchEventGenerator, eventConsumer)
+  lazy val footballData = new FootballData(paFootballClient, syntheticMatchEventGenerator)
+
+  lazy val articleSearcher = new ArticleSearcher(capiClient)
 
   def debugSetTime(): Unit = {
     // this is only used to debug
@@ -86,6 +91,8 @@ object Lambda extends Logging {
     logContainer()
 
     val result = footballData.pollFootballData
+      .flatMap(eventFilter.filterRawMatchDataList)
+      .flatMap(articleSearcher.tryToMatchWithCapiArticle)
       .map(_.flatMap(eventConsumer.receiveEvents))
       .flatMap(notificationSender.sendNotifications)
 

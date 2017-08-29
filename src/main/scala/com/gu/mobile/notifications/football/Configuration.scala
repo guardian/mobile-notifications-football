@@ -35,7 +35,6 @@ class Configuration {
   val paHost = conf.getString("pa.host")
   val notificationsHost = conf.getString("notifications-client.host")
   val notificationsApiKey = conf.getString("notifications-client.api-key")
-  val notificationsLegacyHost = conf.getString("notifications-client.legacy.host")
-  val notificationsLegacyApiKey = conf.getString("notifications-client.legacy.api-key")
   val mapiHost = conf.getString("mapi.host")
+  val capiApiKey = conf.getString("capi.key")
 }

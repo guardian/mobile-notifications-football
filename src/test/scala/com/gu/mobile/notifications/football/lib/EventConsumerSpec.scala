@@ -38,7 +38,8 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
         matchId = "4011135",
-        mapiUrl = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Minor,
         topic = Set(
           Topic(FootballTeam, "1006"),
@@ -74,7 +75,8 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
         matchId = "4011135",
-        mapiUrl = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Minor,
         topic = Set(
           Topic(FootballTeam, "1006"),
@@ -112,7 +114,8 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
         matchId = "4011135",
-        mapiUrl = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Minor,
         topic = Set(
           Topic(FootballTeam, "1006"),
@@ -148,7 +151,8 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
         matchId = "4011135",
-        mapiUrl = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Minor,
         topic = Set(
           Topic(FootballTeam, "1006"),
@@ -184,7 +188,8 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
         matchId = "4011135",
-        mapiUrl = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Major,
         topic = Set(
           Topic(FootballTeam, "1006"),
@@ -248,6 +253,6 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
     def matchDay: MatchDay = Parser.parseMatchDay(loadFile("20170811.xml")).head
 
     def events: List[MatchEvent] = new SyntheticMatchEventGenerator().generate(rawEvents, "4011135", matchDay)
-    def matchData = MatchData(matchDay, events, events)
+    def matchData = MatchDataWithArticle(matchDay, events, events, Some("football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live"))
   }
 }
