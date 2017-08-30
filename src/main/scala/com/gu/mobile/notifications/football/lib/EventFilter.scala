@@ -4,9 +4,8 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 
 import com.gu.Logging
+import com.gu.mobile.notifications.client.models.NotificationPayload
 import com.gu.mobile.notifications.football.lib.DynamoDistinctCheck._
-import com.gu.mobile.notifications.football.models.{FilteredMatchData, RawMatchData}
-import pa.MatchEvent
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -19,30 +18,24 @@ class EventFilter(distinctCheck: DynamoDistinctCheck) extends Logging {
     })
   }
 
-  private def filterOneEvent(matchId: String)(event: MatchEvent)(implicit ec: ExecutionContext): Future[Option[MatchEvent]] = {
-    event.id.filterNot(processedEvents.get.contains).map { eventId =>
-      distinctCheck.insertEvent(matchId, eventId, event).map {
+  private def filterNotification(notification: NotificationPayload)(implicit ec: ExecutionContext): Future[Option[NotificationPayload]] = {
+    if (!processedEvents.get.contains(notification.id)) {
+      distinctCheck.insertNotification(notification).map {
         case Distinct =>
-          cache(eventId)
-          Some(event)
+          cache(notification.id)
+          Some(notification)
         case Duplicate =>
-          cache(eventId)
+          cache(notification.id)
           None
         case _ => None
       }
-    } getOrElse {
-      logger.debug(s"Event ${event.id} already exists in local cache or does not have an id - discarding")
+    } else {
+      logger.debug(s"Event ${notification.id} already exists in local cache or does not have an id - discarding")
       Future.successful(None)
     }
   }
 
-  def filterRawMatchData(matchData: RawMatchData)(implicit ec: ExecutionContext): Future[FilteredMatchData] = {
-    val filteredEvents = Future.traverse(matchData.allEvents)(filterOneEvent(matchData.matchDay.id)).map(_.flatten)
-    filteredEvents.map(matchData.withFilteredEvents)
-  }
-
-  def filterRawMatchDataList(matches: List[RawMatchData])(implicit ec: ExecutionContext): Future[List[FilteredMatchData]] = {
-    Future.traverse(matches)(filterRawMatchData)
-      .map(_.filter(_.filteredEvents.nonEmpty))
+  def filterNotifications(notifications: List[NotificationPayload])(implicit ec: ExecutionContext): Future[List[NotificationPayload]] = {
+    Future.traverse(notifications)(filterNotification).map(_.flatten)
   }
 }

@@ -14,7 +14,7 @@ class EventConsumer(
 ) extends Logging {
 
   def eventsToNotifications(matchData: MatchDataWithArticle): List[NotificationPayload] = {
-    matchData.filteredEvents.flatMap { event =>
+    matchData.allEvents.flatMap { event =>
       receiveEvent(matchData.matchDay, matchData.allEvents, event, matchData.articleId)
     }
   }

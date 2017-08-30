@@ -3,24 +3,31 @@ package com.gu.mobile.notifications.football.lib
 import scala.concurrent.{ExecutionContext, Future}
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
 import com.gu.Logging
+import com.gu.mobile.notifications.client.models.{FootballMatchStatusPayload, NotificationPayload}
 import com.gu.scanamo.{ScanamoAsync, Table}
 import com.gu.scanamo.syntax._
-import pa.MatchEvent
+import play.api.libs.json.Json
 
-case class DynamoMatchEvent(
-  eventId: String,
-  matchId: String,
-  matchEvent: MatchEvent,
+case class DynamoMatchNotification(
+  notificationId: String,
+  matchId: Option[String],
+  notification: String,
   ttl: Long
 )
 
-object DynamoMatchEvent {
-  def apply(matchId: String, eventId: String, event: MatchEvent): DynamoMatchEvent = DynamoMatchEvent(
-    eventId = eventId,
-    matchId = matchId,
-    matchEvent = event,
-    ttl = (System.currentTimeMillis() / 1000) + (14 * 24 * 3600)
-  )
+object DynamoMatchNotification {
+  def apply(notification: NotificationPayload): DynamoMatchNotification = {
+    val matchId = PartialFunction.condOpt(notification) {
+      case p: FootballMatchStatusPayload => p.matchId
+    }
+
+    DynamoMatchNotification(
+      notificationId = notification.id,
+      matchId = matchId,
+      notification = Json.prettyPrint(Json.toJson(notification)),
+      ttl = (System.currentTimeMillis() / 1000) + (14 * 24 * 3600)
+    )
+  }
 }
 
 object DynamoDistinctCheck {
@@ -33,16 +40,16 @@ object DynamoDistinctCheck {
 class DynamoDistinctCheck(client: AmazonDynamoDBAsync, tableName: String) extends Logging {
   import DynamoDistinctCheck._
 
-  val eventsTable = Table[DynamoMatchEvent](tableName)
+  private val notificationsTable = Table[DynamoMatchNotification](tableName)
 
-  def insertEvent(matchId: String, eventId: String, event: MatchEvent)(implicit ec: ExecutionContext): Future[DistinctStatus] = {
-    val putResult = ScanamoAsync.exec(client)(eventsTable.given(not(attributeExists('eventId))).put(DynamoMatchEvent(matchId, eventId, event)))
+  def insertNotification(notification: NotificationPayload)(implicit ec: ExecutionContext): Future[DistinctStatus] = {
+    val putResult = ScanamoAsync.exec(client)(notificationsTable.given(not(attributeExists('notificationId))).put(DynamoMatchNotification(notification)))
     putResult map {
       case Right(_) =>
-        logger.info(s"Distinct event ${event.id} written to dynamodb")
+        logger.info(s"Distinct notification ${notification.id} written to dynamodb")
         Distinct
       case Left(_) =>
-        logger.debug(s"Event ${event.id} already exists in dynamodb - discarding")
+        logger.debug(s"Notification ${notification.id} already exists in dynamodb - discarding")
         Duplicate
     } recover {
       case e =>

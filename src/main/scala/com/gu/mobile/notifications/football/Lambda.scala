@@ -22,7 +22,7 @@ object Lambda extends Logging {
 
   var cachedLambda: Boolean = false
 
-  def tableName = s"mobile-notifications-football-events-${configuration.stage}"
+  def tableName = s"mobile-notifications-football-notifications-${configuration.stage}"
 
   lazy val configuration: Configuration = {
     logger.debug("Creating configuration")
@@ -92,9 +92,9 @@ object Lambda extends Logging {
     logContainer()
 
     val result = footballData.pollFootballData
-      .flatMap(eventFilter.filterRawMatchDataList)
       .flatMap(articleSearcher.tryToMatchWithCapiArticle)
       .map(_.flatMap(eventConsumer.eventsToNotifications))
+      .flatMap(eventFilter.filterNotifications)
       .flatMap(notificationSender.sendNotifications)
 
     Try(Await.ready(result, 40.seconds)).recover {

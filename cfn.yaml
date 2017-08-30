@@ -67,7 +67,7 @@ Resources:
                 - dynamodb:PutItem
                 - dynamodb:UpdateItem
                 - dynamodb:Query
-              Resource: !Sub arn:aws:dynamodb:eu-west-1:201359054765:table/${Stack}-${App}-events-${Stage}
+              Resource: !Sub arn:aws:dynamodb:eu-west-1:201359054765:table/${Stack}-${App}-notifications-${Stage}
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -125,15 +125,15 @@ Resources:
           MetricName: "error"
           MetricValue: 1
 
-  dynamoTable:
+  DynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub ${Stack}-${App}-events-${Stage}
+      TableName: !Sub ${Stack}-${App}-notifications-${Stage}
       AttributeDefinitions:
-        - AttributeName: eventId
+        - AttributeName: notificationId
           AttributeType: S
       KeySchema:
-      - AttributeName: eventId
+      - AttributeName: notificationId
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -152,7 +152,7 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       Dimensions:
       - Name: TableName
-        Value: !Ref dynamoTable
+        Value: !Ref DynamoTable
       Threshold: 10
       Period: 300
       EvaluationPeriods: 1
@@ -168,58 +168,8 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       Dimensions:
       - Name: TableName
-        Value: !Ref dynamoTable
+        Value: !Ref DynamoTable
       Threshold: 10
       Period: 300
       EvaluationPeriods: 1
       AlarmActions: [ !Ref DynamoNotificationTopic ]
-
-  WriteCapacityScalableTarget:
-    Type: AWS::ApplicationAutoScaling::ScalableTarget
-    Properties:
-      MaxCapacity: 100
-      MinCapacity: 20
-      ResourceId: !Sub table/${dynamoTable}
-      RoleARN: !GetAtt ScalingRole.Arn
-      ScalableDimension: dynamodb:table:WriteCapacityUnits
-      ServiceNamespace: dynamodb
-
-  ScalingRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: [ application-autoscaling.amazonaws.com ]
-          Action: [ "sts:AssumeRole" ]
-      Path: /
-      Policies:
-      - PolicyName: root
-        PolicyDocument:
-          Version: 2012-10-17
-          Statement:
-          - Effect: Allow
-            Action:
-              - dynamodb:DescribeTable
-              - dynamodb:UpdateTable
-              - cloudwatch:PutMetricAlarm
-              - cloudwatch:DescribeAlarms
-              - cloudwatch:GetMetricStatistics
-              - cloudwatch:SetAlarmState
-              - cloudwatch:DeleteAlarms
-            Resource: "*"
-
-  WriteScalingPolicy:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
-    Properties:
-      PolicyName: WriteAutoScalingPolicy
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref WriteCapacityScalableTarget
-      TargetTrackingScalingPolicyConfiguration:
-        TargetValue: 70.0
-        ScaleInCooldown: 300
-        ScaleOutCooldown: 30
-        PredefinedMetricSpecification:
-          PredefinedMetricType: DynamoDBWriteCapacityUtilization
