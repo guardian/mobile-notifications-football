@@ -12,10 +12,11 @@ import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificati
 import org.joda.time.{DateTime, DateTimeUtils}
 import play.api.libs.json.Json
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, TimeoutException}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
 import scala.io.Source
+import scala.util.Try
 
 object Lambda extends Logging {
 
@@ -96,7 +97,11 @@ object Lambda extends Logging {
       .map(_.flatMap(eventConsumer.receiveEvents))
       .flatMap(notificationSender.sendNotifications)
 
-    Await.ready(result, 50.seconds)
+    Try(Await.ready(result, 40.seconds)).recover {
+      // in case of timeout, don't crash the lambda as it will cold start again
+      // making the problem worse.
+      case e: TimeoutException => logger.error("Task timed out", e)
+    }
     "done"
   }
 
