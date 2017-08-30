@@ -9,6 +9,8 @@ import org.joda.time.DateTime
 
 trait OkHttp extends pa.Http with Logging {
 
+  implicit val ec: ExecutionContext
+
   val httpClient = new OkHttpClient
 
   def apiKey: String
@@ -17,13 +19,13 @@ trait OkHttp extends pa.Http with Logging {
     logger.info("Http GET " + urlString.replaceAll(apiKey, "<api-key>"))
     val httpRequest = new Request.Builder().url(urlString).build()
     val httpResponse = httpClient.newCall(httpRequest).execute()
-    Future.successful(Response(httpResponse.code(), httpResponse.body().string, httpResponse.message()))
+    Future(Response(httpResponse.code(), httpResponse.body().string, httpResponse.message()))
   }
 }
 
 class PaFootballClient(override val apiKey: String, apiBase: String) extends PaClient with OkHttp {
 
-  import ExecutionContext.Implicits.global
+  override implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
 
   override lazy val base = apiBase
 
