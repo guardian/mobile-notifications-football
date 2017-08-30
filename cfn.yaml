@@ -136,13 +136,13 @@ Resources:
       - AttributeName: eventId
         KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: 20
+        ReadCapacityUnits: 5
         WriteCapacityUnits: 20
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
 
-  mobileNotificationsFootballConsumedReadThrottleEvents:
+  MobileNotificationsFootballConsumedReadThrottleEvents:
     Type: AWS::CloudWatch::Alarm
     Properties:
       Namespace: AWS/DynamoDB
@@ -153,12 +153,12 @@ Resources:
       Dimensions:
       - Name: TableName
         Value: !Ref dynamoTable
-      Threshold: 20
+      Threshold: 10
       Period: 300
       EvaluationPeriods: 1
       AlarmActions: [ !Ref DynamoNotificationTopic ]
 
-  mobileNotificationsFootballConsumedWriteThrottleEvents:
+  MobileNotificationsFootballConsumedWriteThrottleEvents:
     Type: AWS::CloudWatch::Alarm
     Properties:
       Namespace: AWS/DynamoDB
@@ -169,7 +169,57 @@ Resources:
       Dimensions:
       - Name: TableName
         Value: !Ref dynamoTable
-      Threshold: 20
+      Threshold: 10
       Period: 300
       EvaluationPeriods: 1
       AlarmActions: [ !Ref DynamoNotificationTopic ]
+
+  WriteCapacityScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 100
+      MinCapacity: 20
+      ResourceId: !Sub table/${dynamoTable}
+      RoleARN: !GetAtt ScalingRole.Arn
+      ScalableDimension: dynamodb:table:WriteCapacityUnits
+      ServiceNamespace: dynamodb
+
+  ScalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ application-autoscaling.amazonaws.com ]
+          Action: [ "sts:AssumeRole" ]
+      Path: /
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:UpdateTable
+              - cloudwatch:PutMetricAlarm
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:SetAlarmState
+              - cloudwatch:DeleteAlarms
+            Resource: "*"
+
+  WriteScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: WriteAutoScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref WriteCapacityScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 70.0
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 30
+        PredefinedMetricSpecification:
+          PredefinedMetricType: DynamoDBWriteCapacityUtilization
