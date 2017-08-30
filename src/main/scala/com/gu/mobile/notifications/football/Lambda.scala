@@ -94,7 +94,7 @@ object Lambda extends Logging {
     val result = footballData.pollFootballData
       .flatMap(eventFilter.filterRawMatchDataList)
       .flatMap(articleSearcher.tryToMatchWithCapiArticle)
-      .map(_.flatMap(eventConsumer.receiveEvents))
+      .map(_.flatMap(eventConsumer.eventsToNotifications))
       .flatMap(notificationSender.sendNotifications)
 
     Try(Await.ready(result, 40.seconds)).recover {

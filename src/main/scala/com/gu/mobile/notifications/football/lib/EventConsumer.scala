@@ -13,7 +13,7 @@ class EventConsumer(
   matchStatusNotificationBuilder: MatchStatusNotificationBuilder
 ) extends Logging {
 
-  def receiveEvents(matchData: MatchDataWithArticle): List[NotificationPayload] = {
+  def eventsToNotifications(matchData: MatchDataWithArticle): List[NotificationPayload] = {
     matchData.filteredEvents.flatMap { event =>
       receiveEvent(matchData.matchDay, matchData.allEvents, event, matchData.articleId)
     }
