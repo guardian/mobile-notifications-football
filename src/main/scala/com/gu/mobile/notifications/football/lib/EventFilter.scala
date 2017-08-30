@@ -1,5 +1,8 @@
 package com.gu.mobile.notifications.football.lib
 
+import java.util.concurrent.atomic.AtomicReference
+import java.util.function.UnaryOperator
+
 import com.gu.Logging
 import com.gu.mobile.notifications.football.lib.DynamoDistinctCheck._
 import com.gu.mobile.notifications.football.models.{FilteredMatchData, RawMatchData}
@@ -8,16 +11,22 @@ import pa.MatchEvent
 import scala.concurrent.{ExecutionContext, Future}
 
 class EventFilter(distinctCheck: DynamoDistinctCheck) extends Logging {
-  private var processedEvents = Set.empty[String]
+  private val processedEvents = new AtomicReference[Set[String]](Set.empty)
+
+  private def cache(eventId: String): Unit = {
+    processedEvents.getAndUpdate(new UnaryOperator[Set[String]] {
+      override def apply(set: Set[String]): Set[String] = set + eventId
+    })
+  }
 
   private def filterOneEvent(matchId: String)(event: MatchEvent)(implicit ec: ExecutionContext): Future[Option[MatchEvent]] = {
-    event.id.filterNot(processedEvents.contains).map { eventId =>
+    event.id.filterNot(processedEvents.get.contains).map { eventId =>
       distinctCheck.insertEvent(matchId, eventId, event).map {
         case Distinct =>
-          processedEvents = processedEvents + eventId
+          cache(eventId)
           Some(event)
         case Duplicate =>
-          processedEvents = processedEvents + eventId
+          cache(eventId)
           None
         case _ => None
       }
