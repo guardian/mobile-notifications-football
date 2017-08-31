@@ -16,7 +16,7 @@ import scala.concurrent.{Await, TimeoutException}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
 import scala.io.Source
-import scala.util.Try
+import scala.util.Failure
 
 object Lambda extends Logging {
 
@@ -91,17 +91,24 @@ object Lambda extends Logging {
     debugSetTime()
     logContainer()
 
-    val result = footballData.pollFootballData
+    val processing = footballData.pollFootballData
       .flatMap(articleSearcher.tryToMatchWithCapiArticle)
       .map(_.flatMap(eventConsumer.eventsToNotifications))
       .flatMap(eventFilter.filterNotifications)
       .flatMap(notificationSender.sendNotifications)
 
-    Try(Await.ready(result, 40.seconds)).recover {
-      // in case of timeout, don't crash the lambda as it will cold start again
-      // making the problem worse.
-      case e: TimeoutException => logger.error("Task timed out", e)
+    // we're in a lambda so we do need to block the main thread until processing is finished
+    val result = Await.ready(processing, 40.seconds)
+
+    result.value match {
+      case Some(Failure(e: TimeoutException)) => logger.error("Task timed out", e)
+      case Some(Failure(e: Exception)) =>
+        logger.error("Something went wrong", e)
+        throw e
+      case _ =>
     }
+
+    logger.info("Finished processing")
     "done"
   }
 

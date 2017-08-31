@@ -14,11 +14,12 @@ class NotificationSender(notificationClient: ApiClient) extends Logging {
   }
 
   def sendNotification(notification: NotificationPayload)(implicit ec: ExecutionContext): Future[Unit] = {
+    val notificationString = notification.toString.replaceAll("\n", "")
     notificationClient.send(notification).map {
-      case Right(_) => logger.info(s"Match status for $notification successfully sent")
-      case Left(error) => logger.error(s"Error sending match status for $notification - ${error.description}")
+      case Right(_) => logger.info(s"Match status for $notificationString successfully sent")
+      case Left(error) => logger.error(s"Error sending match status for $notificationString - ${error.description}")
     }.recover {
-      case NonFatal(exception) => logger.error(s"Error sending match status for $notification ${exception.getMessage}", exception)
+      case NonFatal(exception) => logger.error(s"Error sending match status for $notificationString ${exception.getMessage}", exception)
     }
   }
 }

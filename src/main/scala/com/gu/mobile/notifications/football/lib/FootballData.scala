@@ -22,7 +22,7 @@ class FootballData(
 
     val matchesData = for {
       liveMatches <- matchIdsInProgress
-      md <- Future.traverse(liveMatches)(processMatch)
+      md <- Batch.process(liveMatches, 5)(processMatch)
     } yield md.flatten
 
     matchesData andThen {

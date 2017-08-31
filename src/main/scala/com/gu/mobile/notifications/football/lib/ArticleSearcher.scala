@@ -8,23 +8,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ArticleSearcher(capiClient: GuardianContentClient) extends Logging {
 
-  def tryToMatchWithCapiArticle(matchData: List[RawMatchData])(implicit ec: ExecutionContext): Future[List[MatchDataWithArticle]] = {
-    Future.traverse(matchData){ filteredMatchData =>
-      val homeTeam = filteredMatchData.matchDay.homeTeam.id
-      val awayTeam = filteredMatchData.matchDay.awayTeam.id
+  def tryToMatchWithCapiArticle(matchesData: List[RawMatchData])(implicit ec: ExecutionContext): Future[List[MatchDataWithArticle]] = {
+    Batch.process(matchesData, 5) { matchData =>
+      val homeTeam = matchData.matchDay.homeTeam.id
+      val awayTeam = matchData.matchDay.awayTeam.id
       val query = capiClient.search
-        .fromDate(filteredMatchData.matchDay.date.withTimeAtStartOfDay)
+        .fromDate(matchData.matchDay.date.withTimeAtStartOfDay)
         .reference(s"pa-football-team/$homeTeam,pa-football-team/$awayTeam")
         .tag("tone/minutebyminute")
       val response = capiClient.getResponse(query)
       val articleId = response.map(_.results.headOption.map(_.id))
 
       articleId.foreach {
-        case Some(id) => logger.info(s"Attaching article $id to matchId ${filteredMatchData.matchDay.id}")
-        case None => logger.info(s"No article found for matchId ${filteredMatchData.matchDay.id}")
+        case Some(id) => logger.info(s"Attaching article $id to matchId ${matchData.matchDay.id}")
+        case None => logger.info(s"No article found for matchId ${matchData.matchDay.id}")
       }
 
-      articleId.map(filteredMatchData.withArticle)
+      articleId.map(matchData.withArticle)
     }
   }
 }

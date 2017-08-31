@@ -41,9 +41,6 @@ class EventConsumer(
     val sentGoalAlert = condOpt(event) { case goal: Goal => goalNotificationBuilder.build(goal, matchDay, previousEvents) }
     val sentMatchStatus = Some(matchStatusNotificationBuilder.build(event, matchDay, previousEvents, articleId))
 
-    val notifications = List(sentGoalAlert, sentMatchStatus).flatten
-    logger.info(s"Prepared the following notifications for match ${matchDay.id}, event $event: $notifications")
-
-    notifications
+    List(sentGoalAlert, sentMatchStatus).flatten
   }
 }
