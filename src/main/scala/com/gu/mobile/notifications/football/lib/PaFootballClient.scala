@@ -1,10 +1,12 @@
 package com.gu.mobile.notifications.football.lib
 
+import java.io.IOException
+
 import com.gu.Logging
 import pa._
 
-import scala.concurrent.{ExecutionContext, Future}
-import okhttp3.{OkHttpClient, Request}
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import okhttp3.{Call, Callback, OkHttpClient, Request}
 import org.joda.time.DateTime
 
 trait OkHttp extends pa.Http with Logging {
@@ -16,10 +18,19 @@ trait OkHttp extends pa.Http with Logging {
   def apiKey: String
 
   def GET(urlString: String): Future[Response] = {
+
+    val promise = Promise[Response]
+
     logger.info("Http GET " + urlString.replaceAll(apiKey, "<api-key>"))
     val httpRequest = new Request.Builder().url(urlString).build()
-    val httpResponse = httpClient.newCall(httpRequest).execute()
-    Future(Response(httpResponse.code(), httpResponse.body().string, httpResponse.message()))
+    httpClient.newCall(httpRequest).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit = promise.failure(e)
+      override def onResponse(call: Call, response: okhttp3.Response): Unit = {
+        promise.success(Response(response.code(), response.body().string, response.message()))
+      }
+    })
+
+    promise.future
   }
 }
 
