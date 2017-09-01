@@ -36,9 +36,19 @@ class FootballData(
   private def matchIdsInProgress: Future[List[MatchDay]] = {
     def inProgress(m: MatchDay): Boolean =
       m.date.minusMinutes(5).isBeforeNow && m.date.plusHours(4).isAfterNow
+
+    // unfortunately PA provide 00:00 as start date when they don't have the start date
+    // so we can't do anything with these matches
+    def isMidnight(matchDay: MatchDay): Boolean = {
+      val localDate = matchDay.date.toLocalTime
+      localDate.getHourOfDay == 0 && localDate.getMinuteOfHour == 0
+    }
+
     logger.info("Retrieving today's matches from PA")
     val matches = paClient.aroundToday
-    matches.map(_.filter(inProgress))
+    matches.map(
+      _.filter(inProgress).filterNot(isMidnight)
+    )
   }
 
   private def processMatch(matchDay: MatchDay): Future[Option[RawMatchData]] = {
