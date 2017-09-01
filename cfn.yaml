@@ -67,7 +67,7 @@ Resources:
                 - dynamodb:PutItem
                 - dynamodb:UpdateItem
                 - dynamodb:Query
-              Resource: !Sub arn:aws:dynamodb:eu-west-1:201359054765:table/${Stack}-${App}-events-${Stage}
+              Resource: !Sub arn:aws:dynamodb:eu-west-1:201359054765:table/${Stack}-${App}-notifications-${Stage}
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -83,7 +83,7 @@ Resources:
           App: !Ref App
       Description: Send Goal Alert notifications
       Handler: com.gu.mobile.notifications.football.Lambda::handler
-      MemorySize: 384
+      MemorySize: 512
       Role: !GetAtt ExecutionRole.Arn
       Runtime: java8
       Timeout: 60
@@ -125,24 +125,24 @@ Resources:
           MetricName: "error"
           MetricValue: 1
 
-  dynamoTable:
+  DynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub ${Stack}-${App}-events-${Stage}
+      TableName: !Sub ${Stack}-${App}-notifications-${Stage}
       AttributeDefinitions:
-        - AttributeName: eventId
+        - AttributeName: notificationId
           AttributeType: S
       KeySchema:
-      - AttributeName: eventId
+      - AttributeName: notificationId
         KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: 20
+        ReadCapacityUnits: 5
         WriteCapacityUnits: 20
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
 
-  mobileNotificationsFootballConsumedReadThrottleEvents:
+  MobileNotificationsFootballConsumedReadThrottleEvents:
     Type: AWS::CloudWatch::Alarm
     Properties:
       Namespace: AWS/DynamoDB
@@ -152,13 +152,13 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       Dimensions:
       - Name: TableName
-        Value: !Ref dynamoTable
-      Threshold: 20
+        Value: !Ref DynamoTable
+      Threshold: 10
       Period: 300
       EvaluationPeriods: 1
       AlarmActions: [ !Ref DynamoNotificationTopic ]
 
-  mobileNotificationsFootballConsumedWriteThrottleEvents:
+  MobileNotificationsFootballConsumedWriteThrottleEvents:
     Type: AWS::CloudWatch::Alarm
     Properties:
       Namespace: AWS/DynamoDB
@@ -168,8 +168,8 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       Dimensions:
       - Name: TableName
-        Value: !Ref dynamoTable
-      Threshold: 20
+        Value: !Ref DynamoTable
+      Threshold: 10
       Period: 300
       EvaluationPeriods: 1
       AlarmActions: [ !Ref DynamoNotificationTopic ]

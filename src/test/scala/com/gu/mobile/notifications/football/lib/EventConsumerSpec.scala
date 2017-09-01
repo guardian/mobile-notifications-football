@@ -20,7 +20,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
     "generate a kick-off notification" in new MatchEventsContext {
       override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "KO")
 
-      val result: List[NotificationPayload] = eventConsumer.receiveEvents(matchData)
+      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
 
       val expectedNotification = FootballMatchStatusPayload(
         title = "Kick-off!",
@@ -57,7 +57,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
     "generate half-time notification" in new MatchEventsContext {
       override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "HT")
 
-      val result: List[NotificationPayload] = eventConsumer.receiveEvents(matchData)
+      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
 
       val expectedNotification = FootballMatchStatusPayload(
         title = "Half-time",
@@ -96,7 +96,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
       override def rawEvents: List[MatchEvent] = super.rawEvents.takeWhile(!_.id.contains("23572566"))
       override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "SHS")
 
-      val result: List[NotificationPayload] = eventConsumer.receiveEvents(matchData)
+      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
 
       val expectedNotification = FootballMatchStatusPayload(
         title = "Second-half start",
@@ -133,7 +133,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
     "generate full time notification" in new MatchEventsContext {
       override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "FT", result = true)
 
-      val result: List[NotificationPayload] = eventConsumer.receiveEvents(matchData)
+      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
 
       val expectedNotification = FootballMatchStatusPayload(
         title = "Full-Time",
@@ -170,7 +170,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
     "generate goal notifications from FootballMatchStatusPayload" in new MatchEventsContext {
       override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "KO", result = true)
 
-      val result: List[NotificationPayload] = eventConsumer.receiveEvents(matchData)
+      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
 
       val expectedNotification = FootballMatchStatusPayload(
         title = "Goal!",
@@ -207,7 +207,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
     "generate goal notifications from GoalAlertPayload" in new MatchEventsContext {
       override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "KO", result = true)
 
-      val result: List[NotificationPayload] = eventConsumer.receiveEvents(matchData)
+      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
 
       val expectedNotification = GoalAlertPayload(
         title = "The Guardian",
@@ -253,6 +253,6 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
     def matchDay: MatchDay = Parser.parseMatchDay(loadFile("20170811.xml")).head
 
     def events: List[MatchEvent] = new SyntheticMatchEventGenerator().generate(rawEvents, "4011135", matchDay)
-    def matchData = MatchDataWithArticle(matchDay, events, events, Some("football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live"))
+    def matchData = MatchDataWithArticle(matchDay, events, Some("football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live"))
   }
 }

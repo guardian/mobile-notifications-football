@@ -12,16 +12,17 @@ import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificati
 import org.joda.time.{DateTime, DateTimeUtils}
 import play.api.libs.json.Json
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, TimeoutException}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
 import scala.io.Source
+import scala.util.Failure
 
 object Lambda extends Logging {
 
   var cachedLambda: Boolean = false
 
-  def tableName = s"mobile-notifications-football-events-${configuration.stage}"
+  def tableName = s"mobile-notifications-football-notifications-${configuration.stage}"
 
   lazy val configuration: Configuration = {
     logger.debug("Creating configuration")
@@ -90,13 +91,24 @@ object Lambda extends Logging {
     debugSetTime()
     logContainer()
 
-    val result = footballData.pollFootballData
-      .flatMap(eventFilter.filterRawMatchDataList)
+    val processing = footballData.pollFootballData
       .flatMap(articleSearcher.tryToMatchWithCapiArticle)
-      .map(_.flatMap(eventConsumer.receiveEvents))
+      .map(_.flatMap(eventConsumer.eventsToNotifications))
+      .flatMap(eventFilter.filterNotifications)
       .flatMap(notificationSender.sendNotifications)
 
-    Await.ready(result, 50.seconds)
+    // we're in a lambda so we do need to block the main thread until processing is finished
+    val result = Await.ready(processing, 40.seconds)
+
+    result.value match {
+      case Some(Failure(e: TimeoutException)) => logger.error("Task timed out", e)
+      case Some(Failure(e: Exception)) =>
+        logger.error("Something went wrong", e)
+        throw e
+      case _ =>
+    }
+
+    logger.info("Finished processing")
     "done"
   }
 
