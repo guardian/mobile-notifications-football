@@ -19,7 +19,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
       val notification = builder.build(baseGoal, matchInfo, List.empty, Some("football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live"))
       notification shouldEqual FootballMatchStatusPayload(
         title = "Goal!",
-        message = "Liverpool 1-0 Plymouth (1st)",
+        message = "Liverpool 1-0 Plymouth (1st)\nSteve 5min",
         thumbnailUrl = None,
         sender = "mobile-notifications-football-lambda",
         awayTeamName = "Plymouth",

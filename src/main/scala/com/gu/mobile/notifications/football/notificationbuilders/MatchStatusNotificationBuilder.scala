@@ -32,7 +32,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
 
     FootballMatchStatusPayload(
       title = eventTitle(triggeringEvent),
-      message = mainMessage(matchInfo.homeTeam, matchInfo.awayTeam, score, status),
+      message = mainMessage(triggeringEvent, matchInfo.homeTeam, matchInfo.awayTeam, score, status),
       sender = "mobile-notifications-football-lambda",
       awayTeamName = matchInfo.awayTeam.name,
       awayTeamScore = score.away,
@@ -81,8 +81,32 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     if (msg == "") " " else msg
   }
 
-  private def mainMessage(homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, score: Score, matchStatus: String) = {
-    s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
+  private def mainMessage(triggeringEvent: FootballMatchEvent, homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, score: Score, matchStatus: String) = {
+
+    def goalMsg(goal: Goal) = {
+      val extraInfo = {
+        val goalTypeInfo = condOpt(goal.goalType) {
+          case OwnGoalType => "o.g."
+          case PenaltyGoalType => "pen"
+        }
+
+        val addedTimeInfo = goal.addedTime.map("+" + _)
+
+        List(goalTypeInfo, addedTimeInfo).flatten match {
+          case Nil => ""
+          case xs => s" (${xs.mkString(" ")})"
+        }
+      }
+
+      s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)
+         |${goal.scorerName} ${goal.minute}min$extraInfo""".stripMargin
+    }
+
+    triggeringEvent match {
+      case g: Goal => goalMsg(g)
+      case _ =>
+        s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
+    }
   }
 
   private def eventTitle(fme: FootballMatchEvent): String = fme match {
