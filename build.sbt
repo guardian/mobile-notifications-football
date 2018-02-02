@@ -6,6 +6,7 @@ scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-simple" % "1.7.25",
+  "com.typesafe" % "config" % "1.3.2",
   "com.gu" %% "mobile-notifications-client" % "1.1",
   "com.gu" %% "pa-client" % "6.0.2",
   "com.gu" %% "scanamo" % "0.8.1",
