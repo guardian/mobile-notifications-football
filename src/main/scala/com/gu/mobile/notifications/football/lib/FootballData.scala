@@ -36,7 +36,7 @@ class FootballData(
   private def matchIdsInProgress: Future[List[MatchDay]] = {
     def inProgress(m: MatchDay): Boolean = {
       m.competition match {
-        case Some(c) => logger.info(s"Match: ${m.id} Competition: ${c.id} Home: (Name: ${m.homeTeam.name} Id: ${m.homeTeam.id})  Away: (Name: ${m.awayTeam.name}, id: ${m.awayTeam.id}")
+        case Some(c) => logger.info(s"Match: ${m.id} Competition: ${c.id} Round: ${m.round.roundNumber} Home: (Name: ${m.homeTeam.name} Id: ${m.homeTeam.id})  Away: (Name: ${m.awayTeam.name}, id: ${m.awayTeam.id}")
         case _ => logger.info(s"Match: ${m.id} No Competition")
       }
       m.date.minusMinutes(5).isBeforeNow && m.date.plusHours(4).isAfterNow
