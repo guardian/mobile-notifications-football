@@ -34,8 +34,13 @@ class FootballData(
   }
 
   private def matchIdsInProgress: Future[List[MatchDay]] = {
-    def inProgress(m: MatchDay): Boolean =
+    def inProgress(m: MatchDay): Boolean = {
+      m.competition match {
+        case Some(c) => logger.info(s"Match: ${m.id} Competition: ${c.id}")
+        case _ => logger.info(s"Match: ${m.id} No Competition")
+      }
       m.date.minusMinutes(5).isBeforeNow && m.date.plusHours(4).isAfterNow
+    }
 
     // unfortunately PA provide 00:00 as start date when they don't have the start date
     // so we can't do anything with these matches
