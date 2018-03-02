@@ -41,13 +41,14 @@ class FootballData(
       "23104"   //Brazil
     )
 
-    private lazy val roundNumber = Try(matchDay.round.roundNumber.toInt).toOption
-
     private lazy val isUncoveredInternationalFriendly: Boolean = Set(matchDay.homeTeam.id, matchDay.awayTeam.name).intersect(internationalTeamsForFriendlies).isEmpty
 
-    private lazy val isEarlyQualifyingRound: Boolean = roundNumber.map( r => r < 3 ).getOrElse(true)
-
-
+    private lazy val isEarlyQualifyingRound: Boolean = Try(matchDay.round.roundNumber.toInt) match {
+      case Success(r) => r < 3
+      case _ => false
+    }
+  }
+  
   def pollFootballData: Future[List[RawMatchData]] = {
     logger.info("Starting poll for new match events")
 
