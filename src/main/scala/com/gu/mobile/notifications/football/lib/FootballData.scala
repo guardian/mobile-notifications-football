@@ -19,28 +19,29 @@ class FootballData(
 
   implicit class RichMatchDay(matchDay: MatchDay) {
 
-    private lazy val internationalTeams = Set(
-      "England",
-      "Scotland",
-      "Wales",
-      "Rep of Ireland",
-      "Spain",
-      "Germany",
-      "Italy",
-      "France",
-      "Belgium",
-      "Portugal",
-      "Turkey",
-      "Poland",
-      "Norway",
-      "Sweden",
-      "Denmark",
-      "Russia",
-      "Argentina",
-      "Brazil"
+    private lazy val internationalTeamsForFriendlies = Set(
+      "497",    //England,
+      "499",    //'Scotland,
+      "630",    //Wales,
+      "494",    //Republic of Ireland,
+      "964",    //Northern Ireland,
+      "999",    //Spain,
+      "1678",   //Germany,
+      "717",    //Italy,
+      "619",    //France,
+      "997",    //Belgium,
+      "5539",   //Portugal,
+      "1661",   //Turkey,
+      "629",    //Poland,
+      "716",    //Norway,
+      "5845",   //Sweden,
+      "986",    //Denmark,
+      "5827",   //Russia,
+      "965",    //Argentina,
+      "23104"   //Brazil
     )
 
-    def isUncoveredInternationalFriendly: Boolean = Set(matchDay.homeTeam.name, matchDay.awayTeam.name).intersect(internationalTeams).isEmpty
+    def isUncoveredInternationalFriendly: Boolean = Set(matchDay.homeTeam.id, matchDay.awayTeam.name).intersect(internationalTeamsForFriendlies).isEmpty
 
     def isEarlyQualifyingRound: Boolean = competitionRoundToInt.map( r => r < 3 ).getOrElse(true)
 
@@ -87,10 +88,8 @@ class FootballData(
         c => c.id match {
           //International friendly: Must involve one of a specific set of teams
           case "721" if matchDay.isUncoveredInternationalFriendly => false
-
           //FA cup qualifying rounds not covererd before round 3
           case "303" if matchDay.isEarlyQualifyingRound => false
-
           case _ => true
         }
       }.getOrElse(false) //Shouldn't ever happen
