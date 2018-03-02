@@ -8,7 +8,7 @@ import pa.MatchDay
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 case class EndedMatch(matchId: String, startTime: DateTime)
 
@@ -41,18 +41,11 @@ class FootballData(
       "23104"   //Brazil
     )
 
-    def isUncoveredInternationalFriendly: Boolean = Set(matchDay.homeTeam.id, matchDay.awayTeam.name).intersect(internationalTeamsForFriendlies).isEmpty
+    private lazy val roundNumber = Try(matchDay.round.roundNumber.toInt).toOption
 
-    def isEarlyQualifyingRound: Boolean = competitionRoundToInt.map( r => r < 3 ).getOrElse(true)
+    private lazy val isUncoveredInternationalFriendly: Boolean = Set(matchDay.homeTeam.id, matchDay.awayTeam.name).intersect(internationalTeamsForFriendlies).isEmpty
 
-    private def competitionRoundToInt: Option[Int] = {
-      try {
-        Some(matchDay.round.roundNumber.toInt)
-      } catch {
-        case e: Exception => None
-      }
-    }
-  }
+    private lazy val isEarlyQualifyingRound: Boolean = roundNumber.map( r => r < 3 ).getOrElse(true)
 
 
   def pollFootballData: Future[List[RawMatchData]] = {
