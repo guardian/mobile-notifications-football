@@ -8,7 +8,7 @@ import pa.MatchDay
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 case class EndedMatch(matchId: String, startTime: DateTime)
 
@@ -17,6 +17,38 @@ class FootballData(
   syntheticEvents: SyntheticMatchEventGenerator
 ) extends Logging {
 
+  implicit class RichMatchDay(matchDay: MatchDay) {
+
+    private lazy val internationalTeamsForFriendlies = Set(
+      "497",    //England,
+      "499",    //'Scotland,
+      "630",    //Wales,
+      "494",    //Republic of Ireland,
+      "964",    //Northern Ireland,
+      "999",    //Spain,
+      "1678",   //Germany,
+      "717",    //Italy,
+      "619",    //France,
+      "997",    //Belgium,
+      "5539",   //Portugal,
+      "1661",   //Turkey,
+      "629",    //Poland,
+      "716",    //Norway,
+      "5845",   //Sweden,
+      "986",    //Denmark,
+      "5827",   //Russia,
+      "965",    //Argentina,
+      "23104"   //Brazil
+    )
+
+    private lazy val isUncoveredInternationalFriendly: Boolean = Set(matchDay.homeTeam.id, matchDay.awayTeam.name).intersect(internationalTeamsForFriendlies).isEmpty
+
+    private lazy val isEarlyQualifyingRound: Boolean = Try(matchDay.round.roundNumber.toInt) match {
+      case Success(r) => r < 3
+      case _ => false
+    }
+  }
+  
   def pollFootballData: Future[List[RawMatchData]] = {
     logger.info("Starting poll for new match events")
 
@@ -44,10 +76,25 @@ class FootballData(
       localDate.getHourOfDay == 0 && localDate.getMinuteOfHour == 0
     }
 
+    //Theres some stuff that PA don't provide data for and we want to supress alerts for these matches
+    def paProvideAlerts(matchDay: MatchDay) : Boolean = {
+      matchDay.competition.map {
+        c => c.id match {
+          //International friendly: Must involve one of a specific set of teams
+          case "721" if matchDay.isUncoveredInternationalFriendly => false
+          //FA cup qualifying rounds not covererd before round 3
+          case "303" if matchDay.isEarlyQualifyingRound => false
+          case _ => true
+        }
+      }.getOrElse(false) //Shouldn't ever happen
+    }
+
     logger.info("Retrieving today's matches from PA")
     val matches = paClient.aroundToday
     matches.map(
-      _.filter(inProgress).filterNot(isMidnight)
+      _.filter(inProgress)
+       .filter(paProvideAlerts)
+       .filterNot(isMidnight)
     )
   }
 
