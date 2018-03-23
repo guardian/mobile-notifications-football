@@ -3,10 +3,10 @@ package com.gu.mobile.notifications.football
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.auth.{AWSCredentialsProviderChain, DefaultAWSCredentialsProviderChain}
 import com.gu.conf.{ConfigurationLoader, SSMConfigurationLocation}
-import com.gu.{AppIdentity, AwsIdentity}
+import com.gu.{AppIdentity, AwsIdentity, Logging}
 import com.typesafe.config.Config
 
-class Configuration {
+class Configuration extends Logging {
 
   val credentials = new AWSCredentialsProviderChain(
     new ProfileCredentialsProvider("mobile"),
@@ -21,7 +21,7 @@ class Configuration {
      ConfigurationLoader.load(identity = identity, credentials = credentials) {
        case AwsIdentity(app, stack, stage, _) =>
          val path = s"/$app/$stage/$stack"
-         sys.error(s"Attempting to retrieve config from: $path")
+         logger.info(s"Attempting to retrieve config from: $path")
          SSMConfigurationLocation(path = path)
      }
   }
