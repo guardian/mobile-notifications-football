@@ -58,7 +58,7 @@ Resources:
               Effect: Allow
               Action:
                 - ssm:GetParametersByPath
-              Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/${Stage}/${Stack
+              Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${App}/${Stage}/${Stack
         - PolicyName: dynamodb
           PolicyDocument:
             Statement:
@@ -79,6 +79,8 @@ Resources:
       Environment:
         Variables:
           App: !Ref App
+          Stage: !Ref Stage
+          
       Description: Send Goal Alert notifications
       Handler: com.gu.mobile.notifications.football.Lambda::handler
       MemorySize: 512
