@@ -58,7 +58,7 @@ Resources:
               Effect: Allow
               Action:
                 - ssm:GetParametersByPath
-              Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${App}/${Stage}/${Stack
+              Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${App}/${Stage}/${Stack}
         - PolicyName: dynamodb
           PolicyDocument:
             Statement:
