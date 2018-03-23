@@ -4,6 +4,8 @@ version := "1.0"
 
 scalaVersion := "2.11.11"
 
+resolvers += "Guardian Platform Bintray" at "https://dl.bintray.com/guardian/platforms"
+
 libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-simple" % "1.7.25",
   "com.typesafe" % "config" % "1.3.2",
