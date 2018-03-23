@@ -13,8 +13,8 @@ class Configuration extends Logging {
     DefaultAWSCredentialsProviderChain.getInstance()
   )
 
-  val appName = Option(System.getenv("App")).getOrElse(sys.error("No app name set. Lambda will not rum"))
-  val stage = Option(System.getenv("Stage")).getOrElse(sys.error("No app name set. Lambda will not rum"))
+  val appName = Option(System.getenv("App")).getOrElse(sys.error("No app name set. Lambda will not run"))
+  val stage = Option(System.getenv("Stage")).getOrElse(sys.error("No app name set. Lambda will not run"))
 
   private val conf: Config = {
      val identity = AppIdentity.whoAmI(defaultAppName = appName)
