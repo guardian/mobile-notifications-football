@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "com.gu" %% "pa-client" % "6.0.2",
   "com.gu" %% "scanamo" % "0.8.1",
   "com.gu" %% "content-api-client" % "11.23",
+  "com.gu" %% "simple-configuration-ssm" % "1.4.1",
   "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.60",
   "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
   "com.squareup.okhttp3" % "okhttp" % "3.8.1",

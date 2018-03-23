@@ -1,13 +1,10 @@
 package com.gu.mobile.notifications.football
 
-import java.io.{BufferedReader, InputStreamReader}
-import java.util.stream.Collectors
-
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
-import com.amazonaws.auth.{AWSCredentialsProviderChain, DefaultAWSCredentialsProviderChain, EnvironmentVariableCredentialsProvider, InstanceProfileCredentialsProvider}
-import com.amazonaws.regions.{Region, Regions}
-import com.amazonaws.services.s3.AmazonS3Client
-import com.typesafe.config.{Config, ConfigFactory}
+import com.amazonaws.auth.{AWSCredentialsProviderChain, DefaultAWSCredentialsProviderChain}
+import com.gu.conf.{ConfigurationLoader, SSMConfigurationLocation}
+import com.gu.{AppIdentity, AwsIdentity}
+import com.typesafe.config.Config
 
 class Configuration {
 
@@ -16,19 +13,16 @@ class Configuration {
     DefaultAWSCredentialsProviderChain.getInstance()
   )
 
-  private val s3Client = {
-    val c = new AmazonS3Client(credentials)
-    c.setRegion(Region.getRegion(Regions.EU_WEST_1))
-    c
-  }
-
-  val stack = Option(System.getenv("Stack")).getOrElse("DEV")
-  val stage = Option(System.getenv("Stage")).getOrElse("DEV")
+  val appName = Option(System.getenv("App")).getOrElse(sys.error("No app name set. Lambda will not rum"))
 
   private val conf: Config = {
-    val dataStream = s3Client.getObject("mobile-notifications-dist", s"$stage/football/football.conf").getObjectContent
-    val data = new BufferedReader(new InputStreamReader(dataStream)).lines.collect(Collectors.joining("\n"))
-    ConfigFactory.parseString(data)
+     val identity = AppIdentity.whoAmI(defaultAppName = appName)
+     ConfigurationLoader.load(identity = identity, credentials = credentials) {
+       case AwsIdentity(app, stack, stage, _) =>
+         val path = s"/$app/$stage/$stack"
+         sys.error(s"Attempting to retrieve config from: $path")
+         SSMConfigurationLocation(path = path)
+     }
   }
 
   val paApiKey = conf.getString("pa.api-key")
