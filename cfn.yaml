@@ -79,6 +79,7 @@ Resources:
       Environment:
         Variables:
           App: !Ref App
+          Stack: !Ref Stack
           Stage: !Ref Stage
           
       Description: Send Goal Alert notifications

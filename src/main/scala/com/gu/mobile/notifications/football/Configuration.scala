@@ -18,6 +18,7 @@ class Configuration extends Logging {
 
   private val conf: Config = {
      val identity = AppIdentity.whoAmI(defaultAppName = appName)
+     logger.info(s"Tryling: ${identity}")
      ConfigurationLoader.load(identity = identity, credentials = credentials) {
        case AwsIdentity(app, stack, stage, _) =>
          val path = s"/$app/$stage/$stack"
