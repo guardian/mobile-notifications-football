@@ -52,13 +52,13 @@ Resources:
               Action:
                 - lambda:InvokeFunction
               Resource: "*"
-        - PolicyName: s3Config
+        - PolicyName: ssmConfig
           PolicyDocument:
             Statement:
               Effect: Allow
               Action:
-                - s3:GetObject
-              Resource: !Sub arn:aws:s3:::mobile-notifications-dist/${Stage}/*
+                - ssm:GetParametersByPath
+              Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${App}/${Stage}/${Stack}
         - PolicyName: dynamodb
           PolicyDocument:
             Statement:
@@ -78,9 +78,10 @@ Resources:
         S3Key: !Sub ${Stack}/${Stage}/${App}/${App}.jar
       Environment:
         Variables:
-          Stage: !Ref Stage
-          Stack: !Ref Stack
           App: !Ref App
+          Stack: !Ref Stack
+          Stage: !Ref Stage
+          
       Description: Send Goal Alert notifications
       Handler: com.gu.mobile.notifications.football.Lambda::handler
       MemorySize: 512
