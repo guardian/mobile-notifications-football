@@ -137,8 +137,8 @@ Resources:
       - AttributeName: notificationId
         KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 20
+        ReadCapacityUnits: 3
+        WriteCapacityUnits: 3
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
