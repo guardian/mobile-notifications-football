@@ -2,14 +2,11 @@ package com.gu.mobile.notifications.football.lib
 
 import com.gu.Logging
 import com.gu.mobile.notifications.client.models.NotificationPayload
-import com.gu.mobile.notifications.football.models.{FootballMatchEvent, Goal, MatchDataWithArticle}
-import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
+import com.gu.mobile.notifications.football.models.{FootballMatchEvent, MatchDataWithArticle}
+import com.gu.mobile.notifications.football.notificationbuilders.MatchStatusNotificationBuilder
 import pa.{MatchDay, MatchEvent}
 
-import scala.PartialFunction._
-
 class EventConsumer(
-  goalNotificationBuilder: GoalNotificationBuilder,
   matchStatusNotificationBuilder: MatchStatusNotificationBuilder
 ) extends Logging {
 
@@ -23,24 +20,12 @@ class EventConsumer(
     logger.debug(s"Processing event $event for match ${matchDay.id}")
     val previousEvents = events.takeWhile(_ != event)
     FootballMatchEvent.fromPaMatchEvent(matchDay.homeTeam, matchDay.awayTeam)(event) map { ev =>
-      prepareNotifications(
-        matchDay = matchDay,
+      List(matchStatusNotificationBuilder.build(
+        triggeringEvent = ev,
+        matchInfo = matchDay,
         previousEvents = previousEvents.flatMap(FootballMatchEvent.fromPaMatchEvent(matchDay.homeTeam, matchDay.awayTeam)(_)),
-        event = ev,
-        articleId
-      )
+        articleId = articleId
+      ))
     } getOrElse Nil
-  }
-
-  private def prepareNotifications(
-    matchDay: MatchDay,
-    previousEvents: List[FootballMatchEvent],
-    event: FootballMatchEvent,
-    articleId: Option[String]
-  ): List[NotificationPayload] = {
-    val sentGoalAlert = condOpt(event) { case goal: Goal => goalNotificationBuilder.build(goal, matchDay, previousEvents) }
-    val sentMatchStatus = Some(matchStatusNotificationBuilder.build(event, matchDay, previousEvents, articleId))
-
-    List(sentGoalAlert, sentMatchStatus).flatten
   }
 }

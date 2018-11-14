@@ -9,7 +9,7 @@ import com.gu.mobile.notifications.football.lib._
 import com.gu.Logging
 import com.gu.contentapi.client.GuardianContentClient
 import com.gu.mobile.notifications.client.ApiClient
-import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
+import com.gu.mobile.notifications.football.notificationbuilders.MatchStatusNotificationBuilder
 import org.joda.time.{DateTime, DateTimeUtils}
 import play.api.libs.json.Json
 
@@ -44,8 +44,6 @@ object Lambda extends Logging {
 
   lazy val syntheticMatchEventGenerator = new SyntheticMatchEventGenerator()
 
-  lazy val goalNotificationBuilder = new GoalNotificationBuilder(configuration.mapiHost)
-
   lazy val notificationHttpProvider = new NotificationHttpProvider()
 
   lazy val notificationClient = ApiClient(
@@ -58,7 +56,7 @@ object Lambda extends Logging {
 
   lazy val matchStatusNotificationBuilder = new MatchStatusNotificationBuilder(configuration.mapiHost)
 
-  lazy val eventConsumer = new EventConsumer(goalNotificationBuilder, matchStatusNotificationBuilder)
+  lazy val eventConsumer = new EventConsumer(matchStatusNotificationBuilder)
 
   lazy val distinctCheck = new DynamoDistinctCheck(dynamoDBClient, tableName)
 

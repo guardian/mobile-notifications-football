@@ -6,7 +6,7 @@ import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.Importance.{Major, Minor}
 import com.gu.mobile.notifications.client.models.TopicTypes.{FootballMatch, FootballTeam}
 import com.gu.mobile.notifications.football.models._
-import com.gu.mobile.notifications.football.notificationbuilders.{GoalNotificationBuilder, MatchStatusNotificationBuilder}
+import com.gu.mobile.notifications.football.notificationbuilders.MatchStatusNotificationBuilder
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
@@ -203,46 +203,11 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
 
       result should contain(expectedNotification)
     }
-
-    "generate goal notifications from GoalAlertPayload" in new MatchEventsContext {
-      override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "KO", result = true)
-
-      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
-
-      val expectedNotification = GoalAlertPayload(
-        title = "The Guardian",
-        message = "Arsenal 1-0 Leicester\nHenrikh Mkhitaryan 10min",
-        thumbnailUrl = None,
-        sender = "mobile-notifications-football-lambda",
-        goalType = DefaultGoalType,
-        awayTeamName = "Leicester",
-        awayTeamScore = 0,
-        homeTeamName = "Arsenal",
-        homeTeamScore = 1,
-        scoringTeamName = "Arsenal",
-        scorerName = "Henrikh Mkhitaryan",
-        goalMins = 10,
-        otherTeamName = "Leicester",
-        matchId = "4011135",
-        mapiUrl = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
-        importance = Major,
-        topic = Set(
-          Topic(FootballTeam, "1006"),
-          Topic(FootballTeam, "29"),
-          Topic(FootballMatch, "4011135")
-        ),
-        debug = false,
-        addedTime = None
-      )
-
-      result should contain(expectedNotification)
-    }
   }
 
   trait MatchEventsContext extends Scope {
-    val goalNotificationBuilder = new GoalNotificationBuilder("https://mobile.guardianapis.com")
     val matchStatusNotificationBuilder = new MatchStatusNotificationBuilder("https://mobile.guardianapis.com")
-    val eventConsumer = new EventConsumer(goalNotificationBuilder, matchStatusNotificationBuilder)
+    val eventConsumer = new EventConsumer(matchStatusNotificationBuilder)
 
     def loadFile(file: String): String = {
       val stream = this.getClass.getClassLoader.getResourceAsStream(file)
