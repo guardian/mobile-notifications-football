@@ -34,7 +34,7 @@ class MatchStatusNotificationBuilderSpec extends Specification {
         matchInfoUri = new URI("http://localhost/sport/football/matches/some-match-id"),
         articleUri = Some(new URI("http://localhost/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Major,
-        topic = Set(Topic(TopicTypes.FootballTeam, "1"), Topic(TopicTypes.FootballTeam, "2"), Topic(TopicTypes.FootballMatch, "some-match-id")),
+        topic = List(Topic(TopicTypes.FootballTeam, "1"), Topic(TopicTypes.FootballTeam, "2"), Topic(TopicTypes.FootballMatch, "some-match-id")),
         eventId = UUID.nameUUIDFromBytes("".getBytes).toString,
         matchStatus = "1st",
         debug = false,

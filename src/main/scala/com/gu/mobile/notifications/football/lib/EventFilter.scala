@@ -1,5 +1,6 @@
 package com.gu.mobile.notifications.football.lib
 
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 
@@ -10,11 +11,11 @@ import com.gu.mobile.notifications.football.lib.DynamoDistinctCheck._
 import scala.concurrent.{ExecutionContext, Future}
 
 class EventFilter(distinctCheck: DynamoDistinctCheck) extends Logging {
-  private val processedEvents = new AtomicReference[Set[String]](Set.empty)
+  private val processedEvents = new AtomicReference[Set[UUID]](Set.empty)
 
-  private def cache(eventId: String): Unit = {
-    processedEvents.getAndUpdate(new UnaryOperator[Set[String]] {
-      override def apply(set: Set[String]): Set[String] = set + eventId
+  private def cache(eventId: UUID): Unit = {
+    processedEvents.getAndUpdate(new UnaryOperator[Set[UUID]] {
+      override def apply(set: Set[UUID]): Set[UUID] = set + eventId
     })
   }
 

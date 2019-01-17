@@ -18,7 +18,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     previousEvents: List[FootballMatchEvent],
     articleId: Option[String]
   ): FootballMatchStatusPayload = {
-    val topics = Set(
+    val topics = List(
       Topic(TopicTypes.FootballTeam, matchInfo.homeTeam.id),
       Topic(TopicTypes.FootballTeam, matchInfo.awayTeam.id),
       Topic(TopicTypes.FootballMatch, matchInfo.id)
