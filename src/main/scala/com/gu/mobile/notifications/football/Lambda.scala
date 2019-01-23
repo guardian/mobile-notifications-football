@@ -87,7 +87,7 @@ object Lambda extends Logging {
   }
 
   def handler(): String = {
-    debugSetTime()
+   //// debugSetTime()
     logContainer()
 
     val processing = footballData.pollFootballData
