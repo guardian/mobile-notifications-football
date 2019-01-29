@@ -9,7 +9,7 @@ class NotificationHttpProvider(implicit ec: ExecutionContext) extends HttpProvid
   val httpClient = new OkHttpClient
 
   override def post(uri: String, apiKey: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = {
-    val authHeader = s"Bearer: $apiKey"
+    val authHeader = s"Bearer $apiKey"
     val mediaType = MediaType.parse(s"${contentType.mediaType}; charset=${contentType.charset}")
     val requestBody = RequestBody.create(mediaType, body)
     val httpRequest = new Request.Builder()
