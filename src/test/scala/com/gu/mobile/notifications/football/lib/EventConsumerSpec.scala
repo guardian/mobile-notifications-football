@@ -41,7 +41,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
         articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Minor,
-        topic = Set(
+        topic = List(
           Topic(FootballTeam, "1006"),
           Topic(FootballTeam, "29"),
           Topic(FootballMatch, "4011135")
@@ -78,7 +78,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
         articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Minor,
-        topic = Set(
+        topic = List(
           Topic(FootballTeam, "1006"),
           Topic(FootballTeam, "29"),
           Topic(FootballMatch, "4011135")
@@ -117,7 +117,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
         articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Minor,
-        topic = Set(
+        topic = List(
           Topic(FootballTeam, "1006"),
           Topic(FootballTeam, "29"),
           Topic(FootballMatch, "4011135")
@@ -154,7 +154,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
         articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Minor,
-        topic = Set(
+        topic = List(
           Topic(FootballTeam, "1006"),
           Topic(FootballTeam, "29"),
           Topic(FootballMatch, "4011135")
@@ -191,7 +191,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         matchInfoUri = new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
         articleUri = Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
         importance = Major,
-        topic = Set(
+        topic = List(
           Topic(FootballTeam, "1006"),
           Topic(FootballTeam, "29"),
           Topic(FootballMatch, "4011135")

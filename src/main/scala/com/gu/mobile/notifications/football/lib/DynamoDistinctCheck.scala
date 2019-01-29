@@ -22,7 +22,7 @@ object DynamoMatchNotification {
     }
 
     DynamoMatchNotification(
-      notificationId = notification.id,
+      notificationId = notification.id.toString,
       matchId = matchId,
       notification = Json.prettyPrint(Json.toJson(notification)),
       ttl = (System.currentTimeMillis() / 1000) + (14 * 24 * 3600)
