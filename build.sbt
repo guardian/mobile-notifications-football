@@ -6,6 +6,7 @@ scalaVersion := "2.11.11"
 
 resolvers ++= Seq(
   "Guardian Platform Bintray" at "https://dl.bintray.com/guardian/platforms",
+  "Guardian Frontend Bintray" at "https://dl.bintray.com/guardian/frontend",
   "Guardian Mobile Bintray" at "https://dl.bintray.com/guardian/mobile"
 )
 
