@@ -203,6 +203,36 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
 
       result should contain(expectedNotification)
     }
+    "generate red card notifications from FootballMatchStatusPayload" in new MatchEventsContext {
+      override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "KO", result = true)
+      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
+
+      val expectedNotification = FootballMatchStatusPayload(
+        "Dismissal",
+        "Henrikh Mkhitaryan (Leicester) 114min",
+        None,
+        "mobile-notifications-football-lambda",
+        "Leicester",
+        0,
+        " ",
+        "29",
+        "Arsenal",
+        3,
+        "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nMarcus Rashford 107'",
+        "1006",
+        Some("Premier League 17/18"),
+        Some("Emirates Stadium"),
+        "4011135",
+        new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
+        Minor,
+        List(Topic(FootballTeam,"1006"), Topic(FootballTeam,"29"), Topic(FootballMatch,"4011135")),
+        "1st",
+        "7c92d6ca-9f20-398f-9510-eb4c179fb5ae",
+        false)
+
+      result should contain(expectedNotification)
+    }
   }
 
   trait MatchEventsContext extends Scope {

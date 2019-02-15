@@ -11,7 +11,9 @@ sealed trait FootballMatchEvent {
 
 object FootballMatchEvent {
   def fromPaMatchEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent): Option[FootballMatchEvent] =
-    MatchPhaseEvent.fromEvent(event) orElse Goal.fromEvent(homeTeam, awayTeam)(event)
+    MatchPhaseEvent.fromEvent(event) orElse
+      Goal.fromEvent(homeTeam, awayTeam)(event) orElse
+      Dismissal.fromEvent(homeTeam,awayTeam)(event)
 }
 
 object Score {
@@ -24,6 +26,32 @@ object Score {
 }
 
 case class Score(home: Int, away: Int)
+
+case class Dismissal(
+  eventId: String,
+  playerName: String,
+  teamName: String,
+  minute: Int
+) extends FootballMatchEvent {
+}
+object Dismissal {
+  def fromEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent) = {
+    condOpt(event.eventType) {
+      case "dismissal" => for {
+          eventId <- event.id
+          player <- event.players.headOption
+          team <- Seq(homeTeam, awayTeam).find(_.id == player.teamID)
+          eventTime <- event.eventTime
+          minute <- Try(eventTime.toInt).toOption
+        } yield Dismissal(
+          eventId,
+          player.name,
+          team.name,
+          minute
+        )
+      }
+  }.flatten
+}
 
 case class Goal(
   goalType: GoalType,

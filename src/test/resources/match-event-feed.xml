@@ -6649,6 +6649,24 @@
             <distance />
             <outcome />
         </event>
+        <event teamID="29" eventID="25990905">
+            <eventType>dismissal</eventType>
+            <matchTime>(114)</matchTime>
+            <eventTime>114</eventTime>
+            <normalTime>114:35</normalTime>
+            <addedTime>0:00</addedTime>
+            <players>
+                <player1 playerID="362759" teamID="29" teamName="Man Utd">Henrikh Mkhitaryan</player1>
+                <player2 playerID="" teamID="" teamName=""/>
+            </players>
+            <reason>Violent Conduct</reason>
+            <how/>
+            <whereFrom/>
+            <whereTo/>
+            <type/>
+            <distance/>
+            <outcome/>
+        </event>
         <event teamID="26291" eventID="23573175">
             <eventType>foul</eventType>
             <matchTime>(114)</matchTime>

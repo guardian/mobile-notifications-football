@@ -102,10 +102,14 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
          |${goal.scorerName} ${goal.minute}min$extraInfo""".stripMargin
     }
 
+    def dismissalMsg(dismissal: Dismissal):String =
+      s"${dismissal.playerName} (${dismissal.teamName}) ${dismissal.minute}min".stripMargin
+
+
     triggeringEvent match {
       case g: Goal => goalMsg(g)
-      case _ =>
-        s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
+      case dismissal: Dismissal => dismissalMsg(dismissal)
+      case _ => s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
     }
   }
 
@@ -115,6 +119,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     case KickOff(_) => "Kick-off!"
     case SecondHalf(_) => "Second-half start"
     case FullTime(_) => "Full-Time"
+    case _:Dismissal => "Dismissal"
     case _ => "The Guardian"
   }
 
