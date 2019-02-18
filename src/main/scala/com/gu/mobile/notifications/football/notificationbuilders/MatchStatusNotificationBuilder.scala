@@ -77,9 +77,16 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
   private def teamMessage(team: MatchDayTeam, events: List[FootballMatchEvent]) = {
     val msg = events.collect {
       case g: Goal if g.scoringTeam == team => goalDescription(g)
+      case d: Dismissal if d.team == team => dismissalTeamMsg(d)
     }.mkString("\n")
     if (msg == "") " " else msg
   }
+
+  def dismissalTeamMsg(dismissal: Dismissal):String =
+    s"Red card: ${dismissal.playerName} (${dismissal.team.name}) ${dismissal.minute}min".stripMargin
+
+  def dismissalMsg(dismissal: Dismissal):String =
+    s"${dismissal.playerName} (${dismissal.team.name}) ${dismissal.minute}min".stripMargin
 
   private def mainMessage(triggeringEvent: FootballMatchEvent, homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, score: Score, matchStatus: String) = {
 
@@ -102,10 +109,6 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
          |${goal.scorerName} ${goal.minute}min$extraInfo""".stripMargin
     }
 
-    def dismissalMsg(dismissal: Dismissal):String =
-      s"${dismissal.playerName} (${dismissal.teamName}) ${dismissal.minute}min".stripMargin
-
-
     triggeringEvent match {
       case g: Goal => goalMsg(g)
       case dismissal: Dismissal => dismissalMsg(dismissal)
@@ -119,7 +122,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     case KickOff(_) => "Kick-off!"
     case SecondHalf(_) => "Second-half start"
     case FullTime(_) => "Full-Time"
-    case _:Dismissal => "Dismissal"
+    case _:Dismissal => "Red card"
     case _ => "The Guardian"
   }
 

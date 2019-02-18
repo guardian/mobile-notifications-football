@@ -70,7 +70,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         awayTeamId = "29",
         homeTeamName = "Arsenal",
         homeTeamScore = 3,
-        homeTeamMessage = "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nMarcus Rashford 107'",
+        homeTeamMessage = "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nRed card: Carl Jenkinson (Arsenal) 106min\nMarcus Rashford 107'\nRed card: Henrikh Mkhitaryan (Arsenal) 114min",
         homeTeamId = "1006",
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
@@ -146,7 +146,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         awayTeamId = "29",
         homeTeamName = "Arsenal",
         homeTeamScore = 3,
-        homeTeamMessage = "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nMarcus Rashford 107'",
+        homeTeamMessage = "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nRed card: Carl Jenkinson (Arsenal) 106min\nMarcus Rashford 107'\nRed card: Henrikh Mkhitaryan (Arsenal) 114min",
         homeTeamId = "1006",
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
@@ -208,8 +208,8 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
       val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
 
       val expectedNotification = FootballMatchStatusPayload(
-        "Dismissal",
-        "Henrikh Mkhitaryan (Leicester) 114min",
+        "Red card",
+        "Henrikh Mkhitaryan (Arsenal) 114min",
         None,
         "mobile-notifications-football-lambda",
         "Leicester",
@@ -218,7 +218,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         "29",
         "Arsenal",
         3,
-        "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nMarcus Rashford 107'",
+        "Red card: Henrikh Mkhitaryan (Arsenal) 114min\nHenrikh Mkhitaryan 10'\nSofiane Hanni 32'\nRed card: Carl Jenkinson (Arsenal) 106min\nMarcus Rashford 107'",
         "1006",
         Some("Premier League 17/18"),
         Some("Emirates Stadium"),

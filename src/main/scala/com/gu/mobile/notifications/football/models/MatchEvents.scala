@@ -30,7 +30,7 @@ case class Score(home: Int, away: Int)
 case class Dismissal(
   eventId: String,
   playerName: String,
-  teamName: String,
+  team: pa.MatchDayTeam,
   minute: Int
 ) extends FootballMatchEvent {
 }
@@ -46,7 +46,7 @@ object Dismissal {
         } yield Dismissal(
           eventId,
           player.name,
-          team.name,
+          team,
           minute
         )
       }

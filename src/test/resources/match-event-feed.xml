@@ -6379,6 +6379,24 @@
             <distance />
             <outcome>Pass</outcome>
         </event>
+        <event teamID="1006" eventID="25990905">
+            <eventType>dismissal</eventType>
+            <matchTime>(106)</matchTime>
+            <eventTime>106</eventTime>
+            <normalTime>106:35</normalTime>
+            <addedTime>0:00</addedTime>
+            <players>
+                <player1 playerID="25" teamID="1006" teamName="Arsenal">Carl Jenkinson</player1>
+                <player2 playerID="" teamID="" teamName=""/>
+            </players>
+            <reason>Violent Conduct</reason>
+            <how/>
+            <whereFrom/>
+            <whereTo/>
+            <type/>
+            <distance/>
+            <outcome/>
+        </event>
         <event teamID="12" eventID="23573117">
             <eventType>shot on target</eventType>
             <matchTime>(107)</matchTime>
@@ -6649,14 +6667,14 @@
             <distance />
             <outcome />
         </event>
-        <event teamID="29" eventID="25990905">
+        <event teamID="1006" eventID="25990905">
             <eventType>dismissal</eventType>
             <matchTime>(114)</matchTime>
             <eventTime>114</eventTime>
             <normalTime>114:35</normalTime>
             <addedTime>0:00</addedTime>
             <players>
-                <player1 playerID="362759" teamID="29" teamName="Man Utd">Henrikh Mkhitaryan</player1>
+                <player1 playerID="362759" teamID="1006" teamName="Arsenal">Henrikh Mkhitaryan</player1>
                 <player2 playerID="" teamID="" teamName=""/>
             </players>
             <reason>Violent Conduct</reason>
