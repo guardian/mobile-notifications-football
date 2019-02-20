@@ -17,7 +17,7 @@ object FootballMatchEvent {
 }
 
 object Score {
-  def fromGoals(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam, goals: List[Goal]) = {
+  def fromGoals(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam, goals: List[Goal]): Score = {
     val home = goals.count(_.scoringTeam == homeTeam)
     val away = goals.count(_.scoringTeam == awayTeam)
 
@@ -35,7 +35,7 @@ case class Dismissal(
 ) extends FootballMatchEvent {
 }
 object Dismissal {
-  def fromEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent) = {
+  def fromEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent): Option[Dismissal] = {
     condOpt(event.eventType) {
       case "dismissal" => for {
           eventId <- event.id
@@ -84,7 +84,7 @@ object Goal {
       event.id.getOrElse("")
   )
 
-  private def goalTypeFromString(s: String) = condOpt(s) {
+  private def goalTypeFromString(s: String): Option[GoalType] = condOpt(s) {
     case "goal" => DefaultGoalType
     case "own goal" => OwnGoalType
     case "goal from penalty" => PenaltyGoalType
