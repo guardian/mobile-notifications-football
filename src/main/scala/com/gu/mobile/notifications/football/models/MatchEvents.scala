@@ -31,7 +31,8 @@ case class Dismissal(
   eventId: String,
   playerName: String,
   team: pa.MatchDayTeam,
-  minute: Int
+  minute: Int,
+  addedTime: Option[String]
 ) extends FootballMatchEvent {
 }
 object Dismissal {
@@ -42,13 +43,14 @@ object Dismissal {
           player <- event.players.headOption
           team <- Seq(homeTeam, awayTeam).find(_.id == player.teamID)
           eventTime <- event.eventTime
-          minute <- Try(eventTime.toInt).toOption
+          eventMinute  <- Try(eventTime.toInt).toOption
         } yield Dismissal(
           eventId,
           player.name,
           team,
-          minute
-        )
+          eventMinute,
+          event.addedTime.filterNot(_ == "0:00")
+      )
       }
   }.flatten
 }

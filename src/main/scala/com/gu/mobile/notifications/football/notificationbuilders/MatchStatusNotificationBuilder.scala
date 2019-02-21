@@ -85,8 +85,6 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
   def dismissalTeamMsg(dismissal: Dismissal):String =
     s"Red card: ${dismissal.playerName} (${dismissal.team.name}) ${dismissal.minute}min".stripMargin
 
-  def dismissalMsg(dismissal: Dismissal):String =
-    s"${dismissal.playerName} (${dismissal.team.name}) ${dismissal.minute}min".stripMargin
 
   private def mainMessage(triggeringEvent: FootballMatchEvent, homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, score: Score, matchStatus: String) = {
 
@@ -105,9 +103,20 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
         }
       }
 
+
       s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)
          |${goal.scorerName} ${goal.minute}min$extraInfo""".stripMargin
     }
+    def dismissalMsg(dismissal: Dismissal):String = {
+      val extraInfo = {
+        dismissal.addedTime.map("+" + _).getOrElse("")
+      }
+
+      s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)
+         |Red card: ${dismissal.playerName} ${dismissal.minute}min$extraInfo""".stripMargin
+    }
+
+
 
     triggeringEvent match {
       case g: Goal => goalMsg(g)

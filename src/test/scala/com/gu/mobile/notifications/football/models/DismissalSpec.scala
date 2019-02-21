@@ -14,7 +14,8 @@ class DismissalSpec  extends Specification with Mockito {
       event.eventTime returns Some("85")
       event.reason returns Some("Violent Conduct")
       event.players returns List(Player("player-1", "home-1", "player-1"), Player("", "", ""))
-      Dismissal.fromEvent(home,away)(event) should beSome(Dismissal("event-1", "player-1", home, 85))
+      event.addedTime returns Some("5:00")
+      Dismissal.fromEvent(home,away)(event) should beSome(Dismissal("event-1", "player-1", home, 85, Some("5:00")))
     }
   }
   trait DismissalScope extends Scope {
