@@ -83,7 +83,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
   }
 
   def dismissalTeamMsg(dismissal: Dismissal):String =
-    s"Red card: ${dismissal.playerName} (${dismissal.team.name}) ${dismissal.minute}min".stripMargin
+    s"Red card: ${dismissal.playerName} ${dismissal.minute}min".stripMargin
 
 
   private def mainMessage(triggeringEvent: FootballMatchEvent, homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, score: Score, matchStatus: String) = {
