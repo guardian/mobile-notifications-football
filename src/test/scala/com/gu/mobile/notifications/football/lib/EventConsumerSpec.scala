@@ -209,7 +209,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
 
       val expectedNotification = FootballMatchStatusPayload(
         "Red card",
-        "Arsenal 3-0 Leicester (1st)\nHenrikh Mkhitaryan 114min",
+        "Arsenal 3-0 Leicester (1st)\nHenrikh Mkhitaryan (Arsenal) 114min",
         None,
         "mobile-notifications-football-lambda",
         "Leicester",
