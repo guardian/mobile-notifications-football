@@ -113,7 +113,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       }
 
       s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)
-         |${dismissal.playerName} ${dismissal.minute}min$extraInfo""".stripMargin
+         |${dismissal.playerName} (${dismissal.team.name}) ${dismissal.minute}min$extraInfo""".stripMargin
     }
 
 
