@@ -11,11 +11,13 @@ sealed trait FootballMatchEvent {
 
 object FootballMatchEvent {
   def fromPaMatchEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent): Option[FootballMatchEvent] =
-    MatchPhaseEvent.fromEvent(event) orElse Goal.fromEvent(homeTeam, awayTeam)(event)
+    MatchPhaseEvent.fromEvent(event) orElse
+      Goal.fromEvent(homeTeam, awayTeam)(event) orElse
+      Dismissal.fromEvent(homeTeam,awayTeam)(event)
 }
 
 object Score {
-  def fromGoals(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam, goals: List[Goal]) = {
+  def fromGoals(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam, goals: List[Goal]): Score = {
     val home = goals.count(_.scoringTeam == homeTeam)
     val away = goals.count(_.scoringTeam == awayTeam)
 
@@ -24,6 +26,34 @@ object Score {
 }
 
 case class Score(home: Int, away: Int)
+
+case class Dismissal(
+  eventId: String,
+  playerName: String,
+  team: pa.MatchDayTeam,
+  minute: Int,
+  addedTime: Option[String]
+) extends FootballMatchEvent {
+}
+object Dismissal {
+  def fromEvent(homeTeam: pa.MatchDayTeam, awayTeam: pa.MatchDayTeam)(event: pa.MatchEvent): Option[Dismissal] = {
+    condOpt(event.eventType) {
+      case "dismissal" => for {
+          eventId <- event.id
+          player <- event.players.headOption
+          team <- Seq(homeTeam, awayTeam).find(_.id == player.teamID)
+          eventTime <- event.eventTime
+          eventMinute  <- Try(eventTime.toInt).toOption
+        } yield Dismissal(
+          eventId,
+          player.name,
+          team,
+          eventMinute,
+          event.addedTime.filterNot(_ == "0:00")
+      )
+      }
+  }.flatten
+}
 
 case class Goal(
   goalType: GoalType,
@@ -56,7 +86,7 @@ object Goal {
       event.id.getOrElse("")
   )
 
-  private def goalTypeFromString(s: String) = condOpt(s) {
+  private def goalTypeFromString(s: String): Option[GoalType] = condOpt(s) {
     case "goal" => DefaultGoalType
     case "own goal" => OwnGoalType
     case "goal from penalty" => PenaltyGoalType

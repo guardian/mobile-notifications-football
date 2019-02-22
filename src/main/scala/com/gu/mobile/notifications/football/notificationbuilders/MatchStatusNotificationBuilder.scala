@@ -73,13 +73,22 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     s"""${goal.scorerName} ${goal.minute}'$extraInfo""".stripMargin
   }
 
+  def dismissalTeamMsg(dismissal: Dismissal):String = {
+    val extraInfo = {
+      dismissal.addedTime.map("+" + _).getOrElse("")
+    }
+    s"Red card: ${dismissal.playerName} ${dismissal.minute}'$extraInfo".stripMargin
+  }
 
   private def teamMessage(team: MatchDayTeam, events: List[FootballMatchEvent]) = {
     val msg = events.collect {
       case g: Goal if g.scoringTeam == team => goalDescription(g)
+      case d: Dismissal if d.team == team => dismissalTeamMsg(d)
     }.mkString("\n")
     if (msg == "") " " else msg
   }
+
+
 
   private def mainMessage(triggeringEvent: FootballMatchEvent, homeTeam: MatchDayTeam, awayTeam: MatchDayTeam, score: Score, matchStatus: String) = {
 
@@ -98,14 +107,25 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
         }
       }
 
+
       s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)
          |${goal.scorerName} ${goal.minute}min$extraInfo""".stripMargin
     }
+    def dismissalMsg(dismissal: Dismissal):String = {
+      val extraInfo = {
+        dismissal.addedTime.map("+" + _).getOrElse("")
+      }
+
+      s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)
+         |${dismissal.playerName} (${dismissal.team.name}) ${dismissal.minute}min$extraInfo""".stripMargin
+    }
+
+
 
     triggeringEvent match {
       case g: Goal => goalMsg(g)
-      case _ =>
-        s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
+      case dismissal: Dismissal => dismissalMsg(dismissal)
+      case _ => s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
     }
   }
 
@@ -115,6 +135,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     case KickOff(_) => "Kick-off!"
     case SecondHalf(_) => "Second-half start"
     case FullTime(_) => "Full-Time"
+    case _:Dismissal => "Red card"
     case _ => "The Guardian"
   }
 

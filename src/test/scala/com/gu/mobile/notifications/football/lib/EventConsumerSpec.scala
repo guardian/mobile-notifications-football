@@ -70,7 +70,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         awayTeamId = "29",
         homeTeamName = "Arsenal",
         homeTeamScore = 3,
-        homeTeamMessage = "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nMarcus Rashford 107'",
+        homeTeamMessage = "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nRed card: Carl Jenkinson 106'\nMarcus Rashford 107'\nRed card: Henrikh Mkhitaryan 114'",
         homeTeamId = "1006",
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
@@ -146,7 +146,7 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         awayTeamId = "29",
         homeTeamName = "Arsenal",
         homeTeamScore = 3,
-        homeTeamMessage = "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nMarcus Rashford 107'",
+        homeTeamMessage = "Henrikh Mkhitaryan 10'\nSofiane Hanni 32'\nRed card: Carl Jenkinson 106'\nMarcus Rashford 107'\nRed card: Henrikh Mkhitaryan 114'",
         homeTeamId = "1006",
         competitionName = Some("Premier League 17/18"),
         venue = Some("Emirates Stadium"),
@@ -200,6 +200,36 @@ class EventConsumerSpec(implicit ev: ExecutionEnv) extends Specification with Mo
         eventId = "1c8d67f9-0f32-342a-8543-aa3e21ee7da4",
         debug = false
       )
+
+      result should contain(expectedNotification)
+    }
+    "generate red card notifications from FootballMatchStatusPayload" in new MatchEventsContext {
+      override def matchDay: MatchDay = super.matchDay.copy(matchStatus = "KO", result = true)
+      val result: List[NotificationPayload] = eventConsumer.eventsToNotifications(matchData)
+
+      val expectedNotification = FootballMatchStatusPayload(
+        "Red card",
+        "Arsenal 3-0 Leicester (1st)\nHenrikh Mkhitaryan (Arsenal) 114min",
+        None,
+        "mobile-notifications-football-lambda",
+        "Leicester",
+        0,
+        " ",
+        "29",
+        "Arsenal",
+        3,
+        "Red card: Henrikh Mkhitaryan 114'\nHenrikh Mkhitaryan 10'\nSofiane Hanni 32'\nRed card: Carl Jenkinson 106'\nMarcus Rashford 107'",
+        "1006",
+        Some("Premier League 17/18"),
+        Some("Emirates Stadium"),
+        "4011135",
+        new URI("https://mobile.guardianapis.com/sport/football/matches/4011135"),
+        Some(new URI("https://mobile.guardianapis.com/items/football/live/2017/aug/11/arsenal-v-leicester-city-premier-league-live")),
+        Minor,
+        List(Topic(FootballTeam,"1006"), Topic(FootballTeam,"29"), Topic(FootballMatch,"4011135")),
+        "1st",
+        "7c92d6ca-9f20-398f-9510-eb4c179fb5ae",
+        false)
 
       result should contain(expectedNotification)
     }
