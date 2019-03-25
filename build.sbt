@@ -2,7 +2,7 @@ name := "football"
 
 version := "1.0"
 
-scalaVersion := "2.11.11"
+scalaVersion := "2.12.8"
 
 resolvers ++= Seq(
   "Guardian Platform Bintray" at "https://dl.bintray.com/guardian/platforms",
