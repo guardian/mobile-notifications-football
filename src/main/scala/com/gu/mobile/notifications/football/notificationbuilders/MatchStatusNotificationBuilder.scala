@@ -44,7 +44,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       homeTeamId = matchInfo.homeTeam.id,
       matchId = matchInfo.id,
       competitionName = matchInfo.competition.map(_.name),
-      venue = matchInfo.venue.map(_.name),
+      venue = matchInfo.venue.map(_.name).filter(_.nonEmpty),
       matchInfoUri = new URI(s"$mapiHost/sport/football/matches/${matchInfo.id}"),
       articleUri = articleId.map(id => new URI(s"$mapiHost/items/$id")),
       importance = importance(triggeringEvent),
