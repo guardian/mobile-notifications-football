@@ -16,8 +16,7 @@ class ArticleSearcher(capiClient: ContentApiClient) extends Logging {
       val homeTeam = matchData.matchDay.homeTeam.id
       val awayTeam = matchData.matchDay.awayTeam.id
       val matchDate = matchData.matchDay.date
-      val query = new SearchQuery()
-      query.withParameter(query.fromDate.withValue(Some(ZonedDateTime.of(matchDate.getYear,
+      val fromInstant: Instant = ZonedDateTime.of(matchDate.getYear,
         matchDate.getMonthOfYear,
         matchDate.getDayOfMonth,
         matchDate.getHourOfDay,
@@ -25,10 +24,13 @@ class ArticleSearcher(capiClient: ContentApiClient) extends Logging {
         matchDate.getSecondOfMinute,
         matchDate.getMillisOfSecond * 1000000,
         ZoneOffset.UTC
-      ).toInstant)))
-        .withParameter(query.reference.withValue(Some(s"pa-football-team/$homeTeam,pa-football-team/$awayTeam")))
-        .withParameter(query.tag.withValue(Some("tone/minutebyminute")))
-      val response = capiClient.getResponse(query)
+      ).toInstant
+
+      val response = capiClient.getResponse(
+        new SearchQuery()
+          .fromDate(fromInstant)
+          .reference(s"pa-football-team/$homeTeam,pa-football-team/$awayTeam")
+          .tag("tone/minutebyminute"))
       val articleId = response.map(_.results.headOption.map(_.id))
 
       articleId.foreach {
