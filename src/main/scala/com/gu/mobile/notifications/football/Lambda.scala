@@ -7,7 +7,7 @@ import com.amazonaws.regions.Regions._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient
 import com.gu.mobile.notifications.football.lib._
 import com.gu.Logging
-import com.gu.contentapi.client.GuardianContentClient
+import com.gu.contentapi.client.{ContentApiClient, GuardianContentClient}
 import com.gu.mobile.notifications.client.ApiClient
 import com.gu.mobile.notifications.football.notificationbuilders.MatchStatusNotificationBuilder
 import org.joda.time.{DateTime, DateTimeUtils}
@@ -40,7 +40,7 @@ object Lambda extends Logging {
     new AmazonDynamoDBAsyncClient(configuration.credentials).withRegion(EU_WEST_1)
   }
 
-  lazy val capiClient: GuardianContentClient = new GuardianContentClient(configuration.capiApiKey)
+  lazy val capiClient: ContentApiClient = new GuardianContentClient(configuration.capiApiKey)
 
   lazy val syntheticMatchEventGenerator = new SyntheticMatchEventGenerator()
 
