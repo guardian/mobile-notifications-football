@@ -108,7 +108,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       }
 
 
-      s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)
+      s"""${homeTeam.name.replace("Ladies", "")} ${score.home}-${score.away} ${awayTeam.name.replace("Ladies", "")} ($matchStatus)
          |${goal.scorerName} ${goal.minute}min$extraInfo""".stripMargin
     }
     def dismissalMsg(dismissal: Dismissal):String = {
@@ -116,7 +116,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
         dismissal.addedTime.map("+" + _).getOrElse("")
       }
 
-      s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)
+      s"""${homeTeam.name.replace("Ladies", "")} ${score.home}-${score.away} ${awayTeam.name.replace("Ladies", "")} ($matchStatus)
          |${dismissal.playerName} (${dismissal.team.name}) ${dismissal.minute}min$extraInfo""".stripMargin
     }
 
@@ -125,7 +125,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
     triggeringEvent match {
       case g: Goal => goalMsg(g)
       case dismissal: Dismissal => dismissalMsg(dismissal)
-      case _ => s"""${homeTeam.name} ${score.home}-${score.away} ${awayTeam.name} ($matchStatus)"""
+      case _ => s"""${homeTeam.name.replace("Ladies", "")} ${score.home}-${score.away} ${awayTeam.name.replace("Ladies", "")} ($matchStatus)"""
     }
   }
 
