@@ -38,7 +38,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       awayTeamScore = score.away,
       awayTeamMessage = teamMessage(matchInfo.awayTeam, allEvents),
       awayTeamId = matchInfo.awayTeam.id,
-      homeTeamName = matchInfo.homeTeam.name,
+      homeTeamName = transformTeamName(matchInfo.homeTeam.name),
       homeTeamScore = score.home,
       homeTeamMessage = teamMessage(matchInfo.homeTeam, allEvents),
       homeTeamId = matchInfo.homeTeam.id,
