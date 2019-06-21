@@ -34,7 +34,7 @@ class MatchStatusNotificationBuilder(mapiHost: String) {
       title = eventTitle(triggeringEvent),
       message = mainMessage(triggeringEvent, transformTeamName(matchInfo.homeTeam.name), transformTeamName(matchInfo.awayTeam.name), score, status),
       sender = "mobile-notifications-football-lambda",
-      awayTeamName = matchInfo.awayTeam.name,
+      awayTeamName = transformTeamName(matchInfo.awayTeam.name),
       awayTeamScore = score.away,
       awayTeamMessage = teamMessage(matchInfo.awayTeam, allEvents),
       awayTeamId = matchInfo.awayTeam.id,
