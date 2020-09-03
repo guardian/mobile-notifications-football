@@ -1,5 +1,3 @@
-# Mobile Goal Notifications
+**This repository is no longer active.** 
 
-Service that watches current football matches on PA, and when a goal is scored
-uses the Guardian Mobile Notifications service to send a push notification to
-subscribed users.
+All functionality has been migrated into [another repo](https://github.com/guardian/mobile-n10n).
